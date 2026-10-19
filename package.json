@@ -1,0 +1,12 @@
+{
+  "name": "chinese-diary",
+  "version": "1.0.0",
+  "private": true,
+  "description": "한국어 일기를 초급 중국어로 번역하고 학습하는 웹앱",
+  "scripts": {
+    "start": "node app/server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
