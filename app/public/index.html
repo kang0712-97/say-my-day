@@ -439,6 +439,15 @@
   @keyframes coachpulse { 50% { outline-color: transparent; } }
   @media (prefers-reduced-motion: reduce) { .coach-hl { animation: none; } }
   .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 35; background: var(--ink); color: var(--paper); border-radius: 999px; padding: 10px 18px; font-family: var(--f-ui); font-size: var(--fs-s); box-shadow: 0 8px 24px rgba(0, 0, 0, .24); max-width: calc(100vw - 32px); text-align: center; }
+
+  /* 글자 색이 읽는 속도를 따라간다 */
+  .c.rd-done .h { color: var(--accent); }
+  .c.rd-now .h { background: var(--hl); color: var(--hl-ink); border-radius: 4px; }
+  /* 오른쪽 스크롤 진행 막대 */
+  .sbar { position: fixed; top: 16px; bottom: calc(100px + env(safe-area-inset-bottom)); right: max(5px, calc((100vw - 560px) / 2 + 5px)); width: 4px; border-radius: 4px; background: var(--line); z-index: 8; opacity: 0; transition: opacity .25s; pointer-events: none; }
+  .sbar.on { opacity: 1; }
+  .sbar i { position: absolute; left: 0; top: 0; width: 100%; height: var(--p, 0%); border-radius: 4px; background: var(--accent); }
+  body.noscroll .sbar { display: none; }
 </style>
 </head>
 <body>
@@ -490,7 +499,7 @@
     <div class="pad">
       <div id="voice-warn" class="banner error hidden" role="alert"></div>
       <h2 class="sec" id="sec-sentences" tabindex="-1"><span class="no">01</span>번역<span class="en">Translation</span></h2>
-      <p class="hint">단어를 누르면 단어 페이지로 넘어가요. 병음은 책처럼 본래 성조로 적어요. 3성이 이어지면 소리만 바뀌어요. 예) 你好 nǐ hǎo → 소리는 ní hǎo</p>
+      <p class="hint">단어를 누르면 뜻과 발음이 나와요. 병음은 책처럼 본래 성조로 적어요. 3성이 이어지면 소리만 바뀌어요. 예) 你好 nǐ hǎo → 소리는 ní hǎo</p>
       <div class="viewbar">
         <div class="seg" role="radiogroup" aria-label="보기 방식"><button role="radio" data-view="list" aria-checked="true">목록</button><button role="radio" data-view="one" aria-checked="false">한 문장씩</button></div>
         <button class="btn solid" id="read-all"><span data-i="speaker"></span>일기 전체 읽기</button>
@@ -592,6 +601,7 @@
   <div class="c-btns"><button class="btn" id="coach-skip">건너뛰기</button><button class="btn solid" id="coach-next">다음</button></div>
 </div>
 <div id="toast" class="toast hidden" role="status"></div>
+<div id="sbar" class="sbar" aria-hidden="true"><i></i></div>
 
 <div id="wmini" class="wmini hidden" role="region" aria-label="단어 뜻"></div>
 
@@ -797,10 +807,42 @@ function zhVoice() {
   });
 }
 function stopSpeak() {
+  karStop();
   if (rd.playing) rdStop();
   if ('speechSynthesis' in window) speechSynthesis.cancel();
   if (currentAudio) { currentAudio.pause(); currentAudio = null; }
   if (playingBtn) { playingBtn.classList.remove('playing'); playingBtn.innerHTML = playingBtn.dataset.html; playingBtn = null; }
+}
+// ---------- 읽는 속도에 맞춰 글자 색이 변하는 표시 ----------
+// 소리의 재생 위치(현재 시간 ÷ 전체 길이)를 글자 수로 나눠 지금 읽는 글자를 찾는다. 속도를 바꾸거나 일시정지해도 소리와 같이 움직인다.
+const kar = { raf: 0, cells: [], cum: [], total: 0, progress: null, idx: -1 };
+function karStop() {
+  cancelAnimationFrame(kar.raf);
+  kar.cells.forEach((c) => c.classList.remove('rd-done', 'rd-now'));
+  Object.assign(kar, { raf: 0, cells: [], cum: [], total: 0, progress: null, idx: -1 });
+}
+function karBegin(line, say, progress) {
+  karStop();
+  if (!line) return;
+  const cells = [...line.querySelectorAll('.c')];
+  const txt = cells.map((c) => c.querySelector('.h').textContent).join('');
+  if (!cells.length || txt.replace(/\s/g, '') !== String(say).replace(/\s/g, '')) return; // 줄의 글자가 읽는 문장과 같을 때만 표시한다
+  let sum = 0; // 글자 1 = 1, 쉼표·마침표는 잠깐 쉬므로 더 길게 센다
+  kar.cum = cells.map((c) => { const t = c.querySelector('.h').textContent; sum += c.classList.contains('pu') ? (/[。？！?!]/.test(t) ? 1.4 : /[，、；：,;:]/.test(t) ? 0.8 : 0.3) : 1; return sum; });
+  kar.cells = cells; kar.total = sum; kar.progress = progress; kar.idx = -1;
+  const tick = () => {
+    const p = Math.max(0, Math.min(1, kar.progress() || 0)) * kar.total;
+    let i = kar.cum.findIndex((c) => c > p); if (i < 0) i = kar.cells.length - 1;
+    if (i !== kar.idx) { kar.cells.forEach((c, k) => { c.classList.toggle('rd-done', k < i); c.classList.toggle('rd-now', k === i); }); kar.idx = i; }
+    kar.raf = requestAnimationFrame(tick);
+  };
+  tick();
+}
+const audioProgress = (a) => () => { const d = a.duration; return d && isFinite(d) ? (a.currentTime - 0.12) / Math.max(0.2, d - 0.32) : 0; }; // 앞뒤 무음을 조금 뺀다
+function karLineFor(btn) { // 듣기 버튼 주변에서, 읽는 문장과 글자가 같은 줄을 찾는다
+  const box = btn.closest('.cardx, .cell, .vrow, .wp-body, .wmini, .quiz-box, .rp-s'); if (!box) return null;
+  const say = String(btn.dataset.say || '').replace(/\s/g, '');
+  return [...box.querySelectorAll('.zhline')].find((l) => [...l.querySelectorAll('.c .h')].map((h) => h.textContent).join('') === say) || null;
 }
 // 자연스러운 음성(edge-tts): 서버가 mp3를 만들어 주고 한 번 만든 문장은 캐시한다.
 const rateKey = () => String(Number($('opt-rate').value) || 0.9);
@@ -810,7 +852,7 @@ function speakEdge(btn, voice) {
   btn.dataset.html = btn.innerHTML; btn.classList.add('playing'); btn.innerHTML = `${ICON.stop}<span>불러오는 중…</span>`; playingBtn = btn;
   const fail = (msg) => { if (playingBtn === btn) stopSpeak(); warn.textContent = msg; warn.classList.remove('hidden'); };
   const a = new Audio(edgeUrl(btn.dataset.say, voice, btn.dataset.rate)); currentAudio = a;
-  a.addEventListener('playing', () => { if (playingBtn === btn) btn.innerHTML = `${ICON.stop}<span>정지</span>`; });
+  a.addEventListener('playing', () => { if (playingBtn === btn) { btn.innerHTML = `${ICON.stop}<span>정지</span>`; karBegin(karLineFor(btn), btn.dataset.say, audioProgress(a)); } });
   a.addEventListener('ended', () => { if (playingBtn === btn) stopSpeak(); });
   a.addEventListener('error', () => fail('자연스러운 음성을 불러오지 못했어요. 인터넷 연결을 확인하거나 설정에서 다른 음성을 골라 주세요.'));
   a.play().catch((err) => { if (err && err.name === 'NotAllowedError') fail('브라우저가 자동 재생을 막았어요. 듣기 버튼을 직접 눌러 주세요.'); });
@@ -848,6 +890,9 @@ async function speak(btn) {
   const u = new SpeechSynthesisUtterance(btn.dataset.say);
   u.lang = voice.lang; u.voice = voice; u.rate = Number(btn.dataset.rate) || Number($('opt-rate').value) || 0.9;
   u.onend = u.onerror = () => { if (playingBtn === btn) stopSpeak(); };
+  { let bp = null, t0 = 0; const say = btn.dataset.say; const estMs = say.length * 330 / (u.rate || 0.9); // 경계 신호가 없는 음성은 속도로 어림한다
+    u.onstart = () => { t0 = performance.now(); karBegin(karLineFor(btn), say, () => (bp != null ? bp : (performance.now() - t0) / estMs)); };
+    u.onboundary = (e) => { if (typeof e.charIndex === 'number' && e.charIndex > 0) bp = e.charIndex / say.length; }; }
   btn.dataset.html = btn.innerHTML;
   btn.classList.add('playing'); btn.innerHTML = `${ICON.stop}<span>정지</span>`; playingBtn = btn;
   speechSynthesis.speak(u);
@@ -879,14 +924,16 @@ function wordsOf(s, vocab) {
   return [...zh].map((ch) => ({ zh: ch, ko: gloss.get(ch) || '' }));
 }
 let sentState = []; // [{ s, words }]
-function sentenceHtml(words, si) {
+let extraState = [], gramState = []; // 활용 문장·문법 예문도 같은 형태
+const unitState = (kind) => (kind === 'x' ? extraState : kind === 'g' ? gramState : sentState);
+function sentenceHtml(words, si, kind = 's') {
   // 문장부호는 앞 단어와 한 묶음(.nw)으로 만들어 줄바꿈 때 혼자 다음 줄로 떨어지지 않게 한다.
   const groups = [];
   words.forEach((w, k) => {
     const punct = isPunct(w.zh);
     const html = (punct || isLatin(w.zh))
       ? cells(w.zh)
-      : `<button class="wd" data-s="${si}" data-k="${k}" aria-label="단어 뜻 보기: ${esc(w.zh)}">${cells(w.zh)}</button>`;
+      : `<button class="wd" data-kind="${kind}" data-s="${si}" data-k="${k}" aria-label="단어 뜻 보기: ${esc(w.zh)}">${cells(w.zh)}</button>`;
     if (punct && groups.length) groups[groups.length - 1] += html; else groups.push(html);
   });
   return groups.map((g) => `<span class="nw">${g}</span>`).join('');
@@ -938,8 +985,8 @@ const wpSaveBtn = (w) => hasWord(w.zh)
   : `<button class="btn" data-wpsave aria-label="단어장에 저장: ${esc(w.zh)}">${ICON.star}<span>단어장</span></button>`;
 // 문장 속 단어를 누르면 화면 전환 없이 작은 카드로 뜻·듣기·단어장 저장을 보여 주고, "자세히"를 눌러야 단어 페이지로 넘어간다.
 let mini = null; // { si, k, w, el }
-function miniWord(si, k) {
-  const { s, words } = sentState[si]; const w = words[k];
+function miniWord(kind, si, k) {
+  const { s, words } = unitState(kind)[si]; const w = words[k];
   const v = currentVocab.find((x) => x.zh === w.zh);
   return { zh: w.zh, ko: w.ko || '', ctx_zh: s.zh, ctx_ko: s.ko, ex_zh: v?.example_zh || '', ex_ko: v?.example_ko || '' };
 }
@@ -950,14 +997,14 @@ function hideMini() {
   if (!mini) return;
   mini.el?.classList.remove('sel'); mini = null; $('wmini').classList.add('hidden'); $('wmini').innerHTML = '';
 }
-function showMini(si, k, el) {
+function showMini(kind, si, k, el) {
   if (mini && mini.el === el) return hideMini(); // 같은 단어를 다시 누르면 닫는다
   hideMini(); stopSpeak();
-  const w = miniWord(si, k); mini = { si, k, w, el }; el.classList.add('sel');
+  const w = miniWord(kind, si, k); mini = { kind, si, k, w, el }; el.classList.add('sel');
   const box = $('wmini');
   box.innerHTML = `<button class="btn icon mx" data-mclose aria-label="닫기">${ICON.close}</button>
     <div class="mtop"><div class="zhline mid" lang="zh-CN">${cells(w.zh)}</div>
-    <div class="mko ${w.ko ? '' : 'none'}">${w.ko ? esc(w.ko) : '뜻 정보가 없어요. 자세히에서 발음을 들어 보세요.'}</div></div>
+    <div class="mko ${w.ko ? '' : 'none'}">${w.ko ? esc(w.ko) : '이 단어의 뜻 정보가 없어요. 발음은 들을 수 있어요.'}</div></div>
     <div class="actions">${playBtn(w.zh, '듣기', true)}${miniSaveBtn(w.zh)}<button class="btn" data-mmore>${ICON.list}<span>자세히</span></button></div>`;
   box.style.bottom = (document.querySelector('.tabbar')?.offsetHeight || 56) + 24 + 'px';
   box.classList.remove('hidden');
@@ -965,8 +1012,8 @@ function showMini(si, k, el) {
   if (gap > -12) window.scrollBy({ top: gap + 16, behavior: 'smooth' });
   box.querySelector('.play')?.click(); // 누르면 발음을 바로 들려 준다
 }
-function openSentenceWord(si, k, from) {
-  const { s, words } = sentState[si]; const items = []; let idx = 0;
+function openSentenceWord(kind, si, k, from) {
+  const { s, words } = unitState(kind)[si]; const items = []; let idx = 0;
   words.forEach((w, kk) => {
     if (isPunct(w.zh) || isLatin(w.zh)) return;
     if (kk === k) idx = items.length;
@@ -1037,16 +1084,20 @@ function render(r, isMock) {
           <div class="py">${esc(plainPinyin(v.example_zh))}</div><div class="ex-ko maskable">${esc(v.example_ko)}</div></details>` : ''}
       </div>`).join('')}</div>` : ''}`;
 
+  // 활용 문장·문법 예문의 단어 뜻은 이 일기에서 이미 아는 단어(핵심 단어, 번역 문장 속 단어)에서 찾는다
+  const gloss = [...currentVocab, ...sentState.flatMap(({ words }) => words)].filter((w) => w.ko);
+  const lineOf = (zh, ko, kind, i, state) => { state[i] = { s: { zh, ko: ko || '' }, words: wordsOf({ zh }, gloss) }; return `<div class="zhline mid" lang="zh-CN">${sentenceHtml(state[i].words, i, kind)}</div>`; };
+  gramState = []; extraState = [];
   $('grammar').innerHTML = (r.grammar || []).map((g, gi) => `
     <div class="cell"><div class="pat">${esc(g.pattern)}</div>
       <div>${esc(g.explanation_ko)}</div>
-      ${g.example_zh ? zhLine(g.example_zh, 'mid') : ''}
+      ${g.example_zh ? lineOf(g.example_zh, g.example_ko, 'g', gi, gramState) : ''}
       ${g.example_ko ? `<div class="ex-ko maskable">${esc(g.example_ko)}</div>` : ''}
       <div class="actions">${g.example_zh ? playBtn(g.example_zh) + sentSaveBtn('gram:' + gi, g.example_zh) : ''}</div></div>`).join('');
 
   $('extra').innerHTML = (r.extra_sentences || []).map((x, xi) => `
     <div class="cell"><div class="ko">${esc(x.situation_ko)}</div>
-      ${zhLine(x.zh, 'mid')}
+      ${lineOf(x.zh, x.ko, 'x', xi, extraState)}
       ${x.ko ? `<div class="ex-ko maskable">${esc(x.ko)}</div>` : ''}
       <div class="actions">${playBtn(x.zh)}${copyBtn(x.zh)}${sentSaveBtn('extra:' + xi, x.zh)}</div></div>`).join('');
 
@@ -1063,9 +1114,9 @@ function render(r, isMock) {
 document.addEventListener('click', (e) => {
   const say = e.target.closest('[data-say]'); if (say) return speak(say);
   const cp = e.target.closest('[data-copy]'); if (cp) return copyText(cp);
-  const wd = e.target.closest('.wd'); if (wd) return showMini(Number(wd.dataset.s), Number(wd.dataset.k), wd);
+  const wd = e.target.closest('.wd'); if (wd) return showMini(wd.dataset.kind || 's', Number(wd.dataset.s), Number(wd.dataset.k), wd);
   if (e.target.closest('[data-mclose]')) return hideMini();
-  if (e.target.closest('[data-mmore]') && mini) { const { si, k, el } = mini; hideMini(); return openSentenceWord(si, k, el); }
+  if (e.target.closest('[data-mmore]') && mini) { const { kind, si, k, el } = mini; hideMini(); return openSentenceWord(kind, si, k, el); }
   if (e.target.closest('[data-msave]') && mini) {
     const w = mini.w; addOrRemoveWord({ zh: w.zh, ko: w.ko || '(뜻 미확인)', ex_zh: w.ctx_zh || w.ex_zh, ex_ko: w.ctx_zh ? w.ctx_ko : w.ex_ko });
     e.target.closest('[data-msave]').outerHTML = miniSaveBtn(w.zh); refreshSaveButtons(); return;
@@ -1533,18 +1584,23 @@ function playOne(text) {
     rd.wake = () => resolve(false);
     if (choice.startsWith('edge:')) {
       const a = new Audio(edgeUrl(text, choice.slice(5), rate)); rd.audio = a;
-      a.onended = () => resolve(true); a.onerror = () => resolve(false);
+      a.onended = () => { karStop(); resolve(true); }; a.onerror = () => { karStop(); resolve(false); };
+      a.onplaying = () => karBegin(document.querySelectorAll('.rp-s')[rd.i]?.querySelector('.zhline'), text, audioProgress(a));
       a.play().catch(() => resolve(false));
     } else if ('speechSynthesis' in window) {
       zhVoice().then((v) => {
         if (!v) return resolve(false);
         const u = new SpeechSynthesisUtterance(text); u.voice = v; u.lang = v.lang; u.rate = Number(rate) || 0.9;
-        u.onend = () => resolve(true); u.onerror = () => resolve(false); speechSynthesis.speak(u);
+        let bp = null, t0 = 0; const estMs = text.length * 330 / (u.rate || 0.9);
+        u.onstart = () => { t0 = performance.now(); karBegin(document.querySelectorAll('.rp-s')[rd.i]?.querySelector('.zhline'), text, () => (bp != null ? bp : (performance.now() - t0) / estMs)); };
+        u.onboundary = (e) => { if (typeof e.charIndex === 'number' && e.charIndex > 0) bp = e.charIndex / text.length; };
+        u.onend = () => { karStop(); resolve(true); }; u.onerror = () => { karStop(); resolve(false); }; speechSynthesis.speak(u);
       });
     } else resolve(false);
   });
 }
 function rdStop() {
+  karStop();
   rd.token++; rd.playing = false; clearTimeout(rd.timer);
   if (rd.audio) { rd.audio.pause(); rd.audio = null; }
   if ('speechSynthesis' in window) speechSynthesis.cancel();
@@ -1908,6 +1964,18 @@ function endTour() {
 }
 $('intro-tour').addEventListener('click', startTour);
 function maybeHints() { if (!store.get(HINT_KEY, '') && !tour) setTimeout(() => { if (!coach.active) coachStart(COACH_STEPS); }, 1000); }
+
+// ---------- 스크롤 진행 막대 ----------
+{ const bar = $('sbar'); let raf = 0;
+  const upd = () => {
+    raf = 0; const max = document.documentElement.scrollHeight - innerHeight;
+    bar.classList.toggle('on', max > 120);
+    bar.style.setProperty('--p', Math.max(0, Math.min(100, (scrollY / Math.max(1, max)) * 100)) + '%');
+  };
+  const req = () => { if (!raf) raf = requestAnimationFrame(upd); };
+  addEventListener('scroll', req, { passive: true }); addEventListener('resize', req);
+  if (window.ResizeObserver) new ResizeObserver(req).observe(document.body);
+  upd(); }
 </script>
 </body>
 </html>
