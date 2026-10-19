@@ -467,12 +467,12 @@
   .w-in { width: min(420px, 100%); text-align: center; }
   .w-ko { font-family: var(--f-body); color: var(--muted); font-size: var(--fs-s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 1.7em; margin-bottom: 4px; }
   .w-ko::before { content: "“"; } .w-ko::after { content: "”"; }
-  .w-svg { display: block; width: min(400px, 94%); height: auto; margin: 0 auto; overflow: visible; }
-  .w-line path { stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
-  .w-line path.fillp { fill: var(--paper); }
-  .w-sheet { transform-box: fill-box; transform-origin: center; opacity: 0; animation: sheetfly 7.2s ease-out infinite; }
-  @keyframes sheetfly { 0% { opacity: 0; transform: translate(0, 0) rotate(0) scale(.5); } 10% { opacity: 1; } 68% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), -150px) rotate(var(--rot)) scale(1.4); } }
-  @media (prefers-reduced-motion: reduce) { .w-sheet { animation: none; opacity: 1; transform: translate(var(--dx), var(--sy)) rotate(var(--rot)); } }
+  .w-svg { display: block; width: min(380px, 92%); height: auto; margin: 0 auto; overflow: visible; }
+  .w-line path { stroke: var(--ink); stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+  .w-line path.pg { fill: var(--cell); }
+  .w-line path.solid { fill: var(--ink); stroke-width: 1.5; }
+  .w-line path.thin { stroke-width: 1.2; }
+  .w-line #w-left path, .w-line #w-right path, .w-line #w-sheet-rows path { stroke-width: 2; }
   .w-t { font-family: var(--f-serif); font-size: var(--fs-l); margin: 18px 0 4px; word-break: keep-all; }
   .w-s { color: var(--muted); font-family: var(--f-ui); font-size: var(--fs-s); margin: 0 0 18px; }
 </style>
@@ -629,25 +629,28 @@
 <div id="writing" class="writing hidden" role="status" aria-live="polite">
   <div class="w-in">
     <div class="w-ko" id="w-ko"></div>
-    <svg class="w-svg" viewBox="0 -30 320 320" aria-hidden="true">
+    <svg class="w-svg" id="w-svg" viewBox="70 20 270 310" aria-hidden="true">
       <g class="w-line">
-        <g transform="translate(106 178)"><g class="w-sheet" style="--dx:-34px;--rot:-10deg;--sy:-92px;animation-delay:2s">
-          <path class="fillp" d="M0 31C12 16 28 7 52 5C66 3 79 4 81 10C72 10 65 16 61 22C55 30 48 35 40 37L7 41C-1 41 -2 34 0 31Z"/>
-          <path d="M29 15l17-2M26 23l22-3M19 12l7 0l0 5l-7 0z"/></g></g>
-        <g transform="translate(108 176)"><g class="w-sheet" style="--dx:30px;--rot:9deg;--sy:-128px;animation-delay:4.4s">
-          <path class="fillp" d="M2 28C14 14 30 8 54 6C68 4 78 7 80 12C70 12 64 18 58 24C50 31 40 33 30 35L5 39C-2 39 -2 31 2 28Z"/>
-          <path d="M26 15l18-2M24 22l24-3M52 28l-14 2"/></g></g>
-        <g transform="translate(110 180)"><g class="w-sheet" style="--dx:-8px;--rot:-5deg;--sy:-158px;animation-delay:6.8s">
-          <path class="fillp" d="M0 30C13 15 29 8 53 5C67 3 80 5 80 11C71 11 66 17 60 23C53 31 46 34 38 36L6 40C-1 40 -2 33 0 30Z"/>
-          <path d="M30 14l16-2M25 22l23-3M20 11l7 0l0 5l-7 0z"/></g></g>
-        <g class="w-book">
-          <path class="fillp" d="M44 224C46 240 50 254 57 270C90 258 122 260 152 276C184 260 224 254 252 260L256 252"/>
-          <path class="fillp" d="M48 214C80 200 118 208 150 230L152 266C122 250 84 250 54 262C52 248 50 232 48 214Z"/>
-          <path class="fillp" d="M150 230C186 204 226 200 254 216L248 250C218 244 182 252 152 266Z"/>
-          <path d="M150 230L152 266M64 222l22 5M68 234l30 7M66 246l24 6M84 214l8 1l-1 7l-8 -1zM198 212l8 -3l1 6l-8 2zM176 253l22 -4"/>
+        <g id="w-book">
+          <path class="solid" d="M92 152C95 190 118 240 140 266L146 270C180 262 214 256 240 254C270 248 300 236 324 224L326 213L238 240L146 251Z"/>
+          <path class="thin" d="M99 152L143 255M96 157L141 261"/>
+          <path class="pg" d="M102 146L182 134L234 242L146 250Z"/>
+          <path class="pg" d="M184 132L266 107L316 216L236 242Z"/>
+          <path class="thin" d="M236 245L318 221M236 249L320 225"/>
+          <path d="M184 132L236 242" style="stroke-width:3"/>
+          <g id="w-left"></g>
+          <path class="solid" d="M289 151L312 145C319 144 323 150 321 158C320 164 317 168 312 170L291 176Z"/>
+          <circle cx="311" cy="158" r="2.3" style="fill:var(--paper);stroke:none"/>
+          <g id="w-right"></g>
         </g>
-        <g class="w-ink" id="w-ink"><path d="M168 228q8-5 14 0t14-1t14 0t14-2t9-1"/><path d="M169 240q8-5 14 0t14 0t14-1t14-2"/><path d="M171 251q8-4 12 0t12 0t12-1"/></g>
-        <g id="w-pen"><path class="fillp" d="M0 0L5 -9L10 -6Z"/><path class="fillp" d="M4 -9.6L10.2 -6.4L47.1 -76.4Q46 -82 41 -80Z"/><path d="M36 -64l6 3M28 -48l6 3"/></g>
+        <g id="w-sheet" style="opacity:0"><path class="pg" d="M184 132L266 107L316 216L236 242Z"/><g id="w-sheet-rows"></g></g>
+        <ellipse id="w-shadow" cx="42" cy="0" rx="42" ry="4.5" style="fill:#000;stroke:none;opacity:.12"/>
+        <g id="w-pen"><g transform="scale(.95)">
+          <path class="pg" d="M0 0L16 -4.2L16 4.2Z"/>
+          <path class="solid" d="M16 -4.6L40 -5.4L40 5.4L16 4.6Z"/>
+          <path class="pg" d="M40 -5.6L80 -5.8Q85 -5.8 85 0Q85 5.8 80 5.8L40 5.6Z"/>
+          <path d="M52 -5.8L74 -7.6M70 -5.8L70 5.8"/>
+        </g></g>
       </g>
     </svg>
     <p class="w-t">내 이야기를 중국어로 옮겨 쓰고 있어요</p>
@@ -1915,29 +1918,95 @@ $('examples').addEventListener('click', (e) => {
 
 
 // ---------- 번역 중: 종이에 펜으로 쓰는 애니메이션 ----------
-const writing = { raf: 0 };
+const writing = { raf: 0, rows: null, sheetRows: null };
+// 번역 중 애니메이션: 펜이 놓여 있던 자리에서 들려 올라 일기장 오른쪽 쪽으로 가서 한 줄씩 쓰고, 네 줄을 다 쓰면 그 쪽이 종이 한 장으로 떠올라 날아간다.
+// 자연스럽게 보이도록: 모든 움직임에 느리게 시작하고 느리게 멈추는 곡선을 쓰고, 단어 사이에서 펜이 살짝 들리고, 종이는 펜이 올라간 뒤에 따라 올라간다(시간차).
+const WRT = { T: 12.6, rowStart: [1.15, 3.3, 5.45, 7.6], rowDur: [1.8, 1.8, 1.8, 1.25], liftAt: 8.85, sheetAt: 9.1, sheetLife: 3.5 };
+const wlerp = (a, b, t) => a + (b - a) * t, wclamp = (x) => Math.max(0, Math.min(1, x));
+const weio = (x) => -(Math.cos(Math.PI * wclamp(x)) - 1) / 2, weo = (x) => 1 - Math.pow(1 - wclamp(x), 3);
+const wpt = (a, b, t) => ({ x: wlerp(a.x, b.x, t), y: wlerp(a.y, b.y, t) });
+function wrnd(seed) { let a = seed; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+function wordPaths(A, B, seed, n) { // 손글씨처럼 살짝 흔들리는 단어 덩어리들
+  const rnd = wrnd(seed), dx = B.x - A.x, dy = B.y - A.y, L = Math.hypot(dx, dy), ux = dx / L, uy = dy / L;
+  const ws = Array.from({ length: n }, () => 0.6 + rnd()), gap = 0.05 * L, total = L - gap * (n - 1), sum = ws.reduce((x, y) => x + y, 0);
+  let pos = 0; return ws.map((w) => { const len = total * w / sum, ph = rnd() * 6.28; let d = '';
+    for (let s = 0; s <= len; s += 2.5) { const wob = Math.sin((pos + s) * 0.62 + ph) * 1.5 + Math.sin((pos + s) * 1.3 + ph * 2) * 0.5; d += (s ? 'L' : 'M') + (A.x + ux * (pos + s) - uy * wob).toFixed(1) + ' ' + (A.y + uy * (pos + s) + ux * wob).toFixed(1); }
+    pos += len + gap; return d; });
+}
+const PAGE_R = { tl: { x: 184, y: 132 }, tr: { x: 266, y: 107 }, br: { x: 316, y: 216 }, bl: { x: 236, y: 242 } };
+const PAGE_L = { tl: { x: 102, y: 146 }, tr: { x: 182, y: 134 }, br: { x: 234, y: 242 }, bl: { x: 146, y: 250 } };
+const pageRow = (pg, f, i0, i1) => { const l = wpt(pg.tl, pg.bl, f), r = wpt(pg.tr, pg.br, f); return { A: wpt(l, r, i0), B: wpt(l, r, i1) }; };
+function wsvg(tag, attrs) { const el = document.createElementNS('http://www.w3.org/2000/svg', tag); Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v)); return el; }
+function writingBuild() {
+  if (writing.rows) return;
+  [[0.12, 0.13, 0.5], [0.27, 0.13, 0.88], [0.4, 0.13, 0.8], [0.52, 0.13, 0.9], [0.65, 0.13, 0.7], [0.79, 0.13, 0.55]].forEach(([f, i0, i1], k) => { // 왼쪽 쪽: 이미 쓰여 있는 글
+    const { A, B } = pageRow(PAGE_L, f, i0, i1); wordPaths(A, B, 40 + k, 3 + (k % 2)).forEach((d) => $('w-left').appendChild(wsvg('path', { d })));
+  });
+  const ext = [[0.16, 0.92], [0.34, 0.86], [0.52, 0.93], [0.7, 0.55]];
+  writing.rows = ext.map(([f, i1], r) => {
+    const { A, B } = pageRow(PAGE_R, f, 0.12, i1); const words = wordPaths(A, B, 7 + r * 5, 3 + (r % 2)).map((d) => {
+      const el = wsvg('path', { d }); $('w-right').appendChild(el); $('w-sheet-rows').appendChild(wsvg('path', { d })); return { el, len: el.getTotalLength() };
+    });
+    const sum = words.reduce((x, w) => x + w.len, 0), gapT = 0.06, wordT = (1 - gapT * (words.length - 1)); let t = 0;
+    const segs = []; words.forEach((w, j) => { const dt = wordT * w.len / sum; segs.push({ j, t0: t, t1: t + dt }); t += dt; if (j < words.length - 1) { segs.push({ gap: true, j, t0: t, t1: t + gapT }); t += gapT; } });
+    const pt = (j, end) => words[j].el.getPointAtLength(end ? words[j].len : 0);
+    return { words, segs, start: pt(0, false), end: pt(words.length - 1, true), pt };
+  });
+}
+function rowDraw(r, u) { // 한 줄을 u(0~1)만큼 쓰고, 그때 펜 끝 위치를 돌려준다
+  let tip = r.start, lift = 0;
+  r.words.forEach((w) => { w.el.style.strokeDasharray = w.len; w.el.style.strokeDashoffset = w.len; });
+  if (u <= 0) return { tip, lift };
+  for (const sg of r.segs) {
+    if (u >= sg.t1) { if (!sg.gap) { r.words[sg.j].el.style.strokeDashoffset = 0; tip = r.pt(sg.j, true); } continue; }
+    if (u < sg.t0) break;
+    const q = (u - sg.t0) / (sg.t1 - sg.t0);
+    if (sg.gap) { tip = wpt(r.pt(sg.j, true), r.pt(sg.j + 1, false), weio(q)); lift = Math.sin(Math.PI * q) * 0.35; }
+    else { const w = r.words[sg.j], e = weio(q); w.el.style.strokeDashoffset = w.len * (1 - e); tip = w.el.getPointAtLength(w.len * e); }
+    break;
+  }
+  return { tip, lift };
+}
+function writingFrame(t, cyc) {
+  const rows = writing.rows, REST = { x: 142, y: 320 }, ROT_REST = -137, ROT_W = -55, ROT_AWAY = -74, AWAY = { x: 304, y: 118 };
+  const HOV1 = rows[0].start; let pen = { x: HOV1.x, y: HOV1.y, rot: ROT_W, h: 1 };
+  const states = rows.map((r, i) => rowDraw(r, (t - WRT.rowStart[i]) / WRT.rowDur[i]));
+  const arc = (A, B, e, rA, rB, hA, hB, k) => ({ ...wpt(A, B, e), y: wlerp(A.y, B.y, e) - Math.sin(Math.PI * e) * k, rot: wlerp(rA, rB, e), h: wlerp(hA, hB, e) });
+  if (t < 1.0) pen = cyc === 0 ? arc(REST, HOV1, weio(t), ROT_REST, ROT_W, 0, 1, 26) : { x: HOV1.x, y: HOV1.y + Math.sin(t * 3) * 0.8, rot: ROT_W + Math.sin(t * 2) * 1, h: 1 };
+  else if (t < WRT.rowStart[0]) { const e = weo((t - 1.0) / (WRT.rowStart[0] - 1.0)); pen = { x: HOV1.x, y: HOV1.y, rot: ROT_W, h: 1 - e }; }
+  else if (t < WRT.liftAt) {
+    let wrote = false;
+    for (let i = 0; i < rows.length; i++) {
+      const s0 = WRT.rowStart[i], s1 = s0 + WRT.rowDur[i];
+      if (t >= s0 && t < s1) { const st = states[i]; pen = { x: st.tip.x + Math.sin(t * 23) * 0.35, y: st.tip.y + Math.cos(t * 31) * 0.35, rot: ROT_W + Math.sin(t * 8) * 1.4 + Math.sin(t * 3) * 1, h: st.lift }; wrote = true; break; }
+      if (i < rows.length - 1 && t >= s1 && t < WRT.rowStart[i + 1]) { const e = weio((t - s1) / (WRT.rowStart[i + 1] - s1)); pen = arc(rows[i].end, rows[i + 1].start, e, ROT_W, ROT_W, 0.15, 0.15, 7); wrote = true; break; }
+    }
+    if (!wrote) pen = { x: rows[3].end.x, y: rows[3].end.y, rot: ROT_W, h: 0 };
+  } else if (t < 9.6) pen = arc(rows[3].end, AWAY, weio((t - WRT.liftAt) / (9.6 - WRT.liftAt)), ROT_W, ROT_AWAY, 0, 1, 10);
+  else if (t < 11.4) pen = { x: AWAY.x + Math.sin(t * 2.2) * 1.2, y: AWAY.y + Math.sin(t * 1.7) * 1.5, rot: ROT_AWAY + Math.sin(t * 1.9) * 1.5, h: 1 };
+  else pen = arc(AWAY, HOV1, weio((t - 11.4) / (WRT.T - 11.4)), ROT_AWAY, ROT_W, 1, 1, 16);
+  $('w-pen').setAttribute('transform', `translate(${pen.x.toFixed(1)} ${(pen.y - pen.h * 12).toFixed(1)}) rotate(${pen.rot.toFixed(1)})`);
+  $('w-shadow').setAttribute('transform', `translate(${(pen.x + 2 + pen.h * 7).toFixed(1)} ${(pen.y + 3 + pen.h * 9).toFixed(1)}) rotate(${pen.rot.toFixed(1)})`);
+  $('w-shadow').style.opacity = (0.13 * (1 - 0.55 * pen.h)).toFixed(3);
+  // 쓴 글은 종이가 떠오르면서 같이 사라진다
+  $('w-right').style.opacity = t > 9.3 ? 1 - weio((t - 9.3) / 0.6) : 1;
+  const a = t - WRT.sheetAt, sh = $('w-sheet');
+  if (a < 0 || a > WRT.sheetLife) { sh.style.opacity = 0; return; }
+  const u = a / WRT.sheetLife, cx = 250, cy = 175;
+  const ty = -weo(u) * 100 - Math.min(1, a / 0.5) * 3, tx = 26 * weio(u) + Math.sin(u * 9) * 5 * u, rot = -3 - 11 * weio(u) + Math.sin(u * 8) * 3, skew = -7 * Math.sin(Math.PI * Math.min(1, u / 0.45)), sc = 1 - 0.22 * weio(u);
+  sh.setAttribute('transform', `translate(${tx.toFixed(1)} ${ty.toFixed(1)}) translate(${cx} ${cy}) rotate(${rot.toFixed(1)}) skewY(${skew.toFixed(1)}) scale(${sc.toFixed(3)}) translate(${-cx} ${-cy})`);
+  sh.style.opacity = u < 0.55 ? 1 : 1 - weio((u - 0.55) / 0.45);
+}
 function writingStart(diary) {
   const first = (diary.split(/(?<=[.!?。？！])\s+|\n/)[0] || diary).trim();
   $('w-ko').textContent = first; $('w-s').textContent = '보통 30초 안팎 걸려요';
   $('writing').classList.remove('hidden'); document.body.classList.add('noscroll'); $('cancel').focus({ preventScroll: true });
-  // 펜이 일기장 오른쪽 쪽에 줄을 쓰고, 한 줄을 다 쓸 때마다 종이 한 장이 날아오른다(종이 날아가기는 CSS, 지연 시간이 줄 쓰기 끝나는 때와 맞는다)
-  const ink = [...$('w-ink').querySelectorAll('path')]; const lens = ink.map((el) => el.getTotalLength());
-  const pen = $('w-pen'); const T = 7.2, SEG = 2.4, DUR = 2.0; const t0 = performance.now();
-  const draw = (t) => {
-    const fade = t > 6.8 ? Math.max(0, 1 - (t - 6.8) / 0.4) : 1; let at = null;
-    ink.forEach((el, k) => {
-      const lp = Math.max(0, Math.min(1, (t - k * SEG) / DUR));
-      el.style.strokeDasharray = lens[k]; el.style.strokeDashoffset = lens[k] * (1 - lp); el.style.opacity = fade;
-      if (t >= k * SEG && t < (k + 1) * SEG) { // 쓰는 중이면 끝점, 다음 줄로 넘어가는 사이에는 부드럽게 옮긴다
-        const e = el.getPointAtLength(lens[k] * lp);
-        if (lp >= 1 && ink[k + 1]) { const q = Math.min(1, (t - k * SEG - DUR) / (SEG - DUR)); const n = ink[k + 1].getPointAtLength(0); at = { x: e.x + (n.x - e.x) * q, y: e.y + (n.y - e.y) * q }; } else at = e;
-      }
-    });
-    if (at && fade > 0.2) { pen.style.opacity = 1; pen.setAttribute('transform', `translate(${(at.x + Math.sin(t * 22) * 0.6).toFixed(1)} ${(at.y + Math.cos(t * 30) * 0.6).toFixed(1)})`); } else pen.style.opacity = 0;
-  };
-  cancelAnimationFrame(writing.raf);
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { draw(4.2); return; } // 움직임을 줄이는 설정이면 멈춘 그림만 보여 준다
-  const loop = () => { draw(((performance.now() - t0) / 1000) % T); writing.raf = requestAnimationFrame(loop); };
+  writingBuild(); cancelAnimationFrame(writing.raf);
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { // 움직임을 줄이는 설정이면 멈춘 그림만 보여 준다
+    writingFrame(0.5, 0); writing.rows.slice(0, 2).forEach((r) => r.words.forEach((w) => { w.el.style.strokeDashoffset = 0; })); return;
+  }
+  const t0 = performance.now();
+  const loop = () => { const el = (performance.now() - t0) / 1000; writingFrame(el % WRT.T, Math.floor(el / WRT.T)); writing.raf = requestAnimationFrame(loop); };
   loop();
 }
 function writingStop() {
