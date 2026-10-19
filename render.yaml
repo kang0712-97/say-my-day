@@ -4,7 +4,7 @@ services:
     runtime: node
     plan: free
     # 신경망 음성(edge-tts)을 파이썬 가상환경에 설치한다. 실패해도 앱은 브라우저 음성으로 동작한다.
-    buildCommand: python3 -m venv .venv && .venv/bin/pip install edge-tts || echo "edge-tts 설치 실패: 브라우저 음성으로 동작"
+    buildCommand: 'python3 -m venv .venv && .venv/bin/pip install edge-tts || echo edge-tts-install-failed'
     startCommand: node app/server.js
     healthCheckPath: /healthz
     envVars:
