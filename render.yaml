@@ -3,7 +3,8 @@ services:
     name: chinese-diary
     runtime: node
     plan: free
-    buildCommand: echo "no build needed"
+    # 신경망 음성(edge-tts)을 파이썬 가상환경에 설치한다. 실패해도 앱은 브라우저 음성으로 동작한다.
+    buildCommand: python3 -m venv .venv && .venv/bin/pip install edge-tts || echo "edge-tts 설치 실패: 브라우저 음성으로 동작"
     startCommand: node app/server.js
     healthCheckPath: /healthz
     envVars:
@@ -11,6 +12,8 @@ services:
         value: "20"
       - key: PUBLIC_MODE
         value: "1"
+      - key: EDGE_TTS_BIN
+        value: /opt/render/project/src/.venv/bin/edge-tts
       # 아래 키는 Render 화면에서 직접 입력합니다(파일에 적지 않습니다). 둘 중 하나만 넣으세요.
       - key: GEMINI_API_KEY
         sync: false

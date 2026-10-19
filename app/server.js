@@ -196,8 +196,24 @@ const ttsInflight = new Map(); // 같은 문장을 동시에 두 번 만들지 �
 
 function edgeAvailable() { return fs.existsSync(EDGE_BIN); }
 
+const ttsKey = (text, voice, rate) => crypto.createHash('sha1').update(`${voice}|${rate}|${text}`).digest('hex');
+const ttsCached = (text, voice, rate) => { const f = path.join(TTS_DIR, `${ttsKey(text, voice, rate)}.mp3`); return fs.existsSync(f) && fs.statSync(f).size > 0; };
+
+// 공개 모드: 새 음성을 만드는 요청(캐시에 없는 문장)만 사람별로 제한해 서버가 음성 변환기로 쓰이지 않게 한다.
+const TTS_PER_IP_HOUR = Number(process.env.TTS_PER_IP_HOUR) || 400;
+const ttsHits = new Map();
+function ttsLimited(req) {
+  if (!PUBLIC_MODE) return false;
+  const now = Date.now(); const ip = clientIp(req);
+  const recent = (ttsHits.get(ip) || []).filter((t) => now - t < 3600e3);
+  if (recent.length >= TTS_PER_IP_HOUR) return true;
+  recent.push(now); ttsHits.set(ip, recent);
+  if (ttsHits.size > 5000) for (const [k, v] of ttsHits) if (!v.some((t) => now - t < 3600e3)) ttsHits.delete(k);
+  return false;
+}
+
 function makeSpeech(text, voice, rate) {
-  const key = crypto.createHash('sha1').update(`${voice}|${rate}|${text}`).digest('hex');
+  const key = ttsKey(text, voice, rate);
   const file = path.join(TTS_DIR, `${key}.mp3`);
   if (fs.existsSync(file) && fs.statSync(file).size > 0) return Promise.resolve(file);
   if (ttsInflight.has(key)) return ttsInflight.get(key);
@@ -306,6 +322,7 @@ const server = http.createServer(async (req, res) => {
       if (!edgeAvailable()) return sendJson(res, 503, { error: 'edge-tts가 설치되어 있지 않아요.' });
       if (!text || text.length > 300) return sendJson(res, 400, { error: '문장은 1~300자여야 해요.' });
       if (!EDGE_VOICES.some((v) => v.id === voice)) return sendJson(res, 400, { error: '지원하지 않는 음성이에요.' });
+      if (!ttsCached(text, voice, rate) && ttsLimited(req)) return sendJson(res, 429, { error: '잠시 후 다시 시도해 주세요. 음성을 너무 많이 요청했어요.' });
       try {
         const file = await makeSpeech(text, voice, rate);
         res.writeHead(200, { 'content-type': 'audio/mpeg', 'cache-control': 'public, max-age=86400' });
