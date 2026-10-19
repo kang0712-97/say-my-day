@@ -821,16 +821,16 @@ async function prefetchSentences() { // 번역 직후 문장·단어 음성을 �
   const voice = choice.slice(5); const mine = ++prefetchToken;
   const texts = [];
   const add = (zh) => { if (zh && !isPunct(zh) && !isLatin(zh) && !texts.includes(zh)) texts.push(zh); };
-  sentState.forEach(({ s }) => add(s.zh)); // 문장 먼저, 그다음 단어
+  sentState.forEach(({ words }) => words.forEach((w) => add(w.zh))); // 눌러 볼 가능성이 큰 문장 속 단어부터, 그다음 문장·핵심 단어
+  sentState.forEach(({ s }) => add(s.zh));
   currentVocab.forEach((v) => { add(v.zh); add(v.example_zh); });
-  sentState.forEach(({ words }) => words.forEach((w) => add(w.zh)));
   let next = 0;
-  const worker = async () => { // edge-tts 프로세스가 한꺼번에 몰리지 않게 2개씩만 만든다
+  const worker = async () => { // 서버가 한꺼번에 몰리지 않게 4개씩만 만든다
     while (mine === prefetchToken && next < texts.length) {
       try { await (await fetch(edgeUrl(texts[next++], voice))).blob(); } catch {}
     }
   };
-  await Promise.all([worker(), worker()]);
+  await Promise.all([worker(), worker(), worker(), worker()]);
 }
 async function speak(btn) {
   const warn = $('voice-warn');

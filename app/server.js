@@ -5,7 +5,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
-const { execFile } = require('child_process');
+const { execFile, spawn } = require('child_process');
 
 const ROOT = __dirname;
 const PUBLIC = path.join(ROOT, 'public');
@@ -200,7 +200,7 @@ const ttsKey = (text, voice, rate) => crypto.createHash('sha1').update(`${voice}
 const ttsCached = (text, voice, rate) => { const f = path.join(TTS_DIR, `${ttsKey(text, voice, rate)}.mp3`); return fs.existsSync(f) && fs.statSync(f).size > 0; };
 
 // 공개 모드: 새 음성을 만드는 요청(캐시에 없는 문장)만 사람별로 제한해 서버가 음성 변환기로 쓰이지 않게 한다.
-const TTS_PER_IP_HOUR = Number(process.env.TTS_PER_IP_HOUR) || 400;
+const TTS_PER_IP_HOUR = Number(process.env.TTS_PER_IP_HOUR) || 800;
 const ttsHits = new Map();
 function ttsLimited(req) {
   if (!PUBLIC_MODE) return false;
@@ -212,6 +212,50 @@ function ttsLimited(req) {
   return false;
 }
 
+// 음성 작업 프로세스: edge-tts를 한 번만 불러와 두고 요청마다 재사용한다(없거나 죽으면 요청마다 실행하는 방식으로 대신한다).
+const EDGE_PY = path.join(path.dirname(EDGE_BIN), process.platform === 'win32' ? 'python.exe' : 'python');
+let ttsWorker = null, ttsWorkerReady = false, ttsWorkerFails = [], ttsJobId = 0;
+const ttsPending = new Map();
+function ttsWorkerAlive() {
+  if (ttsWorker) return true;
+  const now = Date.now(); ttsWorkerFails = ttsWorkerFails.filter((t) => now - t < 60000);
+  if (ttsWorkerFails.length >= 3 || !fs.existsSync(EDGE_PY)) return false; // 계속 죽으면 포기하고 요청마다 실행한다
+  const w = spawn(EDGE_PY, [path.join(__dirname, 'tts_worker.py')], { stdio: ['pipe', 'pipe', 'ignore'] });
+  ttsWorker = w; ttsWorkerReady = false; let buf = '';
+  w.stdout.on('data', (d) => {
+    buf += d; let i;
+    while ((i = buf.indexOf('\n')) >= 0) {
+      const line = buf.slice(0, i); buf = buf.slice(i + 1);
+      let m; try { m = JSON.parse(line); } catch { continue; }
+      if (m.ready) { ttsWorkerReady = true; continue; }
+      const p = ttsPending.get(m.id); if (!p) continue;
+      ttsPending.delete(m.id); clearTimeout(p.timer);
+      m.ok ? p.resolve() : p.reject(new Error(m.error || '음성 변환 실패'));
+    }
+  });
+  const gone = () => {
+    if (ttsWorker !== w) return;
+    ttsWorker = null; ttsWorkerFails.push(Date.now());
+    for (const [id, p] of ttsPending) { clearTimeout(p.timer); p.reject(new Error('음성 작업 프로세스가 멈췄어요.')); ttsPending.delete(id); }
+  };
+  w.on('exit', gone); w.on('error', gone); w.stdin.on('error', () => {});
+  return true;
+}
+function workerSpeech(text, voice, rate, out) {
+  return new Promise((resolve, reject) => {
+    const id = ++ttsJobId;
+    const timer = setTimeout(() => { ttsPending.delete(id); reject(new Error('시간 초과')); }, 25000);
+    ttsPending.set(id, { resolve, reject, timer });
+    ttsWorker.stdin.write(JSON.stringify({ id, text, voice, rate, out }) + '\n');
+  });
+}
+function execSpeech(text, voice, rate, out) {
+  return new Promise((resolve, reject) => {
+    // 셸을 거치지 않고 인자 배열로 넘긴다. --text=는 문장이 '-'로 시작해도 옵션으로 오해되지 않게 한다.
+    execFile(EDGE_BIN, [`--voice=${voice}`, `--rate=${rate}`, `--text=${text}`, `--write-media=${out}`], { timeout: 25000 }, (err) => (err ? reject(err) : resolve()));
+  });
+}
+
 function makeSpeech(text, voice, rate) {
   const key = ttsKey(text, voice, rate);
   const file = path.join(TTS_DIR, `${key}.mp3`);
@@ -219,13 +263,11 @@ function makeSpeech(text, voice, rate) {
   if (ttsInflight.has(key)) return ttsInflight.get(key);
   fs.mkdirSync(TTS_DIR, { recursive: true });
   const tmp = `${file}.${process.pid}.part`;
-  const job = new Promise((resolve, reject) => {
-    // 셸을 거치지 않고 인자 배열로 넘긴다. --text=는 문장이 '-'로 시작해도 옵션으로 오해되지 않게 한다.
-    execFile(EDGE_BIN, [`--voice=${voice}`, `--rate=${rate}`, `--text=${text}`, `--write-media=${tmp}`], { timeout: 25000 }, (err) => {
-      if (err || !fs.existsSync(tmp) || fs.statSync(tmp).size === 0) { fs.rmSync(tmp, { force: true }); return reject(err || new Error('빈 음성 파일')); }
-      fs.renameSync(tmp, file); resolve(file);
-    });
-  }).finally(() => ttsInflight.delete(key));
+  const run = ttsWorkerAlive() ? workerSpeech(text, voice, rate, tmp).catch(() => execSpeech(text, voice, rate, tmp)) : execSpeech(text, voice, rate, tmp);
+  const job = run.then(() => {
+    if (!fs.existsSync(tmp) || fs.statSync(tmp).size === 0) throw new Error('빈 음성 파일');
+    fs.renameSync(tmp, file); return file;
+  }).catch((err) => { fs.rmSync(tmp, { force: true }); throw err; }).finally(() => ttsInflight.delete(key));
   ttsInflight.set(key, job);
   return job;
 }
