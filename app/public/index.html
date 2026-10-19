@@ -465,12 +465,15 @@
   /* 번역 중: 종이에 펜으로 쓰는 화면 */
   .writing { position: fixed; inset: 0; z-index: 18; background: var(--paper); display: flex; align-items: center; justify-content: center; padding: 20px; }
   .w-in { width: min(420px, 100%); text-align: center; }
-  .w-paper { background: var(--cell); border: 1px solid var(--line); border-radius: 18px; padding: 16px 16px 6px; box-shadow: 0 10px 30px rgba(0, 0, 0, .08); transform: rotate(-1.2deg); text-align: left; }
-  .w-ko { font-family: var(--f-body); color: var(--muted); font-size: var(--fs-s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 1.7em; }
-  .w-svg { display: block; width: 100%; height: auto; overflow: visible; }
-  .w-rules path { stroke: var(--line); stroke-width: 1; fill: none; }
-  .w-ink path { stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
-  .w-t { font-family: var(--f-serif); font-size: var(--fs-l); margin: 24px 0 4px; word-break: keep-all; }
+  .w-ko { font-family: var(--f-body); color: var(--muted); font-size: var(--fs-s); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 1.7em; margin-bottom: 4px; }
+  .w-ko::before { content: "“"; } .w-ko::after { content: "”"; }
+  .w-svg { display: block; width: min(400px, 94%); height: auto; margin: 0 auto; overflow: visible; }
+  .w-line path { stroke: var(--ink); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+  .w-line path.fillp { fill: var(--paper); }
+  .w-sheet { transform-box: fill-box; transform-origin: center; opacity: 0; animation: sheetfly 7.2s ease-out infinite; }
+  @keyframes sheetfly { 0% { opacity: 0; transform: translate(0, 0) rotate(0) scale(.5); } 10% { opacity: 1; } 68% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), -150px) rotate(var(--rot)) scale(1.4); } }
+  @media (prefers-reduced-motion: reduce) { .w-sheet { animation: none; opacity: 1; transform: translate(var(--dx), var(--sy)) rotate(var(--rot)); } }
+  .w-t { font-family: var(--f-serif); font-size: var(--fs-l); margin: 18px 0 4px; word-break: keep-all; }
   .w-s { color: var(--muted); font-family: var(--f-ui); font-size: var(--fs-s); margin: 0 0 18px; }
 </style>
 </head>
@@ -625,14 +628,28 @@
 
 <div id="writing" class="writing hidden" role="status" aria-live="polite">
   <div class="w-in">
-    <div class="w-paper">
-      <div class="w-ko" id="w-ko"></div>
-      <svg class="w-svg" viewBox="0 0 300 150" aria-hidden="true">
-        <g class="w-rules"><path d="M12 44H288M12 80H288M12 116H288"/></g>
-        <g class="w-ink" id="w-ink"><path/><path/><path/></g>
-        <g id="w-pen"><path d="M0 0L-3 -12L4 -13Z" fill="var(--accent)"/><path d="M-3 -12L4 -13L30 -58L22 -63Z" fill="var(--ink)"/></g>
-      </svg>
-    </div>
+    <div class="w-ko" id="w-ko"></div>
+    <svg class="w-svg" viewBox="0 -30 320 320" aria-hidden="true">
+      <g class="w-line">
+        <g transform="translate(106 178)"><g class="w-sheet" style="--dx:-34px;--rot:-10deg;--sy:-92px;animation-delay:2s">
+          <path class="fillp" d="M0 31C12 16 28 7 52 5C66 3 79 4 81 10C72 10 65 16 61 22C55 30 48 35 40 37L7 41C-1 41 -2 34 0 31Z"/>
+          <path d="M29 15l17-2M26 23l22-3M19 12l7 0l0 5l-7 0z"/></g></g>
+        <g transform="translate(108 176)"><g class="w-sheet" style="--dx:30px;--rot:9deg;--sy:-128px;animation-delay:4.4s">
+          <path class="fillp" d="M2 28C14 14 30 8 54 6C68 4 78 7 80 12C70 12 64 18 58 24C50 31 40 33 30 35L5 39C-2 39 -2 31 2 28Z"/>
+          <path d="M26 15l18-2M24 22l24-3M52 28l-14 2"/></g></g>
+        <g transform="translate(110 180)"><g class="w-sheet" style="--dx:-8px;--rot:-5deg;--sy:-158px;animation-delay:6.8s">
+          <path class="fillp" d="M0 30C13 15 29 8 53 5C67 3 80 5 80 11C71 11 66 17 60 23C53 31 46 34 38 36L6 40C-1 40 -2 33 0 30Z"/>
+          <path d="M30 14l16-2M25 22l23-3M20 11l7 0l0 5l-7 0z"/></g></g>
+        <g class="w-book">
+          <path class="fillp" d="M44 224C46 240 50 254 57 270C90 258 122 260 152 276C184 260 224 254 252 260L256 252"/>
+          <path class="fillp" d="M48 214C80 200 118 208 150 230L152 266C122 250 84 250 54 262C52 248 50 232 48 214Z"/>
+          <path class="fillp" d="M150 230C186 204 226 200 254 216L248 250C218 244 182 252 152 266Z"/>
+          <path d="M150 230L152 266M64 222l22 5M68 234l30 7M66 246l24 6M84 214l8 1l-1 7l-8 -1zM198 212l8 -3l1 6l-8 2zM176 253l22 -4"/>
+        </g>
+        <g class="w-ink" id="w-ink"><path d="M168 228q8-5 14 0t14-1t14 0t14-2t9-1"/><path d="M169 240q8-5 14 0t14 0t14-1t14-2"/><path d="M171 251q8-4 12 0t12 0t12-1"/></g>
+        <g id="w-pen"><path class="fillp" d="M0 0L5 -9L10 -6Z"/><path class="fillp" d="M4 -9.6L10.2 -6.4L47.1 -76.4Q46 -82 41 -80Z"/><path d="M36 -64l6 3M28 -48l6 3"/></g>
+      </g>
+    </svg>
     <p class="w-t">내 이야기를 중국어로 옮겨 쓰고 있어요</p>
     <p class="w-s" id="w-s"></p>
     <button class="btn" id="cancel">취소</button>
@@ -1898,30 +1915,28 @@ $('examples').addEventListener('click', (e) => {
 
 
 // ---------- 번역 중: 종이에 펜으로 쓰는 애니메이션 ----------
-const writing = { raf: 0, paths: [], lens: [] };
-function inkPath(y, x1, seed) { // 손글씨처럼 살짝 흔들리는 선
-  let d = `M14 ${y}`, x = 14, r = seed; const rnd = () => { r = (r * 9301 + 49297) % 233280; return r / 233280; };
-  while (x < x1) { const dx = 7 + rnd() * 9; const cx = x + dx / 2, cy = y - 3 + (rnd() * 2 - 1) * 9; x = Math.min(x1, x + dx); d += ` Q${cx.toFixed(1)} ${cy.toFixed(1)} ${x.toFixed(1)} ${(y - 3 + (rnd() * 2 - 1) * 3).toFixed(1)}`; }
-  return d;
-}
+const writing = { raf: 0 };
 function writingStart(diary) {
   const first = (diary.split(/(?<=[.!?。？！])\s+|\n/)[0] || diary).trim();
   $('w-ko').textContent = first; $('w-s').textContent = '보통 30초 안팎 걸려요';
   $('writing').classList.remove('hidden'); document.body.classList.add('noscroll'); $('cancel').focus({ preventScroll: true });
-  const ink = [...$('w-ink').querySelectorAll('path')], ends = [286, 286, 200];
-  writing.paths = ink; writing.lens = ink.map((el, k) => { el.setAttribute('d', inkPath(40 + k * 36, ends[k], 11 + k * 7)); return el.getTotalLength(); });
-  const pen = $('w-pen'); const T = 9, SEG = 3; const t0 = performance.now();
-  const draw = (t) => { // t: 0~9초. 줄마다 3초씩, 끝에서 한 번 지우고 처음부터 다시 쓴다
-    const fade = t > 8.4 ? Math.max(0, 1 - (t - 8.4) / 0.6) : 1; let penAt = null;
+  // 펜이 일기장 오른쪽 쪽에 줄을 쓰고, 한 줄을 다 쓸 때마다 종이 한 장이 날아오른다(종이 날아가기는 CSS, 지연 시간이 줄 쓰기 끝나는 때와 맞는다)
+  const ink = [...$('w-ink').querySelectorAll('path')]; const lens = ink.map((el) => el.getTotalLength());
+  const pen = $('w-pen'); const T = 7.2, SEG = 2.4, DUR = 2.0; const t0 = performance.now();
+  const draw = (t) => {
+    const fade = t > 6.8 ? Math.max(0, 1 - (t - 6.8) / 0.4) : 1; let at = null;
     ink.forEach((el, k) => {
-      const lp = Math.max(0, Math.min(1, (t - k * SEG) / 2.6)); const len = writing.lens[k];
-      el.style.strokeDasharray = len; el.style.strokeDashoffset = len * (1 - lp); el.style.opacity = fade;
-      if (lp > 0 && (lp < 1 || k === 2 || t < (k + 1) * SEG)) penAt = el.getPointAtLength(len * lp);
+      const lp = Math.max(0, Math.min(1, (t - k * SEG) / DUR));
+      el.style.strokeDasharray = lens[k]; el.style.strokeDashoffset = lens[k] * (1 - lp); el.style.opacity = fade;
+      if (t >= k * SEG && t < (k + 1) * SEG) { // 쓰는 중이면 끝점, 다음 줄로 넘어가는 사이에는 부드럽게 옮긴다
+        const e = el.getPointAtLength(lens[k] * lp);
+        if (lp >= 1 && ink[k + 1]) { const q = Math.min(1, (t - k * SEG - DUR) / (SEG - DUR)); const n = ink[k + 1].getPointAtLength(0); at = { x: e.x + (n.x - e.x) * q, y: e.y + (n.y - e.y) * q }; } else at = e;
+      }
     });
-    if (penAt && fade > 0.3) { pen.style.opacity = 1; pen.setAttribute('transform', `translate(${penAt.x.toFixed(1)} ${penAt.y.toFixed(1)})`); } else pen.style.opacity = 0;
+    if (at && fade > 0.2) { pen.style.opacity = 1; pen.setAttribute('transform', `translate(${(at.x + Math.sin(t * 22) * 0.6).toFixed(1)} ${(at.y + Math.cos(t * 30) * 0.6).toFixed(1)})`); } else pen.style.opacity = 0;
   };
   cancelAnimationFrame(writing.raf);
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { draw(8); return; } // 움직임을 줄이는 설정이면 멈춘 그림만 보여 준다
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { draw(4.2); return; } // 움직임을 줄이는 설정이면 멈춘 그림만 보여 준다
   const loop = () => { draw(((performance.now() - t0) / 1000) % T); writing.raf = requestAnimationFrame(loop); };
   loop();
 }
