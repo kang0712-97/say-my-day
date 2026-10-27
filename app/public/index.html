@@ -166,6 +166,8 @@
   .c { display: inline-flex; flex-direction: column; align-items: center; min-width: 1.45em; }
   .c.pu { min-width: .55em; }
   .c .p { font-family: var(--f-py); font-size: .44em; line-height: 1.5; height: 1.5em; color: var(--accent); white-space: nowrap; letter-spacing: .01em; }
+  .c { position: relative; }
+  .c .rg { position: absolute; top: 0; left: 0; width: calc(var(--n) * 1.45em / .44 + (var(--n) - 1) * 2px); /* .p 글꼴이 .44em이라 칸 폭(1.45em)을 나눠서 맞춘다 */ text-align: center; overflow: visible; }
   .c .h { line-height: 1.3; }
   .c.mk .h { background: var(--hl); color: var(--hl-ink); }
   .nw { display: inline-flex; align-items: flex-end; }
@@ -633,7 +635,7 @@
           <div class="hint" id="gl-msg" role="status" style="margin:6px 0 0"></div>
         </div>
         <label class="opt"><span><span data-rl>병음</span> 보기</span> <input type="checkbox" id="opt-py" checked></label>
-        <label class="opt">한국어 가리기 <input type="checkbox" id="opt-ko"></label>
+        <label class="opt"><span data-sn>한국어</span> 가리기 <input type="checkbox" id="opt-ko"></label>
         <label class="opt">음성 <select id="opt-voice" aria-label="듣기 음성"></select></label>
         <label class="opt">속도
           <select id="opt-rate" aria-label="듣기 속도"><option value="0.75">느리게</option><option value="0.9" selected>보통</option><option value="1">빠르게</option></select>
@@ -661,11 +663,11 @@
       </section>
       <section class="slide" aria-label="2 / 3" aria-hidden="true">
         <p class="eyebrow">이렇게 배워요</p>
-        <h2>한국어로 쓴 일기를<br><em>배우는 말로</em></h2>
+        <h2><span data-sn>한국어</span>로 쓴 일기를<br><em>배우는 말로</em></h2>
         <div class="demo"><div class="d-ko">오늘은 날씨가 좋다.</div><div class="d-arrow" aria-hidden="true">↓</div>
           <div class="d-zh" lang="zh-CN">今天天气很好。</div><div class="d-py">jīntiān tiānqì hěn hǎo.</div>
           <div class="d-zh" lang="ja" style="margin-top:10px;font-family:'Noto Serif JP','Hiragino Mincho ProN',serif">今日は天気がいいです。</div><div class="d-py">きょうはてんきがいいです。</div></div>
-        <ol class="d-steps"><li>한국어로 한 줄 써요</li><li>바뀐 내 문장을 듣고 읽어요</li><li>내가 쓴 문장으로 퀴즈를 풀어요</li></ol>
+        <ol class="d-steps"><li><span data-sn>한국어</span>로 한 줄 써요</li><li>바뀐 내 문장을 듣고 읽어요</li><li>내가 쓴 문장으로 퀴즈를 풀어요</li></ol>
       </section>
       <section class="slide" aria-label="3 / 3" aria-hidden="true">
         <p class="eyebrow">언어 고르기</p>
@@ -742,7 +744,7 @@
         <label>속도 <select id="rp-rate" aria-label="읽기 속도"><option value="0.75">느리게</option><option value="0.9">보통</option><option value="1">빠르게</option></select></label>
         <label>문장 사이 쉬는 시간 <select id="rp-gap" aria-label="문장 사이 쉬는 시간"><option value="0">없음</option><option value="3">3초</option><option value="6">6초</option></select></label>
         <label><input type="checkbox" id="rp-py"> <span data-rl>병음</span></label>
-        <label><input type="checkbox" id="rp-ko"> 한국어</label>
+        <label><input type="checkbox" id="rp-ko"> <span data-sn>한국어</span></label>
       </div>
     </div>
   </div>
@@ -785,6 +787,7 @@ function readLangPrefs() {
 let LANG = readLangPrefs();
 // 언어 팩: 학습 언어마다 읽기(발음 표기)를 만드는 방법을 담는다. 일본어·영어·한국어는 이 자리에 추가한다.
 const tgtName = () => LANGS[LANG.tgt].name;
+const srcName = () => LANGS[LANG.src].name;
 const BCP = () => LANGS[LANG.tgt].bcp;
 const readLabel = () => (LANG.tgt === 'ja' ? '후리가나' : '병음');
 // 일본어 읽기: 번역 결과의 단어별 히라가나(AI)를 글자마다 나눠 붙인다. 한 글자 = 한 칸이라는 화면 구조(따라 읽기·형광펜)를 그대로 쓰기 위해
@@ -817,8 +820,10 @@ function jaCharTokens(surface, reading, chk) {
   const kr = runs.filter((u) => u.k); if (!kr.length) return toks;
   const pat = runs.map((u) => (u.k ? '(.+?)' : u.idx.map((k) => toHira(chars[k]).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join(''))).join('');
   const m = r.match(new RegExp('^' + pat + '$'));
-  if (m) kr.forEach((u, j) => jaSplit(m[j + 1], u.idx.length).forEach((p, q) => { toks[u.idx[q]].pinyin = p; }));
-  else { const all = kr.flatMap((u) => u.idx); jaSplit(r, all.length).forEach((p, q) => { toks[all[q]].pinyin = p; }); } // 가나가 맞지 않으면 읽기 전체를 한자에 고르게 나눔
+  // 글자별 읽기(pinyin)는 글자 풀이용으로 두고, 화면에는 한자 덩어리의 읽기(rd)를 덩어리 첫 칸에 한 번만 올린다(후리가나 표준)
+  const put = (from, to, text) => { toks[from].rd = text; toks[from].rn = to - from + 1; for (let k = from + 1; k <= to; k++) toks[k].cont = true; };
+  if (m) kr.forEach((u, j) => { jaSplit(m[j + 1], u.idx.length).forEach((p, q) => { toks[u.idx[q]].pinyin = p; }); put(u.idx[0], u.idx[u.idx.length - 1], m[j + 1]); });
+  else { const all = kr.flatMap((u) => u.idx); jaSplit(r, all.length).forEach((p, q) => { toks[all[q]].pinyin = p; }); put(all[0], all[all.length - 1], r); } // 가나가 맞지 않으면 읽기 전체를 첫 한자부터 마지막 한자 위에 한 번
   if (chk) toks.forEach((t) => { if (t.isZh) t.chk = true; });
   return toks;
 }
@@ -841,6 +846,7 @@ function learnReadings(r) {
 function applyLangUI() {
   document.documentElement.dataset.tgt = LANG.tgt;
   document.querySelectorAll('[data-tn]').forEach((el) => { el.textContent = tgtName(); });
+  document.querySelectorAll('[data-sn]').forEach((el) => { el.textContent = srcName(); });
   document.querySelectorAll('[data-rl]').forEach((el) => { el.textContent = readLabel(); });
   const rh = $('read-hint'); if (rh) { if (!rh.dataset.zh) rh.dataset.zh = rh.textContent; rh.textContent = LANG.tgt === 'ja' ? '단어를 누르면 뜻과 발음이 나와요. 한자 위의 작은 글자가 읽는 법(후리가나)이고, 점선 밑줄이 있으면 읽기를 한 번 더 확인해 보세요.' : rh.dataset.zh; }
   $('ring-text').textContent = `Say My Day · 오늘의 ${tgtName()} · Say My Day · 오늘의 ${tgtName()} ·`;
@@ -955,7 +961,9 @@ $('opt-bright').addEventListener('input', () => setBright(Number($('opt-bright')
 // ---------- 병음·한자 칸 ----------
 // 병음은 모델이 아니라 pinyin-pro(+교정 사전)가 생성한다.
 const cell = (t, mk) => t.isZh
-  ? `<span class="c${mk ? ' mk' : ''}"><span class="p${t.chk ? ' chk' : ''}" aria-hidden="true">${esc(t.pinyin)}</span><span class="h">${esc(t.origin)}</span></span>`
+  ? (t.rd !== undefined
+    ? `<span class="c${mk ? ' mk' : ''}"><span class="p" aria-hidden="true"></span><span class="rg p${t.chk ? ' chk' : ''}" style="--n:${t.rn}" aria-hidden="true">${esc(t.rd)}</span><span class="h">${esc(t.origin)}</span></span>`
+    : `<span class="c${mk ? ' mk' : ''}"><span class="p${t.chk ? ' chk' : ''}" aria-hidden="true">${t.cont ? '' : esc(t.pinyin)}</span><span class="h">${esc(t.origin)}</span></span>`)
   : `<span class="c pu"><span class="p" aria-hidden="true"></span><span class="h">${esc(t.origin)}</span></span>`;
 const cells = (text) => readTokens(text).map((t) => cell(t)).join('');
 const cellsFrom = (toks) => toks.map((t) => cell(t)).join('');
@@ -973,7 +981,7 @@ function zhLine(text, size = 'mid', mark = '') {
   const groups = [];
   readTokens(text).forEach((t, i) => {
     const html = cell(t, start >= 0 && i >= start && i < start + mark.length);
-    if (!t.isZh && isPunct(t.origin) && groups.length) groups[groups.length - 1] += html; else groups.push(html);
+    if ((t.cont || (!t.isZh && isPunct(t.origin))) && groups.length) groups[groups.length - 1] += html; else groups.push(html);
   });
   return `<div class="zhline ${size}" lang="${BCP()}">${groups.map((g) => `<span class="nw">${g}</span>`).join('')}</div>`;
 }
@@ -2444,7 +2452,7 @@ const COACH_STEPS = [
   { target: () => $('read-all'), text: '"일기 전체 읽기"를 누르면 내 일기를 처음부터 끝까지 ' + tgtName() + '로 들려줘요. 소리 내어 따라 읽어 보세요.' },
   { target: () => document.querySelector('[data-view="one"]'), text: '"한 문장씩"으로 바꾸면 문장을 하나씩 천천히 익힐 수 있어요.' },
   { target: () => $('tab-word'), text: '저장한 단어와 문장은 보관함에서 퀴즈로 복습해요. 잊을 때쯤 홈에 "오늘의 복습"으로 알려 드려요.' },
-  { target: () => $('tab-set'), text: '설정에서 목소리와 속도, 화면 밝기, 다크 모드를 바꿀 수 있어요. ' + readLabel() + '이나 한국어를 가리고 연습할 수도 있어요.', last: '알겠어요' },
+  { target: () => $('tab-set'), text: '설정에서 목소리와 속도, 화면 밝기, 다크 모드를 바꿀 수 있어요. ' + readLabel() + '이나 ' + srcName() + '를 가리고 연습할 수도 있어요.', last: '알겠어요' },
 ];
 function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.add('hidden'), 2600); }
 function coachPlace() {
