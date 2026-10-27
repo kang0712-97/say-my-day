@@ -104,14 +104,56 @@ function buildSystemPrompt(extra = [], file = PAIRS['ko>zh']) {
   return prompt.replace('{{GLOSSARY}}', () => glossary);
 }
 
-// 사용자가 쓴 일기를 문장 단위로 나눈다. 한국어 원문은 모델이 아니라 이 결과를 그대로 화면에 쓴다.
-function splitSentences(text) {
+// 문장부호 없이 길게 쓴 글도 따라 읽기 쉽게 의미 구간으로 나눈다. 쉼표 → 연결어미(한국어)·접속어(중국어) → 길이 순으로 자른다.
+// 규칙으로 못 나눈 조각은 그대로 두고 모델의 끊어 읽기(`*_split`)에 맡긴다. 한국어·중국어 입력만 다룬다.
+const SPLIT_MAX = { ko: 26, zh: 20 }, SPLIT_MIN = { ko: 6, zh: 6 };
+const KO_CUT = /(?:고|며|으며|지만|니까|으니까|라서|해서|어서|아서|해도|다가|려고|는데|은데|인데|면서|하면|으면|려면|다면|이면|거나|도록)$/;
+const KO_NOT = /(?:에서|에게서|한테서|로서|으로서|라면|냉면)$/;
+const ZH_BEFORE = /^(?:然后|然後|但是|可是|所以|因为|因為|而且|不过|不過|后来|後來|接着|接著|于是|於是|另外|还有|還有|结果|結果|如果|虽然|雖然|不但|并且|並且|同时|同時)/;
+function splitLong(piece, src) {
+  const max = SPLIT_MAX[src], min = SPLIT_MIN[src];
+  if (!max || [...piece].length <= max) return [piece];
+  // 1) 쉼표 단위로 자른 뒤, 너무 짧은 조각은 앞 조각에 붙인다
+  let frags = piece.match(/[^,，、;；]+[,，、;；]*/g) || [piece];
+  const merged = [];
+  for (const f of frags) {
+    if (merged.length && [...merged[merged.length - 1]].length < min) merged[merged.length - 1] += f; else merged.push(f);
+  }
+  if (merged.length > 1 && [...merged[merged.length - 1]].length < min) merged[merged.length - 2] += merged.pop();
+  // 2) 아직 긴 조각은 연결어미(한국어) 뒤, 접속어(중국어) 앞에서 자른다
+  const out = [];
+  for (const f of merged) {
+    if ([...f].length <= max) { out.push(f); continue; }
+    const chunks = [];
+    let cur = '';
+    if (src === 'ko') {
+      for (const w of f.split(/(?<=\s)/)) {
+        cur += w;
+        const bare = w.trim(), len = [...cur.trim()].length;
+        if (len >= max || (len >= min && KO_CUT.test(bare) && !KO_NOT.test(bare))) { chunks.push(cur.trim()); cur = ''; }
+      }
+    } else {
+      const chars = [...f];
+      for (let i = 0; i < chars.length; i++) {
+        if ([...cur].length >= min && ZH_BEFORE.test(chars.slice(i).join(''))) { chunks.push(cur); cur = ''; }
+        cur += chars[i];
+      }
+    }
+    if (cur.trim()) { if (chunks.length && [...cur.trim()].length < min) chunks[chunks.length - 1] += (src === 'ko' ? ' ' : '') + cur.trim(); else chunks.push(cur.trim()); }
+    out.push(...chunks);
+  }
+  return out.map((x) => x.trim()).filter(Boolean);
+}
+
+// 사용자가 쓴 일기를 문장 단위로 나눈다. 원문은 모델이 아니라 이 결과를 그대로 화면에 쓴다.
+function splitSentences(text, src = 'ko') {
   return text
     .replace(/\r/g, '')
     .split(/\n+/)
     .flatMap((line) => line.match(/[^.!?。！？…]+[.!?。！？…]*["'”’)]*|[.!?。！？…]+/g) || [])
     .map((s) => s.trim())
-    .filter((s) => /[\p{L}\p{N}]/u.test(s));
+    .filter((s) => /[\p{L}\p{N}]/u.test(s))
+    .flatMap((s) => splitLong(s, src));
 }
 
 // 모델 응답의 sentences를 사용자 원문 문장과 번호로 맞춘다. 누락·불일치는 ambiguities에 남긴다.
@@ -158,8 +200,8 @@ async function translateWithGemini(userText, key, glossary = [], file) {
   return { mock: false, result: extractJson(text) };
 }
 
-async function translate(diary, glossary = [], file, tgt = 'zh') {
-  const parts = splitSentences(diary);
+async function translate(diary, glossary = [], file, tgt = 'zh', src = 'ko') {
+  const parts = splitSentences(diary, src);
   const userText = parts.map((s, i) => `${i + 1}. ${s}`).join('\n');
   const out = await callModel(userText, glossary, file);
   // 목업 응답은 입력과 무관하므로 원문 보존 처리를 하지 않는다.
@@ -510,7 +552,7 @@ const server = http.createServer(async (req, res) => {
       const blocked = checkTranslateLimit(req);
       if (blocked) return sendJson(res, 429, { error: blocked });
       running += 1;
-      try { return sendJson(res, 200, await translate(diary, cleanGlossary(body.glossary), pair.file, pair.tgt)); } finally { running -= 1; }
+      try { return sendJson(res, 200, await translate(diary, cleanGlossary(body.glossary), pair.file, pair.tgt, pair.src)); } finally { running -= 1; }
     }
     if (req.method === 'GET' && req.url === '/api/langs') {
       return sendJson(res, 200, { langs: LANGS, pairs: Object.keys(PAIRS).map((k) => { const [src, tgt] = k.split('>'); return { src, tgt }; }) });
