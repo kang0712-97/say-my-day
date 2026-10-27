@@ -3,13 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>중국어 다이어리</title>
+<title>Say My Day</title>
 <!-- 저장된 테마를 첫 화면 그리기 전에 적용해서 깜빡임을 막는다 -->
 <script>try { var t = JSON.parse(localStorage.getItem('theme') || 'null'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <!-- 폰트: 제목·본문 Noto Serif KR, UI Noto Sans KR, 한자 Noto Serif SC. 오프라인이면 시스템 폰트로 대체된다. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+SC:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@400;600;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Serif+SC:wght@400;600&family=Noto+Serif+JP:wght@400;600&display=swap" rel="stylesheet">
 <style>
   :root {
     /* 크림 종이 + 먹색 선 + 붉은 포인트(병음·강조). 레퍼런스: 가는 선 그리드, 점선 구분, 검은 알약 버튼 */
@@ -143,6 +143,19 @@
   .ko { font-family: var(--f-hand); font-size: 1.45rem; line-height: 1.25; color: var(--muted); margin-bottom: 6px; }
   .ex-ko { color: var(--muted); font-size: var(--fs-s); margin-top: 2px; }
   .zh-font { font-family: var(--f-zh); }
+  :root[data-tgt="ja"] { --f-zh: "Noto Serif JP", "Hiragino Mincho ProN", "Yu Mincho", "Noto Serif SC", serif; }
+  .c .p.chk { text-decoration: underline dotted; text-underline-offset: 3px; }
+  .chknote { margin-top: 8px; padding: 8px 10px; border: 1px dashed var(--line); border-radius: 8px; font-size: var(--fs-s); color: var(--muted); line-height: 1.6; }
+  .langbar { display: flex; justify-content: flex-end; padding: 4px 0 0; }
+  .lp-h { font-family: var(--f-ui); font-size: var(--fs-s); color: var(--muted); font-weight: 500; margin: 18px 0 8px; }
+  .lp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+  .lp-card { border: 1px solid var(--line); background: var(--cell); color: var(--ink); border-radius: 10px; padding: 12px 10px; min-height: 64px; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left; position: relative; cursor: pointer; font-family: var(--f-ui); }
+  .lp-card .lp-n { font-family: var(--f-serif); font-size: 1.3rem; line-height: 1.3; }
+  .lp-card .lp-k { font-size: var(--fs-s); color: var(--muted); }
+  .lp-card em { position: absolute; top: 8px; right: 8px; font-style: normal; font-size: .7rem; color: var(--muted); }
+  .lp-card em.beta { color: var(--accent); }
+  .lp-card.sel { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+  .lp-card:disabled { opacity: .5; cursor: default; }
   .py { font-family: var(--f-py); color: var(--accent); font-size: var(--fs-s); }
 
   /* 한자 한 글자 = 한 칸. 병음이 길어도 칸 너비가 일정해서 간격이 고르다 */
@@ -502,9 +515,10 @@
 </head>
 <body>
 <div class="app">
-  <header class="top"><button class="hdr-back" id="hdr-back" aria-label="일기 쓰기 화면으로 돌아가기"><span data-i="back"></span><span>일기</span></button><h1>중국어 다이어리</h1><button class="btn icon theme" id="theme-toggle" aria-label="다크 모드로 전환"></button></header>
+  <header class="top"><button class="hdr-back" id="hdr-back" aria-label="일기 쓰기 화면으로 돌아가기"><span data-i="back"></span><span>일기</span></button><h1>Say My Day</h1><button class="btn icon theme" id="theme-toggle" aria-label="다크 모드로 전환"></button></header>
 
   <div id="v-write">
+  <div class="langbar"><button class="btn" id="lang-chip" aria-label="배우는 말 바꾸기"></button></div>
   <section id="due-card" class="duecard hidden" aria-label="오늘의 복습">
     <div><b>오늘의 복습</b><span id="due-text"></span></div>
     <button class="btn solid" id="due-start">복습 시작</button>
@@ -518,7 +532,7 @@
     </div>
     <div class="ring" aria-hidden="true">
       <svg class="spin" viewBox="0 0 100 100"><defs><path id="circ" d="M50,50 m-38,0 a38,38 0 1,1 76,0 a38,38 0 1,1 -76,0"/></defs>
-        <text><textPath href="#circ" textLength="236" lengthAdjust="spacing">Dear Diary · 오늘의 중국어 · Dear Diary · 오늘의 중국어 ·</textPath></text></svg>
+        <text><textPath id="ring-text" href="#circ" textLength="236" lengthAdjust="spacing">Say My Day · 오늘의 중국어 · Say My Day · 오늘의 중국어 ·</textPath></text></svg>
       <div class="day"><span id="day-num"></span></div>
     </div>
   </section>
@@ -552,7 +566,7 @@
     <div class="pad">
       <div id="voice-warn" class="banner error hidden" role="alert"></div>
       <h2 class="sec" id="sec-sentences" tabindex="-1"><span class="no">01</span>번역<span class="en">Translation</span></h2>
-      <p class="hint">단어를 누르면 뜻과 발음이 나와요. 병음은 책처럼 본래 성조로 적어요. 3성이 이어지면 소리만 바뀌어요. 예) 你好 nǐ hǎo → 소리는 ní hǎo</p>
+      <p class="hint" id="read-hint">단어를 누르면 뜻과 발음이 나와요. 병음은 책처럼 본래 성조로 적어요. 3성이 이어지면 소리만 바뀌어요. 예) 你好 nǐ hǎo → 소리는 ní hǎo</p>
       <div class="viewbar">
         <div class="seg" role="radiogroup" aria-label="보기 방식"><button role="radio" data-view="list" aria-checked="true">목록</button><button role="radio" data-view="one" aria-checked="false">한 문장씩</button></div>
         <button class="btn solid" id="read-all"><span data-i="speaker"></span>일기 전체 읽기</button>
@@ -566,7 +580,7 @@
       <h2 class="sec" id="sec-wrap"><span class="no">06</span>마무리<span class="en">Wrap-up</span></h2>
       <div class="cell">
         <ol class="steps">
-          <li><h4>오늘 일기를 중국어로 읽어 보세요</h4><p class="hint" style="margin:0 0 8px">처음부터 끝까지 듣고, 소리 내어 따라 읽어요.</p><button class="btn solid" id="wrap-read"><span data-i="speaker"></span>일기 전체 읽기</button></li>
+          <li><h4>오늘 일기를 <span data-tn>중국어</span>로 읽어 보세요</h4><p class="hint" style="margin:0 0 8px">처음부터 끝까지 듣고, 소리 내어 따라 읽어요.</p><button class="btn solid" id="wrap-read"><span data-i="speaker"></span>일기 전체 읽기</button></li>
           <li><h4>마음에 드는 단어·문장을 저장하세요</h4><p class="hint" style="margin:0" id="wrap-count"></p></li>
           <li><h4>저장한 것으로 바로 퀴즈를 풀어요</h4><p class="hint" style="margin:0 0 8px">방금 저장한 단어·문장을 한 번 더 익혀요.</p><button class="btn solid" id="wrap-quiz">퀴즈 시작</button></li>
         </ol>
@@ -604,8 +618,9 @@
           </div>
         </div>
         <label class="opt">밝기 <input type="range" id="opt-bright" min="50" max="100" step="5" value="100" aria-label="화면 밝기"></label>
+        <div class="opt">배우는 말 <button class="btn" id="lang-set">바꾸기</button></div>
         <div class="opt">소개 화면 <button class="btn" id="intro-again">다시 보기</button></div>
-        <p class="hint" style="margin:6px 0 14px"><b>내 일기는 이 기기에 보관돼요.</b> 일기는 이 기기의 브라우저에만 저장돼요. 번역할 때만 일기 문장이 AI(Claude)에 전달되고, 음성을 만들 때는 번역된 중국어 문장이 음성 서비스에 전달돼요.</p>
+        <p class="hint" style="margin:6px 0 14px"><b>내 일기는 이 기기에 보관돼요.</b> 일기는 이 기기의 브라우저에만 저장돼요. 번역할 때만 일기 문장이 AI(Claude)에 전달되고, 음성을 만들 때는 번역된 <span data-tn>중국어</span> 문장이 음성 서비스에 전달돼요.</p>
         <div class="gl" id="gl-wrap">
           <div class="gl-head"><b>내 표현 사전</b><span class="hint" id="gl-count" style="margin:0"></span></div>
           <p class="hint" style="margin:4px 0 6px">자주 쓰는 이름이나 표현을 적어 두면 번역할 때 반영돼요. 이 기기에 저장되고, 번역할 때만 일기와 함께 AI에 전달돼요.</p>
@@ -617,7 +632,7 @@
           </div>
           <div class="hint" id="gl-msg" role="status" style="margin:6px 0 0"></div>
         </div>
-        <label class="opt">병음 보기 <input type="checkbox" id="opt-py" checked></label>
+        <label class="opt"><span><span data-rl>병음</span> 보기</span> <input type="checkbox" id="opt-py" checked></label>
         <label class="opt">한국어 가리기 <input type="checkbox" id="opt-ko"></label>
         <label class="opt">음성 <select id="opt-voice" aria-label="듣기 음성"></select></label>
         <label class="opt">속도
@@ -639,22 +654,29 @@
   <div class="intro-in">
     <button class="intro-skip" id="intro-skip">건너뛰기</button>
     <div class="intro-slides" id="intro-slides">
-      <section class="slide on" aria-label="1 / 2">
-        <p class="eyebrow">중국어 다이어리</p>
-        <h2 id="intro-t0">오늘 하루 어땠나요?<br><em>나의 이야기를 중국어로 말해봐요.</em></h2>
-        <p class="small">가장 일상적인 이야기를 통한 중국어 공부.<br>새로운 언어를 내 일상으로 만들 때까지.</p>
+      <section class="slide on" aria-label="1 / 3">
+        <p class="eyebrow">Say My Day</p>
+        <h2 id="intro-t0">오늘 하루 어땠나요?<br><em>내 이야기를 외국어로 말해봐요.</em></h2>
+        <p class="small">내 하루를 일기로 쓰면, 그게 오늘 배울 문장이 돼요.<br>새로운 언어를 내 일상으로 만들 때까지.</p>
       </section>
-      <section class="slide" aria-label="2 / 2" aria-hidden="true">
+      <section class="slide" aria-label="2 / 3" aria-hidden="true">
         <p class="eyebrow">이렇게 배워요</p>
-        <h2>한국어로 쓴 일기를<br><em>중국어로</em></h2>
+        <h2>한국어로 쓴 일기를<br><em>배우는 말로</em></h2>
         <div class="demo"><div class="d-ko">오늘은 날씨가 좋다.</div><div class="d-arrow" aria-hidden="true">↓</div>
-          <div class="d-zh" lang="zh-CN">今天天气很好。</div><div class="d-py">jīntiān tiānqì hěn hǎo.</div></div>
-        <ol class="d-steps"><li>한국어로 한 줄 써요</li><li>중국어로 바뀐 내 문장을 듣고 읽어요</li><li>내가 쓴 문장으로 퀴즈를 풀어요</li></ol>
-        <button class="btn" id="intro-tour" style="margin-top:18px">먼저 예시로 둘러보기</button>
+          <div class="d-zh" lang="zh-CN">今天天气很好。</div><div class="d-py">jīntiān tiānqì hěn hǎo.</div>
+          <div class="d-zh" lang="ja" style="margin-top:10px;font-family:'Noto Serif JP','Hiragino Mincho ProN',serif">今日は天気がいいです。</div><div class="d-py">きょうはてんきがいいです。</div></div>
+        <ol class="d-steps"><li>한국어로 한 줄 써요</li><li>바뀐 내 문장을 듣고 읽어요</li><li>내가 쓴 문장으로 퀴즈를 풀어요</li></ol>
+      </section>
+      <section class="slide" aria-label="3 / 3" aria-hidden="true">
+        <p class="eyebrow">언어 고르기</p>
+        <h2>어떤 말로<br><em>내 하루를 말해 볼까요?</em></h2>
+        <h3 class="lp-h">일기를 쓰는 말</h3><div class="lp-grid" id="lp-src" role="radiogroup" aria-label="일기를 쓰는 말"></div>
+        <h3 class="lp-h">배우고 싶은 말</h3><div class="lp-grid" id="lp-tgt" role="radiogroup" aria-label="배우고 싶은 말"></div>
+        <p class="small" id="lp-note" style="margin-top:12px"></p>
       </section>
     </div>
     <div class="intro-foot">
-      <div class="dots" aria-hidden="true"><i class="on"></i><i></i></div>
+      <div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
       <button class="primary" id="intro-next"><span id="intro-next-label">다음</span><span class="arrow" data-i="arrow"></span></button>
     </div>
   </div>
@@ -687,7 +709,7 @@
         </g></g>
       </g>
     </svg>
-    <p class="w-t">내 이야기를 중국어로 옮겨 쓰고 있어요</p>
+    <p class="w-t">내 이야기를 <span data-tn>중국어</span>로 옮겨 쓰고 있어요</p>
     <p class="w-s" id="w-s"></p>
     <button class="btn" id="cancel">취소</button>
   </div>
@@ -712,14 +734,14 @@
 
 <div id="rpage" class="wpage hidden" role="dialog" aria-modal="true" aria-label="오늘 일기 전체 읽기">
   <div class="wp-in">
-    <div class="wp-bar"><button class="btn icon" id="rp-back" aria-label="뒤로"><span data-i="back"></span></button><span class="t">read aloud</span><button class="btn icon" id="rp-copy" aria-label="중국어 전체 복사"><span data-i="copy"></span></button></div>
+    <div class="wp-bar"><button class="btn icon" id="rp-back" aria-label="뒤로"><span data-i="back"></span></button><span class="t">read aloud</span><button class="btn icon" id="rp-copy" aria-label="번역문 전체 복사"><span data-i="copy"></span></button></div>
     <div class="wp-body" id="rp-body"></div>
     <div class="rp-ctrl">
       <div class="rp-row"><button class="btn icon" id="rp-prev" aria-label="이전 문장"><span data-i="back"></span></button><button class="btn solid big" id="rp-play"></button><button class="btn icon" id="rp-next" aria-label="다음 문장"><span data-i="arrow"></span></button><span class="rp-n" id="rp-n"></span></div>
       <div class="rp-row small">
         <label>속도 <select id="rp-rate" aria-label="읽기 속도"><option value="0.75">느리게</option><option value="0.9">보통</option><option value="1">빠르게</option></select></label>
         <label>문장 사이 쉬는 시간 <select id="rp-gap" aria-label="문장 사이 쉬는 시간"><option value="0">없음</option><option value="3">3초</option><option value="6">6초</option></select></label>
-        <label><input type="checkbox" id="rp-py"> 병음</label>
+        <label><input type="checkbox" id="rp-py"> <span data-rl>병음</span></label>
         <label><input type="checkbox" id="rp-ko"> 한국어</label>
       </div>
     </div>
@@ -762,7 +784,68 @@ function readLangPrefs() {
 }
 let LANG = readLangPrefs();
 // 언어 팩: 학습 언어마다 읽기(발음 표기)를 만드는 방법을 담는다. 일본어·영어·한국어는 이 자리에 추가한다.
-const PACKS = { zh: { readTokens: (text) => pinyin(text, { type: 'all' }) } };
+const tgtName = () => LANGS[LANG.tgt].name;
+const BCP = () => LANGS[LANG.tgt].bcp;
+const readLabel = () => (LANG.tgt === 'ja' ? '후리가나' : '병음');
+// 일본어 읽기: 번역 결과의 단어별 히라가나(AI)를 글자마다 나눠 붙인다. 한 글자 = 한 칸이라는 화면 구조(따라 읽기·형광펜)를 그대로 쓰기 위해
+// 한자 덩어리의 읽기를 글자 수만큼 나눠 각 칸 위에 올린다(예: 友達 ともだち → 友 とも / 達 だち).
+const KANJI_RE = /[一-鿿々〆]/;
+const HIRA_RE = /^[ぁ-ゖー]+$/;
+const toHira = (s) => String(s || '').replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
+const jaDict = new Map(); // 지금까지 본 단어의 읽기. 단어 단위가 아닌 글(예문 등)에 읽기를 붙일 때 쓴다
+function jaLearn(surface, reading) { const r = toHira(reading); if (surface && KANJI_RE.test(surface) && HIRA_RE.test(r)) jaDict.set(surface, r); }
+function jaSplit(reading, n) {
+  if (n <= 1) return [reading];
+  const units = []; // 음절 단위: 요음(きょ)·촉음(っ)·ん·장음(ー)은 앞 글자에 붙인다
+  const O = 'おこそとのほもよろをごぞどぼぽょ', E = 'えけせてねへめれげぜでべぺ', U = 'うくすつぬふむゆるぐずづぶぷゅ';
+  for (const ch of reading) {
+    const prev = units.length ? [...units[units.length - 1]].pop() : '';
+    const longV = (ch === 'う' && (O + U).includes(prev)) || (ch === 'い' && E.includes(prev)); // とう·きょう·せい 같은 장음은 한 덩어리
+    if (units.length && ('ゃゅょぁぃぅぇぉゎっんー'.includes(ch) || longV)) units[units.length - 1] += ch; else units.push(ch);
+  }
+  const base = Math.floor(units.length / n), extra = units.length % n; const out = []; let at = 0;
+  for (let k = 0; k < n; k++) { const size = base + (k < extra ? 1 : 0); out.push(units.slice(at, at + size).join('')); at += size; }
+  return out;
+}
+function jaCharTokens(surface, reading, chk) {
+  const chars = [...surface];
+  const toks = chars.map((ch) => ({ origin: ch, pinyin: '', isZh: KANJI_RE.test(ch) }));
+  const r = toHira(reading);
+  if (!HIRA_RE.test(r)) return toks;
+  const runs = [];
+  chars.forEach((ch, k) => { const kj = KANJI_RE.test(ch); const last = runs[runs.length - 1]; if (last && last.k === kj) last.idx.push(k); else runs.push({ k: kj, idx: [k] }); });
+  const kr = runs.filter((u) => u.k); if (!kr.length) return toks;
+  const pat = runs.map((u) => (u.k ? '(.+?)' : u.idx.map((k) => toHira(chars[k]).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join(''))).join('');
+  const m = r.match(new RegExp('^' + pat + '$'));
+  if (m) kr.forEach((u, j) => jaSplit(m[j + 1], u.idx.length).forEach((p, q) => { toks[u.idx[q]].pinyin = p; }));
+  else { const all = kr.flatMap((u) => u.idx); jaSplit(r, all.length).forEach((p, q) => { toks[all[q]].pinyin = p; }); } // 가나가 맞지 않으면 읽기 전체를 한자에 고르게 나눔
+  if (chk) toks.forEach((t) => { if (t.isZh) t.chk = true; });
+  return toks;
+}
+function jaReadTokens(text) {
+  const chars = [...text]; const out = [];
+  for (let i = 0; i < chars.length;) {
+    let hit = 0, rd = '';
+    for (let n = Math.min(8, chars.length - i); n >= 1; n--) { const w = chars.slice(i, i + n).join(''); if (jaDict.has(w)) { hit = n; rd = jaDict.get(w); break; } }
+    if (hit) { out.push(...jaCharTokens(chars.slice(i, i + hit).join(''), rd)); i += hit; }
+    else { out.push({ origin: chars[i], pinyin: '', isZh: KANJI_RE.test(chars[i]) }); i++; }
+  }
+  return out;
+}
+const PACKS = { zh: { readTokens: (text) => pinyin(text, { type: 'all' }) }, ja: { readTokens: jaReadTokens } };
+function learnReadings(r) {
+  if (LANG.tgt !== 'ja') return;
+  (r.sentences || []).forEach((st) => (st.words || []).forEach((w) => jaLearn(w.zh, w.reading)));
+  (r.vocab || []).forEach((v) => jaLearn(v.zh, v.reading));
+}
+function applyLangUI() {
+  document.documentElement.dataset.tgt = LANG.tgt;
+  document.querySelectorAll('[data-tn]').forEach((el) => { el.textContent = tgtName(); });
+  document.querySelectorAll('[data-rl]').forEach((el) => { el.textContent = readLabel(); });
+  const rh = $('read-hint'); if (rh) { if (!rh.dataset.zh) rh.dataset.zh = rh.textContent; rh.textContent = LANG.tgt === 'ja' ? '단어를 누르면 뜻과 발음이 나와요. 한자 위의 작은 글자가 읽는 법(후리가나)이고, 점선 밑줄이 있으면 읽기를 한 번 더 확인해 보세요.' : rh.dataset.zh; }
+  $('ring-text').textContent = `Say My Day · 오늘의 ${tgtName()} · Say My Day · 오늘의 ${tgtName()} ·`;
+  $('lang-chip').textContent = `${LANGS[LANG.src].name} → ${tgtName()}${LANG.tgt === 'ja' ? ' (베타)' : ''} · 바꾸기`;
+}
 const readTokens = (text) => (PACKS[LANG.tgt] || PACKS.zh).readTokens(text);
 const langTags = () => ({ srcLang: LANG.src, tgtLang: LANG.tgt, glossLang: LANG.src }); // 일기에 붙이는 꼬리표
 // 꼬리표가 없는 기존 기록은 한국어 > 중국어로 표시한다(이미 표시된 것은 건드리지 않는다).
@@ -872,13 +955,14 @@ $('opt-bright').addEventListener('input', () => setBright(Number($('opt-bright')
 // ---------- 병음·한자 칸 ----------
 // 병음은 모델이 아니라 pinyin-pro(+교정 사전)가 생성한다.
 const cell = (t, mk) => t.isZh
-  ? `<span class="c${mk ? ' mk' : ''}"><span class="p" aria-hidden="true">${esc(t.pinyin)}</span><span class="h">${esc(t.origin)}</span></span>`
+  ? `<span class="c${mk ? ' mk' : ''}"><span class="p${t.chk ? ' chk' : ''}" aria-hidden="true">${esc(t.pinyin)}</span><span class="h">${esc(t.origin)}</span></span>`
   : `<span class="c pu"><span class="p" aria-hidden="true"></span><span class="h">${esc(t.origin)}</span></span>`;
 const cells = (text) => readTokens(text).map((t) => cell(t)).join('');
 const cellsFrom = (toks) => toks.map((t) => cell(t)).join('');
 // 단어를 하나씩 따로 계산하면 了(le/liǎo)·得(de/dé)·不·一처럼 앞뒤 글자에 따라 소리가 바뀌는 글자가 틀린다.
 // 그래서 문장 전체로 병음을 계산한 뒤 단어 길이대로 나눈다. 글자 수가 맞지 않을 때만 단어별로 따로 계산한다.
 function wordTokens(words) {
+  if (LANG.tgt === 'ja') return words.map((w) => (w.reading ? jaCharTokens(w.zh, w.reading, w.check) : readTokens(w.zh)));
   const whole = readTokens(words.map((w) => w.zh).join(''));
   if (whole.length !== words.reduce((n, w) => n + [...w.zh].length, 0)) return words.map((w) => readTokens(w.zh));
   let pos = 0; return words.map((w) => { const n = [...w.zh].length; const t = whole.slice(pos, pos + n); pos += n; return t; });
@@ -891,9 +975,10 @@ function zhLine(text, size = 'mid', mark = '') {
     const html = cell(t, start >= 0 && i >= start && i < start + mark.length);
     if (!t.isZh && isPunct(t.origin) && groups.length) groups[groups.length - 1] += html; else groups.push(html);
   });
-  return `<div class="zhline ${size}" lang="zh-CN">${groups.map((g) => `<span class="nw">${g}</span>`).join('')}</div>`;
+  return `<div class="zhline ${size}" lang="${BCP()}">${groups.map((g) => `<span class="nw">${g}</span>`).join('')}</div>`;
 }
 function plainPinyin(text) {
+  if (LANG.tgt === 'ja') return readTokens(text).map((t) => (t.isZh ? t.pinyin || t.origin : t.origin)).join('');
   return readTokens(text).map((t) => t.isZh ? t.pinyin : t.origin).join(' ').replace(/\s+([，。？！、,.?!])/g, '$1');
 }
 const isPunct = (t) => /^[\p{P}\p{S}\s]+$/u.test(t);
@@ -905,10 +990,12 @@ let currentAudio = null;
 let rd = { i: 0, playing: false, started: false, done: false, token: 0, audio: null, timer: null, wake: null }; // 일기 전체 읽기 상태
 // 음성은 서버가 알려 주는 신경망 음성 4개만 쓴다. 서버에 edge-tts가 없을 때만 브라우저 음성을 대신 보여 준다.
 let edgeVoices = [];
+let edgeByLang = {};
+const voiceKey = () => (LANG.tgt === 'zh' ? 'voice' : 'voice-' + LANG.tgt); // 중국어는 예전 저장 이름 그대로
 let edgeChecked = false;
 function zhVoices() {
   return speechSynthesis.getVoices()
-    .filter((v) => /^(zh|cmn)[-_]?(CN|Hans)?/i.test(v.lang.replace('_', '-')) && !/HK|TW|yue/i.test(v.lang))
+    .filter((v) => (LANG.tgt === 'ja' ? /^ja/i.test(v.lang) : /^(zh|cmn)[-_]?(CN|Hans)?/i.test(v.lang.replace('_', '-')) && !/HK|TW|yue/i.test(v.lang)))
     .sort((a, b) => voiceScore(b) - voiceScore(a));
 }
 function voiceScore(v) {
@@ -918,18 +1005,18 @@ function voiceScore(v) {
   return 1;
 }
 function fillVoiceSelect() {
-  const sel = $('opt-voice'); const saved = store.get('voice', '');
+  const sel = $('opt-voice'); const saved = store.get(voiceKey(), '');
   let opts;
   if (edgeVoices.length) opts = edgeVoices.map((v) => `<option value="edge:${esc(v.id)}">${esc(v.label)}</option>`);
   else if (!edgeChecked) opts = ['<option value="">불러오는 중…</option>'];
   else opts = (('speechSynthesis' in window) ? zhVoices() : []).map((v) => `<option value="${esc(v.name)}">${esc(v.name.replace(/\s*\(.*\)\s*$/, ''))} (기본 음성)</option>`);
-  sel.innerHTML = opts.length ? opts.join('') : '<option value="">(중국어 음성 없음)</option>';
+  sel.innerHTML = opts.length ? opts.join('') : `<option value="">(${tgtName()} 음성 없음)</option>`;
   if (saved && [...sel.options].some((o) => o.value === saved)) sel.value = saved;
 }
-$('opt-voice').addEventListener('change', () => { store.set('voice', $('opt-voice').value); stopSpeak(); });
+$('opt-voice').addEventListener('change', () => { store.set(voiceKey(), $('opt-voice').value); stopSpeak(); });
 fillVoiceSelect();
 if ('speechSynthesis' in window) speechSynthesis.addEventListener('voiceschanged', () => { if (edgeChecked && !edgeVoices.length) fillVoiceSelect(); });
-fetch('/api/tts-status').then((r) => r.json()).then((d) => { if (d.available) edgeVoices = d.voices; }).catch(() => {}).finally(() => { edgeChecked = true; fillVoiceSelect(); });
+fetch('/api/tts-status').then((r) => r.json()).then((d) => { if (d.available) { edgeByLang = d.voicesByLang || {}; edgeVoices = edgeByLang[LANG.tgt] || (LANG.tgt === 'zh' ? d.voices : []); } }).catch(() => {}).finally(() => { edgeChecked = true; fillVoiceSelect(); });
 function zhVoice() {
   return new Promise((resolve) => {
     const pick = () => { const list = zhVoices(); return list.find((v) => v.name === $('opt-voice').value) || list[0] || null; };
@@ -1095,7 +1182,7 @@ async function speak(btn) {
   if (!('speechSynthesis' in window)) { warn.textContent = '이 브라우저는 음성 재생을 지원하지 않아요. 크롬이나 사파리를 써 보세요.'; warn.classList.remove('hidden'); return; }
   const voice = await zhVoice();
   if (!voice) {
-    warn.textContent = '이 기기에 중국어 음성이 없어서 재생하지 않았어요. 한국어 음성으로 읽으면 발음이 틀려서 공부에 방해가 돼요. 자연스러운 음성은 README의 edge-tts 설치 방법을 따라 켤 수 있어요.';
+    warn.textContent = '이 기기에 ' + tgtName() + ' 음성이 없어서 재생하지 않았어요. 한국어 음성으로 읽으면 발음이 틀려서 공부에 방해가 돼요. 자연스러운 음성은 README의 edge-tts 설치 방법을 따라 켤 수 있어요.';
     warn.classList.remove('hidden'); return;
   }
   warn.classList.add('hidden');
@@ -1128,10 +1215,10 @@ const copyBtn = (zh) => `<button class="btn icon" data-copy="${esc(zh)}" aria-la
 // 모델이 준 words를 쓰되, 이어 붙인 결과가 문장과 다르면 브라우저의 단어 분리기(Intl.Segmenter)로 대신하고 뜻은 핵심 단어 목록에서만 찾는다.
 function wordsOf(s, vocab) {
   const zh = s.zh || '';
-  if (Array.isArray(s.words) && s.words.length && s.words.map((w) => w.zh).join('') === zh) return s.words.map((w) => ({ zh: w.zh, ko: w.ko || '' }));
+  if (Array.isArray(s.words) && s.words.length && s.words.map((w) => w.zh).join('') === zh) return s.words.map((w) => ({ zh: w.zh, ko: w.ko || '', reading: w.reading || '', check: !!w.check, kuro: w.kuro || '' }));
   const gloss = new Map((vocab || []).map((v) => [v.zh, v.ko]));
   if (typeof Intl !== 'undefined' && Intl.Segmenter) {
-    return [...new Intl.Segmenter('zh-CN', { granularity: 'word' }).segment(zh)].map((g) => ({ zh: g.segment, ko: gloss.get(g.segment) || '' }));
+    return [...new Intl.Segmenter(BCP(), { granularity: 'word' }).segment(zh)].map((g) => ({ zh: g.segment, ko: gloss.get(g.segment) || '' }));
   }
   return [...zh].map((ch) => ({ zh: ch, ko: gloss.get(ch) || '' }));
 }
@@ -1182,7 +1269,7 @@ function renderWordPage() {
   const w = wp.list[wp.i]; const n = wp.list.length;
   $('wp-save-slot').innerHTML = wpSaveBtn(w);
   $('wp-body').innerHTML = `
-    <div class="zhline xl" lang="zh-CN">${w.tok ? cellsFrom(w.tok) : cells(w.zh)}</div>
+    <div class="zhline xl" lang="${BCP()}">${w.tok ? cellsFrom(w.tok) : cells(w.zh)}</div>
     <div class="wp-ko ${w.ko ? '' : 'none'}">${w.ko ? esc(w.ko) : '이 단어의 뜻 정보가 없어요. 발음은 들을 수 있어요.'}</div>
     <div class="actions">${playBtn(w.zh, '발음 듣기', true, false, '', ctxOf(w))}${playBtn(w.zh, '느리게', false, false, '0.75', ctxOf(w))}</div>
     ${hasHan(w.zh) ? `<section class="cell chars" id="wp-chars" style="margin-top:22px">${charsHtml(w)}</section>` : ''}
@@ -1197,7 +1284,7 @@ function renderWordPage() {
 
 // ---------- 글자별 풀이 ----------
 // 단어를 이루는 글자를 한 글자씩 보여 준다. 병음은 앱이 문맥에 맞게 계산하고, 한국 한자 훈음과 뜻은 서버(AI)에서 가져와 이 기기에 저장해 두고 다시 쓴다.
-const hasHan = (t) => /^[一-鿿·]+$/.test(String(t || ''));
+const hasHan = (t) => LANG.tgt === 'zh' && /^[一-鿿·]+$/.test(String(t || '')); // 글자별 풀이는 중국어만
 const CH_KEY = 'char-cache'; const charCache = store.get(CH_KEY, {}); const charPending = new Map();
 function saveCharCache() { const ks = Object.keys(charCache); if (ks.length > 600) ks.slice(0, ks.length - 600).forEach((k) => delete charCache[k]); store.set(CH_KEY, charCache); }
 function loadChars(words) {
@@ -1216,7 +1303,7 @@ function charsHtml(w, err) {
   const rows = [...w.zh].map((ch, i) => {
     const g = c && c.chars && c.chars[i]; const py = toks[i] && toks[i].isZh ? toks[i].pinyin : '';
     const body = g ? `<div class="chr-k">${g.hun ? `<b>${esc(g.hun)}</b>` : ''}${g.meaning ? `<span>${esc(g.meaning)}</span>` : ''}</div>` : (err ? '' : '<div class="chr-k mute">풀이를 불러오는 중…</div>');
-    return `<div class="chr"><div class="chr-h" lang="zh-CN">${esc(ch)}</div><div class="chr-b"><div class="chr-py">${esc(py)}</div>${body}</div></div>`;
+    return `<div class="chr"><div class="chr-h" lang="${BCP()}">${esc(ch)}</div><div class="chr-b"><div class="chr-py">${esc(py)}</div>${body}</div></div>`;
   }).join('');
   const tail = c && c.how ? `<div class="chr-how">${esc(c.how)}</div>` : '';
   const fail = !c && err ? `<div class="chr-how">${esc(err)} <button class="btn" data-charsretry style="min-height:32px;padding:2px 12px;margin-left:6px">다시 불러오기</button></div>` : '';
@@ -1241,7 +1328,7 @@ let mini = null; // { si, k, w, el }
 function miniWord(kind, si, k) {
   const { s, words } = unitState(kind)[si]; const w = words[k];
   const v = currentVocab.find((x) => x.zh === w.zh);
-  return { zh: w.zh, ko: w.ko || '', tok: wordTokens(words)[k], ctx_i: words.slice(0, k).reduce((n, x) => n + [...x.zh].length, 0), ctx_zh: s.zh, ctx_ko: s.ko, ex_zh: v?.example_zh || '', ex_ko: v?.example_ko || '' };
+  return { zh: w.zh, ko: w.ko || '', reading: w.reading || '', check: w.check, kuro: w.kuro, tok: wordTokens(words)[k], ctx_i: words.slice(0, k).reduce((n, x) => n + [...x.zh].length, 0), ctx_zh: s.zh, ctx_ko: s.ko, ex_zh: v?.example_zh || '', ex_ko: v?.example_ko || '' };
 }
 const ctxOf = (w) => (w.ctx_zh && w.ctx_i != null ? { zh: w.ctx_zh, i: w.ctx_i } : null); // 문장 속 단어면 문장 정보를 돌려준다
 const miniSaveBtn = (zh) => hasWord(zh)
@@ -1257,8 +1344,9 @@ function showMini(kind, si, k, el) {
   const w = miniWord(kind, si, k); mini = { kind, si, k, w, el }; el.classList.add('sel');
   const box = $('wmini');
   box.innerHTML = `<button class="btn icon mx" data-mclose aria-label="닫기">${ICON.close}</button>
-    <div class="mtop"><div class="zhline mid" lang="zh-CN">${cellsFrom(w.tok)}</div>
-    <div class="mko ${w.ko ? '' : 'none'}">${w.ko ? esc(w.ko) : '이 단어의 뜻 정보가 없어요. 발음은 들을 수 있어요.'}</div></div>
+    <div class="mtop"><div class="zhline mid" lang="${BCP()}">${cellsFrom(w.tok)}</div>
+    <div class="mko ${w.ko ? '' : 'none'}">${w.ko ? esc(w.ko) : '이 단어의 뜻 정보가 없어요. 발음은 들을 수 있어요.'}</div>
+    ${w.check ? `<div class="chknote">읽기를 한 번 더 확인해 보세요 · AI는 「${esc(w.reading)}」, 분석 도구는 「${esc(w.kuro || '?')}」로 읽었어요. 문맥에 따라 읽기가 달라지는 단어일 수 있어요.</div>` : ''}</div>
     ${miniChars(w)}
     <div class="actions">${playBtn(w.zh, '듣기', true, false, '', ctxOf(w))}${miniSaveBtn(w.zh)}<button class="btn" data-mmore>${ICON.list}<span>자세히</span></button></div>`;
   box.style.bottom = (document.querySelector('.tabbar')?.offsetHeight || 56) + 24 + 'px';
@@ -1284,7 +1372,7 @@ const wordbookItems = () => loadWords().map((w) => wordItem(w.zh, w.ko, { ex_zh:
 
 // ---------- 렌더 ----------
 function moreBlock(s) {
-  const split = (s.zh_split && s.zh_split.length > 1) ? `<div class="split zh-font" lang="zh-CN">끊어 읽기: ${s.zh_split.map(esc).join(' / ')}</div>` : '';
+  const split = (s.zh_split && s.zh_split.length > 1) ? `<div class="split zh-font" lang="${BCP()}">끊어 읽기: ${s.zh_split.map(esc).join(' / ')}</div>` : '';
   const note = s.note ? `<div class="note">${esc(s.note)}</div>` : '';
   const tips = (s.pronunciation_tips || []).length ? `<ul class="tips">${s.pronunciation_tips.map((t) => `<li>${esc(t)}</li>`).join('')}</ul>` : '';
   if (!split && !note && !tips) return '';
@@ -1304,6 +1392,7 @@ function render(r, isMock) {
   const ambs = normAmb(r);
   currentResult = r;
   currentVocab = r.vocab || [];
+  learnReadings(r);
 
   hideMini();
   sentState = (r.sentences || []).map((s) => ({ s, words: wordsOf(s, currentVocab) }));
@@ -1314,7 +1403,7 @@ function render(r, isMock) {
       <div class="body">
         <div class="ko"><span class="maskable">${esc(s.ko)}</span>${mine.length ? `<button class="flag" data-flag="${si}" aria-expanded="false">${ICON.alert}확인 필요 ${mine.length}</button>` : ''}</div>
         ${mine.length ? `<div class="flagbox hidden" id="fb-${si}">${mine.map((a) => `<div class="banner warn">${esc(a.text)}</div>`).join('')}</div>` : ''}
-        <div class="zhline big" lang="zh-CN">${sentenceHtml(words, si)}</div>
+        <div class="zhline big" lang="${BCP()}">${sentenceHtml(words, si)}</div>
         <div class="actions">${s.zh ? playBtn(s.zh, '듣기', true) + copyBtn(s.zh) + sentSaveBtn('sent:' + si, s.zh) : ''}</div>
         ${moreBlock(s)}
       </div>
@@ -1324,26 +1413,26 @@ function render(r, isMock) {
   const feat = currentVocab.slice(0, 2), rest = currentVocab.slice(2);
   $('vocab').innerHTML = `<div class="grid">${feat.map((v, i) => `
     <div class="cell">
-      <button class="zlink vocab-zh" data-vw="${i}" lang="zh-CN" aria-label="단어 페이지 열기: ${esc(v.zh)}">${esc(v.zh)}</button>
+      <button class="zlink vocab-zh" data-vw="${i}" lang="${BCP()}" aria-label="단어 페이지 열기: ${esc(v.zh)}">${esc(v.zh)}</button>
       <div class="py">${esc(plainPinyin(v.zh))}</div>
       <div class="maskable" style="margin:2px 0 8px">${esc(v.ko)}</div>
-      <div class="zh-font" lang="zh-CN">${esc(v.example_zh)}</div>
+      <div class="zh-font" lang="${BCP()}">${esc(v.example_zh)}</div>
       <div class="py">${esc(plainPinyin(v.example_zh || ''))}</div>
       <div class="ex-ko maskable">${esc(v.example_ko)}</div>
       <div class="actions">${playBtn(v.zh, '단어')}${v.example_zh ? playBtn(v.example_zh, '예문') : ''}${saveBtn(i, v.zh)}</div>
     </div>`).join('')}</div>
     ${rest.length ? `<div class="vlist">${rest.map((v, j) => `
       <div class="vrow">
-        <div class="vtop"><button class="zlink vz" data-vw="${j + 2}" lang="zh-CN" aria-label="단어 페이지 열기: ${esc(v.zh)}">${esc(v.zh)}</button><span class="py">${esc(plainPinyin(v.zh))}</span><span class="vk maskable">${esc(v.ko)}</span>
+        <div class="vtop"><button class="zlink vz" data-vw="${j + 2}" lang="${BCP()}" aria-label="단어 페이지 열기: ${esc(v.zh)}">${esc(v.zh)}</button><span class="py">${esc(plainPinyin(v.zh))}</span><span class="vk maskable">${esc(v.ko)}</span>
           ${playBtn(v.zh, '단어 듣기', false, true)}${saveBtn(j + 2, v.zh, true)}</div>
         ${v.example_zh ? `<details class="more"><summary>예문</summary>
-          <div class="zh-font" lang="zh-CN">${esc(v.example_zh)} ${playBtn(v.example_zh, '예문 듣기', false, true)}</div>
+          <div class="zh-font" lang="${BCP()}">${esc(v.example_zh)} ${playBtn(v.example_zh, '예문 듣기', false, true)}</div>
           <div class="py">${esc(plainPinyin(v.example_zh))}</div><div class="ex-ko maskable">${esc(v.example_ko)}</div></details>` : ''}
       </div>`).join('')}</div>` : ''}`;
 
   // 활용 문장·문법 예문의 단어 뜻은 이 일기에서 이미 아는 단어(핵심 단어, 번역 문장 속 단어)에서 찾는다
   const gloss = [...currentVocab, ...sentState.flatMap(({ words }) => words)].filter((w) => w.ko);
-  const lineOf = (zh, ko, kind, i, state) => { state[i] = { s: { zh, ko: ko || '' }, words: wordsOf({ zh }, gloss) }; return `<div class="zhline mid" lang="zh-CN">${sentenceHtml(state[i].words, i, kind)}</div>`; };
+  const lineOf = (zh, ko, kind, i, state) => { state[i] = { s: { zh, ko: ko || '' }, words: wordsOf({ zh }, gloss) }; return `<div class="zhline mid" lang="${BCP()}">${sentenceHtml(state[i].words, i, kind)}</div>`; };
   gramState = []; extraState = [];
   $('grammar').innerHTML = (r.grammar || []).map((g, gi) => `
     <div class="cell"><div class="pat">${esc(g.pattern)}</div>
@@ -1446,10 +1535,14 @@ const INTERVALS = [1, 3, 7, 14, 30];
 let currentVocab = [];
 let currentResult = {};
 let wbTab = 'word';
-const loadWords = () => store.get(WORD_KEY, []);
-const saveWords = (w) => store.set(WORD_KEY, w);
-const loadSents = () => store.get(SENT_KEY, []);
-const saveSents = (a) => store.set(SENT_KEY, a);
+// 단어·문장·일기는 학습 언어별로 나눠 보여 준다. 저장할 때는 다른 언어의 기록을 그대로 둔다.
+const langOf = (x) => x.lang || x.tgtLang || 'zh';
+const loadScoped = (key) => store.get(key, []).filter((x) => langOf(x) === LANG.tgt);
+const saveScoped = (key, list) => store.set(key, [...store.get(key, []).filter((x) => langOf(x) !== LANG.tgt), ...list]);
+const loadWords = () => loadScoped(WORD_KEY);
+const saveWords = (w) => saveScoped(WORD_KEY, w);
+const loadSents = () => loadScoped(SENT_KEY);
+const saveSents = (a) => saveScoped(SENT_KEY, a);
 const hasWord = (zh) => loadWords().some((w) => w.zh === zh);
 const hasSent = (zh) => loadSents().some((s) => s.zh === zh);
 function dueLabel(w) {
@@ -1473,7 +1566,7 @@ function renderWords() {
   $('wordlist').innerHTML = words.length ? words.map((w, i) => `
     <div class="word-item">
       <button class="wlink" data-wopen="${i}" aria-label="단어 페이지 열기: ${esc(w.zh)}">
-        <span class="w" lang="zh-CN">${esc(w.zh)}</span>
+        <span class="w" lang="${BCP()}">${esc(w.zh)}</span>
         <span class="m"><span class="py">${esc(plainPinyin(w.zh))}</span><br>${esc(w.ko)}<span class="due">${esc(dueLabel(w))}</span></span>
       </button>
       ${playBtn(w.zh, '단어 듣기', false, true)}
@@ -1482,7 +1575,7 @@ function renderWords() {
   $('sentlist').innerHTML = sents.length ? sents.map((s) => `
     <div class="word-item">
       <div class="wlink" style="cursor:default">
-        <span class="m"><span class="zh-font" lang="zh-CN" style="font-size:var(--fs-l)">${esc(s.zh)}</span><br><span class="py">${esc(plainPinyin(s.zh))}</span><br><span class="maskable">${esc(s.ko)}</span><span class="due">${esc(dueLabel(s))}</span></span>
+        <span class="m"><span class="zh-font" lang="${BCP()}" style="font-size:var(--fs-l)">${esc(s.zh)}</span><br><span class="py">${esc(plainPinyin(s.zh))}</span><br><span class="maskable">${esc(s.ko)}</span><span class="due">${esc(dueLabel(s))}</span></span>
       </div>
       ${playBtn(s.zh, '문장 듣기', false, true)}
       <button class="btn icon" data-delsent="${esc(s.zh)}" aria-label="문장 보관함에서 삭제">${ICON.close}</button>
@@ -1492,7 +1585,7 @@ document.querySelectorAll('[data-wb]').forEach((b) => b.addEventListener('click'
 function addOrRemoveWord(item) {
   let list = loadWords();
   if (list.some((w) => w.zh === item.zh)) list = list.filter((w) => w.zh !== item.zh);
-  else list.push({ zh: item.zh, ko: item.ko, ex_zh: item.ex_zh || '', ex_ko: item.ex_ko || '', lang: LANG.tgt, box: 0, due: Date.now() });
+  else list.push({ zh: item.zh, ko: item.ko, ex_zh: item.ex_zh || '', ex_ko: item.ex_ko || '', reading: item.reading || jaDict.get(item.zh) || '', lang: LANG.tgt, box: 0, due: Date.now() });
   saveWords(list); renderWords();
 }
 function refreshSaveButtons() {
@@ -1521,7 +1614,7 @@ function toggleSent(ref) {
   const d = sentDataFor(ref); if (!d || !d.zh) return;
   let list = loadSents();
   if (list.some((s) => s.zh === d.zh)) list = list.filter((s) => s.zh !== d.zh);
-  else list.push({ zh: d.zh, ko: d.ko || '', words: (d.words || []).map((w) => ({ zh: w.zh, ko: w.ko || '' })), lang: LANG.tgt, box: 0, due: Date.now() });
+  else list.push({ zh: d.zh, ko: d.ko || '', words: (d.words || []).map((w) => ({ zh: w.zh, ko: w.ko || '', reading: w.reading || '' })), lang: LANG.tgt, box: 0, due: Date.now() });
   saveSents(list); renderWords(); refreshSentButtons();
 }
 $('wordlist').addEventListener('click', (e) => {
@@ -1592,14 +1685,14 @@ $('quiz-start').addEventListener('click', () => {
 const qbar = (done, total) => `<div class="qbar"><button class="btn icon" id="quiz-close" aria-label="퀴즈 닫기">${ICON.close}</button>
   <div class="qprog" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${done}"><i style="width:${Math.round((done / total) * 100)}%"></i></div>
   <span class="count">${Math.min(done + 1, total)} / ${total}</span></div>`;
-const optButtons = (opts, field) => `<div class="q-opts" role="group" aria-label="보기">${opts.map((o, i) => `<button data-opt="${i}"><span class="k">${i + 1}</span><span class="${field === 'zh' ? 'hz' : ''}" ${field === 'zh' ? 'lang="zh-CN"' : ''}>${esc(o[field])}</span></button>`).join('')}</div>`;
+const optButtons = (opts, field) => `<div class="q-opts" role="group" aria-label="보기">${opts.map((o, i) => `<button data-opt="${i}"><span class="k">${i + 1}</span><span class="${field === 'zh' ? 'hz' : ''}" ${field === 'zh' ? 'lang="${BCP()}"' : ''}>${esc(o[field])}</span></button>`).join('')}</div>`;
 const center = (html) => `<div class="actions" style="justify-content:center">${html}</div>`;
 
 function learnCard(item, kind) {
   const word = kind === 'word';
   return `<div class="quiz-kind">${word ? '새 단어 · 먼저 익혀 볼까요?' : '새 문장 · 먼저 읽어 볼까요?'}</div>
     <div class="cell" style="text-align:center">
-      ${word ? `<div class="zhline xl" lang="zh-CN" style="justify-content:center">${cells(item.zh)}</div>` : zhLine(item.zh, 'mid').replace('class="zhline mid"', 'class="zhline mid" style="justify-content:center"')}
+      ${word ? `<div class="zhline xl" lang="${BCP()}" style="justify-content:center">${cells(item.zh)}</div>` : zhLine(item.zh, 'mid').replace('class="zhline mid"', 'class="zhline mid" style="justify-content:center"')}
       <div class="wp-ko ${item.ko ? '' : 'none'}">${esc(item.ko || '')}</div>
       ${word && item.ex_zh ? `<div class="back-ex">${zhLine(item.ex_zh, 'mid').replace('class="zhline mid"', 'class="zhline mid" style="justify-content:center"')}<div class="ex-ko">${esc(item.ex_ko)}</div></div>` : ''}
     </div>
@@ -1609,13 +1702,13 @@ function learnCard(item, kind) {
 }
 function askChoose(item, t) {
   t.opts = t.opts || shuffle([{ zh: item.zh, ko: item.ko }, ...distractors('word', item, 3)]);
-  return `<div class="quiz-kind">뜻 고르기 · 병음은 가렸어요</div>
-    <div class="nopy" lang="zh-CN"><div class="zhline xl" style="justify-content:center">${cells(item.zh)}</div></div>
+  return `<div class="quiz-kind">뜻 고르기 · ${readLabel()}${LANG.tgt === 'ja' ? '는' : '은'} 가렸어요</div>
+    <div class="nopy" lang="${BCP()}"><div class="zhline xl" style="justify-content:center">${cells(item.zh)}</div></div>
     ${center(playBtn(item.zh, '발음 듣기'))}${optButtons(t.opts, 'ko')}`;
 }
 function askListen(item, t) {
   t.opts = t.opts || shuffle([{ zh: item.zh, ko: item.ko }, ...distractors('word', item, 3)]);
-  return `<div class="quiz-kind">듣고 뜻 고르기 · 글자도 병음도 안 보여요</div>
+  return `<div class="quiz-kind">듣고 뜻 고르기 · 글자도 ${readLabel()}도 안 보여요</div>
     ${center(playBtn(item.zh, '다시 듣기', true))}${optButtons(t.opts, 'ko')}`;
 }
 function askListenS(item, t) {
@@ -1623,7 +1716,14 @@ function askListenS(item, t) {
   return `<div class="quiz-kind">문장을 듣고 뜻 고르기</div>
     ${center(playBtn(item.zh, '다시 듣기', true) + playBtn(item.zh, '느리게', false, false, '0.75'))}${optButtons(t.opts, 'ko')}`;
 }
+const readingOf = (item) => item.reading || plainPinyin(item.zh);
+function checkKana(input, item) { const a = toHira(input.trim().replace(/\s+/g, '')); return { ok: !!a && (a === toHira(readingOf(item)) || a === item.zh), tone: null }; }
 function askPinyin(item) {
+  if (LANG.tgt === 'ja') return `<div class="quiz-kind">뜻을 보고 히라가나로 쓰기</div>
+    <div class="q-ko">${esc(item.ko)}</div>
+    <input id="q-in" class="q-input" type="text" lang="ja" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="예) ともだち" aria-label="히라가나 입력">
+    <p class="hint" style="text-align:center;margin:8px 0 0" id="q-hint-text">히라가나로 써 보세요. 가타카나로 써도 맞아요.</p>
+    ${center('<button class="btn" id="q-hint">힌트</button><button class="btn solid" id="q-submit">확인</button>')}`;
   return `<div class="quiz-kind">뜻을 보고 병음 쓰기</div>
     <div class="q-ko">${esc(item.ko)}</div>
     <input id="q-in" class="q-input" type="text" inputmode="latin" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="xin qing  /  xin1 qing2  /  xīn qíng" aria-label="병음 입력">
@@ -1640,10 +1740,10 @@ function askCloze(item, t) {
 function askBuild(item, t) {
   const ws = contentWords(item); t.bank = t.bank || shuffle(ws.map((w, i) => ({ zh: w.zh, i })));
   if (t.bank.length > 1 && t.bank.every((c, i) => c.i === i)) t.bank.reverse();
-  return `<div class="quiz-kind">중국어 문장 만들기 · 단어를 순서대로 눌러요</div>
+  return `<div class="quiz-kind">${tgtName()} 문장 만들기 · 단어를 순서대로 눌러요</div>
     <div class="build-ko">${esc(item.ko)}</div>
     <div class="build-line" id="bl" aria-label="내가 만든 문장" aria-live="polite"></div>
-    <div class="build-bank" id="bb">${t.bank.map((c) => `<button class="chipw" data-chip="${c.i}" lang="zh-CN">${esc(c.zh)}</button>`).join('')}</div>
+    <div class="build-bank" id="bb">${t.bank.map((c) => `<button class="chipw" data-chip="${c.i}" lang="${BCP()}">${esc(c.zh)}</button>`).join('')}</div>
     ${center('<button class="btn" id="b-reset">다시</button><button class="btn solid" id="q-check">확인</button>')}`;
 }
 function askSelf(item) {
@@ -1666,7 +1766,7 @@ function renderQuiz() {
 }
 function answerSummary(item, kind) {
   return kind === 'word'
-    ? `<div class="zhline mid" lang="zh-CN" style="justify-content:center">${cells(item.zh)}</div><div class="wp-ko" style="font-size:1.3rem;margin:4px 0">${esc(item.ko)}</div>${item.ex_zh ? `<div class="ex-ko" lang="zh-CN">${esc(item.ex_zh)} · ${esc(item.ex_ko)}</div>` : ''}`
+    ? `<div class="zhline mid" lang="${BCP()}" style="justify-content:center">${cells(item.zh)}</div><div class="wp-ko" style="font-size:1.3rem;margin:4px 0">${esc(item.ko)}</div>${item.ex_zh ? `<div class="ex-ko" lang="${BCP()}">${esc(item.ex_zh)} · ${esc(item.ex_ko)}</div>` : ''}`
     : `${zhLine(item.zh, 'mid').replace('class="zhline mid"', 'class="zhline mid" style="justify-content:center"')}<div class="ex-ko">${esc(item.ko)}</div>`;
 }
 function showFeedback(t, ok, note = '') {
@@ -1698,7 +1798,7 @@ function renderQuizEnd() {
     <div class="empty" style="padding-top:0">${DOODLE}</div>
     <div class="quiz-score">${quiz.yes} / ${n}</div>
     <p style="text-align:center">${quiz.missed.length ? '처음에 틀린 것은 곧 다시 나와요.' : '처음부터 모두 맞혔어요!'}${quiz.review ? ' (복습할 차례인 항목이 없어서 전체에서 골랐어요.)' : ''}</p>
-    ${quiz.missed.length ? `<ul class="missed">${quiz.missed.map(({ item: w, kind }) => `<li><span class="zh-font" lang="zh-CN">${esc(w.zh)}</span><span>${kind === 'word' ? esc(plainPinyin(w.zh)) + ' · ' : ''}${esc(w.ko)}</span></li>`).join('')}</ul>` : ''}
+    ${quiz.missed.length ? `<ul class="missed">${quiz.missed.map(({ item: w, kind }) => `<li><span class="zh-font" lang="${BCP()}">${esc(w.zh)}</span><span>${kind === 'word' ? esc(plainPinyin(w.zh)) + ' · ' : ''}${esc(w.ko)}</span></li>`).join('')}</ul>` : ''}
     ${center((quiz.missed.length ? '<button class="btn" id="quiz-redo">틀린 것만 다시</button>' : '') + '<button class="btn solid" id="quiz-done">닫기</button>')}</div>`;
   renderWords();
 }
@@ -1716,6 +1816,7 @@ function checkPinyin(input, zh) {
   return { ok: true, tone };
 }
 function hintFor(item) {
+  if (LANG.tgt === 'ja') { const r = [...readingOf(item)]; return `${r.length}글자 · 첫 글자 "${r[0] || ''}"`; }
   const syl = pinyin(item.zh, { type: 'array', toneType: 'none' });
   return `${syl.length}음절 · 첫 글자 "${syl[0][0]}"`;
 }
@@ -1736,9 +1837,10 @@ $('quiz').addEventListener('click', (e) => {
   if (e.target.closest('#q-hint')) { $('q-hint-text').textContent = hintFor(t.item); return $('q-in').focus(); }
   if (e.target.closest('#q-submit')) {
     const v = $('q-in').value; if (!v.trim()) return $('q-in').focus();
-    const r = checkPinyin(v, t.item.zh); $('q-in').disabled = true;
-    const sym = pinyin(t.item.zh, { type: 'array', toneType: 'symbol' }).join(' ');
-    const note = r.ok ? (r.tone === true ? '성조까지 정확해요.' : r.tone === false ? `글자는 맞고 성조는 ${sym}예요.` : `성조는 ${sym}예요.`) : '';
+    const ja = LANG.tgt === 'ja';
+    const r = ja ? checkKana(v, t.item) : checkPinyin(v, t.item.zh); $('q-in').disabled = true;
+    const sym = ja ? readingOf(t.item) : pinyin(t.item.zh, { type: 'array', toneType: 'symbol' }).join(' ');
+    const note = ja ? (r.ok ? '' : `읽기는 ${sym}예요.`) : r.ok ? (r.tone === true ? '성조까지 정확해요.' : r.tone === false ? `글자는 맞고 성조는 ${sym}예요.` : `성조는 ${sym}예요.`) : '';
     return showFeedback(t, r.ok, note);
   }
   const chip = e.target.closest('[data-chip]');
@@ -2037,7 +2139,7 @@ $('cal').addEventListener('click', (e) => {
 
 // ---------- 기록 ----------
 const HIST_KEY = 'diary-history';
-function loadHist() { return store.get(HIST_KEY, []); }
+function loadHist() { return loadScoped(HIST_KEY); }
 function renderHist() {
   const list = loadHist();
   setDot($('n-hist'), list.length);
@@ -2054,12 +2156,12 @@ $('hist').addEventListener('click', (e) => {
     const h = list.find((x) => String(x.id) === open.dataset.open); if (!h) return;
     closeSheet(); $('diary').value = h.diary; $('diary').dispatchEvent(new Event('input')); render(h.result, false); showResult();
   } else if (del) {
-    store.set(HIST_KEY, list.filter((x) => String(x.id) !== del.dataset.del)); renderHist();
+    saveScoped(HIST_KEY, list.filter((x) => String(x.id) !== del.dataset.del)); renderHist();
   }
 });
 function saveHist(diary, result) {
   const list = loadHist(); list.unshift({ id: Date.now(), at: new Date().toISOString(), diary, result, ...langTags() });
-  store.set(HIST_KEY, list.slice(0, 300)); renderHist(); bumpActivity('w'); // 일기 1편이 약 5KB라 300편이면 약 1.5MB
+  saveScoped(HIST_KEY, list.slice(0, 300)); renderHist(); bumpActivity('w'); // 일기 1편이 약 5KB라 300편이면 약 1.5MB
 }
 // 화면 전환: 일기 쓰기 화면에서 번역 화면으로 넘어간다(스크롤이 아니라 화면이 바뀐다). 브라우저 뒤로 가기도 쓰기 화면으로 돌아온다.
 const appEl = document.querySelector('.app');
@@ -2272,16 +2374,17 @@ $('go').addEventListener('click', async () => {
 });
 $('status').addEventListener('click', (e) => { if (e.target.id === 'cancel' && controller) controller.abort('user'); });
 document.querySelectorAll('[data-i]').forEach((el) => { if (!el.innerHTML) el.innerHTML = ICON[el.dataset.i] || ''; });
-tagLegacy(); renderHist(); renderWords(); renderCal(); renderGlossary(); updateSyncUI(); pullFromServer();
+applyLangUI(); for (const w of store.get('wordbook', [])) if (w && w.lang === 'ja') jaLearn(w.zh, w.reading); tagLegacy(); renderHist(); renderWords(); renderCal(); renderGlossary(); updateSyncUI(); pullFromServer();
 window.addEventListener('focus', () => { if (sync.pulled) pullFromServer(); });
 
 // ---------- 인트로(처음 한 번, 설정에서 다시 보기) ----------
-const intro = { i: 0, n: 2 };
+const intro = { i: 0, n: 3 };
 function introShow(i) {
   intro.i = Math.max(0, Math.min(intro.n - 1, i));
   document.querySelectorAll('#intro .slide').forEach((el, k) => { el.classList.toggle('on', k === intro.i); el.setAttribute('aria-hidden', String(k !== intro.i)); });
   document.querySelectorAll('#intro .dots i').forEach((el, k) => el.classList.toggle('on', k === intro.i));
-  $('intro-next-label').textContent = intro.i === intro.n - 1 ? '첫 이야기 쓰기' : '다음';
+  $('intro-next-label').textContent = intro.i === intro.n - 1 ? '시작하기' : '다음';
+  if (intro.i === intro.n - 1) lpRender();
   $('intro-skip').classList.toggle('hidden', intro.i === intro.n - 1);
 }
 function introOpen() { introShow(0); $('intro').classList.remove('hidden'); document.body.classList.add('noscroll'); $('intro-next').focus({ preventScroll: true }); }
@@ -2289,7 +2392,36 @@ function introClose() {
   $('intro').classList.add('hidden'); syncScrollLock(); store.set('intro-seen', '1');
   window.scrollTo(0, 0); $('diary').focus({ preventScroll: true });
 }
-$('intro-next').addEventListener('click', () => { if (intro.i === intro.n - 1) introClose(); else introShow(intro.i + 1); });
+// ---------- 언어 고르기(인트로 3장, 설정·위쪽 버튼에서도 열림) ----------
+const LP_NATIVE = { ko: '한국어', zh: '中文', ja: '日本語', en: 'English' };
+const LP_BETA = { ja: true };
+let lpPairs = [{ src: 'ko', tgt: 'zh' }, { src: 'ko', tgt: 'ja' }]; // 서버 /api/langs 목록을 받으면 바뀐다
+const lp = { src: LANG.src, tgt: LANG.tgt };
+function lpRender() {
+  const srcs = [...new Set(lpPairs.map((p) => p.src))];
+  const tgts = lpPairs.filter((p) => p.src === lp.src).map((p) => p.tgt);
+  if (!tgts.includes(lp.tgt)) lp.tgt = tgts[0];
+  const card = (code, on, sel, attr) => `<button class="lp-card${sel ? ' sel' : ''}" ${on ? '' : 'disabled'} ${attr}="${code}" role="radio" aria-checked="${sel}">
+    <span class="lp-n" lang="${LANGS[code].bcp}">${LP_NATIVE[code]}</span><span class="lp-k">${LANGS[code].name}</span>${!on ? '<em>준비 중</em>' : (attr === 'data-lt' && LP_BETA[code]) ? '<em class="beta">베타</em>' : ''}</button>`;
+  $('lp-src').innerHTML = Object.keys(LANGS).map((c) => card(c, srcs.includes(c), c === lp.src, 'data-ls')).join('');
+  $('lp-tgt').innerHTML = Object.keys(LANGS).filter((c) => c !== lp.src).map((c) => card(c, tgts.includes(c), c === lp.tgt, 'data-lt')).join('');
+  $('lp-note').textContent = LP_BETA[lp.tgt] ? `${LANGS[lp.tgt].name}는 베타예요. 번역과 읽기를 계속 다듬고 있어서, 읽기가 애매한 단어는 따로 표시해 드려요.` : '';
+}
+$('intro-slides').addEventListener('click', (e) => {
+  const ls = e.target.closest('[data-ls]'), lt = e.target.closest('[data-lt]');
+  if (ls && !ls.disabled) { lp.src = ls.dataset.ls; lpRender(); } else if (lt && !lt.disabled) { lp.tgt = lt.dataset.lt; lpRender(); }
+});
+function lpApply() { // 고른 언어를 저장한다. 바뀌었으면 화면 전체가 새 언어로 시작하도록 다시 불러온다.
+  const changed = lp.src !== LANG.src || lp.tgt !== LANG.tgt;
+  store.set('lang-src', lp.src); store.set('lang-tgt', lp.tgt);
+  if (changed) { location.reload(); return; }
+  introClose();
+}
+function lpOpen() { introOpen(); introShow(2); }
+fetch('/api/langs').then((r) => r.json()).then((d) => { if (Array.isArray(d.pairs) && d.pairs.length) { lpPairs = d.pairs; if (intro.i === intro.n - 1) lpRender(); } }).catch(() => {});
+$('intro-next').addEventListener('click', () => { if (intro.i === intro.n - 1) lpApply(); else introShow(intro.i + 1); });
+$('lang-chip').addEventListener('click', lpOpen);
+$('lang-set').addEventListener('click', () => { closeSheet(); lpOpen(); });
 $('intro-skip').addEventListener('click', introClose);
 $('intro-again').addEventListener('click', () => { closeSheet(); introOpen(); });
 document.addEventListener('keydown', (e) => {
@@ -2309,10 +2441,10 @@ const coach = { steps: [], i: 0, active: false, target: null, onDone: null, time
 const COACH_STEPS = [
   { target: () => document.querySelector('#sentences .wd'), text: '단어를 눌러 보세요. 뜻이 나오고 발음이 바로 들려요.', wait: 'wd' },
   { target: () => document.querySelector('#sentences [data-ssave^="sent:"]'), text: '별을 누르면 이 문장이 내 보관함에 저장돼요. 저장한 문장으로 퀴즈를 풀 수 있어요.' },
-  { target: () => $('read-all'), text: '"일기 전체 읽기"를 누르면 내 일기를 처음부터 끝까지 중국어로 들려줘요. 소리 내어 따라 읽어 보세요.' },
+  { target: () => $('read-all'), text: '"일기 전체 읽기"를 누르면 내 일기를 처음부터 끝까지 ' + tgtName() + '로 들려줘요. 소리 내어 따라 읽어 보세요.' },
   { target: () => document.querySelector('[data-view="one"]'), text: '"한 문장씩"으로 바꾸면 문장을 하나씩 천천히 익힐 수 있어요.' },
   { target: () => $('tab-word'), text: '저장한 단어와 문장은 보관함에서 퀴즈로 복습해요. 잊을 때쯤 홈에 "오늘의 복습"으로 알려 드려요.' },
-  { target: () => $('tab-set'), text: '설정에서 목소리와 속도, 화면 밝기, 다크 모드를 바꿀 수 있어요. 병음이나 한국어를 가리고 연습할 수도 있어요.', last: '알겠어요' },
+  { target: () => $('tab-set'), text: '설정에서 목소리와 속도, 화면 밝기, 다크 모드를 바꿀 수 있어요. ' + readLabel() + '이나 한국어를 가리고 연습할 수도 있어요.', last: '알겠어요' },
 ];
 function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.add('hidden'), 2600); }
 function coachPlace() {
@@ -2378,7 +2510,7 @@ function endTour() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
   setTimeout(() => coachStart([{ target: () => document.querySelector('.write label.lbl'), text: '이제 오늘의 이야기를 한 줄 써 볼까요? 어떤 이야기라도 괜찮아요.', last: '좋아요' }], () => $('diary').focus()), 500);
 }
-$('intro-tour').addEventListener('click', startTour);
+$('intro-tour')?.addEventListener('click', startTour);
 function maybeHints() { if (!store.get(HINT_KEY, '') && !tour) setTimeout(() => { if (!coach.active) coachStart(COACH_STEPS); }, 1000); }
 
 // ---------- 스크롤 진행 막대 ----------
