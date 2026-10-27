@@ -488,6 +488,16 @@
   .chr-how { margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--line); font-family: var(--f-ui); font-size: var(--fs-s); line-height: 1.6; }
   .mchars { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 6px; font-family: var(--f-ui); font-size: var(--fs-s); color: var(--muted); }
   .mchars b { color: var(--ink); font-weight: 400; font-size: 1.1em; }
+
+  /* 내 표현 사전 */
+  .gl { padding: 12px 0; border-bottom: 1px solid var(--line); font-family: var(--f-ui); }
+  .gl-head { display: flex; align-items: baseline; justify-content: space-between; }
+  .gl-item { display: flex; align-items: flex-start; gap: 10px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .gl-item .g { flex: 1; min-width: 0; }
+  .gl-item .g b { font-weight: 600; }
+  .gl-item .g span { display: block; color: var(--muted); font-size: var(--fs-s); line-height: 1.5; overflow-wrap: anywhere; }
+  .gl-add { display: grid; gap: 8px; margin-top: 10px; }
+  .gl-add input { padding: 10px 12px; border: 1px solid var(--line); border-radius: 12px; background: var(--cell); color: var(--ink); font: inherit; font-size: var(--fs-s); min-height: 44px; width: 100%; }
 </style>
 </head>
 <body>
@@ -596,6 +606,17 @@
         <label class="opt">밝기 <input type="range" id="opt-bright" min="50" max="100" step="5" value="100" aria-label="화면 밝기"></label>
         <div class="opt">소개 화면 <button class="btn" id="intro-again">다시 보기</button></div>
         <p class="hint" style="margin:6px 0 14px"><b>내 일기는 이 기기에 보관돼요.</b> 일기는 이 기기의 브라우저에만 저장돼요. 번역할 때만 일기 문장이 AI(Claude)에 전달되고, 음성을 만들 때는 번역된 중국어 문장이 음성 서비스에 전달돼요.</p>
+        <div class="gl" id="gl-wrap">
+          <div class="gl-head"><b>내 표현 사전</b><span class="hint" id="gl-count" style="margin:0"></span></div>
+          <p class="hint" style="margin:4px 0 6px">자주 쓰는 이름이나 표현을 적어 두면 번역할 때 반영돼요. 이 기기에 저장되고, 번역할 때만 일기와 함께 AI에 전달돼요.</p>
+          <div id="gl-list"></div>
+          <div class="gl-add">
+            <input id="gl-term" maxlength="20" placeholder="표현 (예: 우동)" autocomplete="off" aria-label="표현">
+            <input id="gl-note" maxlength="100" placeholder="어떻게 옮길지 (예: 사람 이름이에요. 항상 于桐로 써 주세요)" autocomplete="off" aria-label="어떻게 옮길지">
+            <button class="btn solid" id="gl-add">추가</button>
+          </div>
+          <div class="hint" id="gl-msg" role="status" style="margin:6px 0 0"></div>
+        </div>
         <label class="opt">병음 보기 <input type="checkbox" id="opt-py" checked></label>
         <label class="opt">한국어 가리기 <input type="checkbox" id="opt-ko"></label>
         <label class="opt">음성 <select id="opt-voice" aria-label="듣기 음성"></select></label>
@@ -716,11 +737,17 @@ customPinyin(PINYIN_FIX);
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // 서버(chinese-diary/data 폴더)에도 저장하는 항목. 설정·테마 같은 기기별 값은 브라우저에만 둔다.
-const SYNCED = ['diary-history', 'wordbook', 'sentbook', 'activity'];
+const SYNCED = ['diary-history', 'wordbook', 'sentbook', 'activity', 'glossary'];
+let storageWarned = 0;
+function storageFull() {
+  if (Date.now() - storageWarned < 60000) return; storageWarned = Date.now();
+  if (typeof toast === 'function') toast('이 기기의 저장 공간이 가득 차서 저장하지 못했어요. 설정에서 내보내기로 백업한 뒤 오래된 일기를 지워 주세요.');
+}
 const store = {
   get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch { return d; } },
   set(k, v) {
-    try { localStorage.setItem(k, JSON.stringify(v)); } catch {}
+    try { localStorage.setItem(k, JSON.stringify(v)); }
+    catch { storageFull(); } // 저장 공간이 가득 차면 조용히 실패하지 않고 알린다
     if (SYNCED.includes(k)) markDirty(k);
   },
 };
@@ -762,7 +789,7 @@ async function pullFromServer() {
     }
     sync.error = ''; sync.lastOk = sync.lastOk || Date.now(); sync.pulled = true;
     if (sync.dirty.size) await flushSync();
-    if (changed) { renderHist(); renderWords(); renderCal(); }
+    if (changed) { renderHist(); renderWords(); renderCal(); renderGlossary(); }
   } catch { sync.error = '서버에 연결하지 못했어요. 이 브라우저에만 저장돼요.'; }
   updateSyncUI();
 }
@@ -1839,7 +1866,7 @@ function offerImport(obj) {
   $('imp-msg').innerHTML = `<div class="banner">파일 안에 일기 ${countOf(obj, 'diary-history')}개 · 단어 ${countOf(obj, 'wordbook')}개 · 문장 ${countOf(obj, 'sentbook')}개가 있어요.<div class="actions"><button class="btn" id="imp-merge">지금 것과 합치기</button><button class="btn" id="imp-replace">이 파일로 바꾸기</button><button class="btn" id="imp-cancel">취소</button></div></div>`;
 }
 function applyImport(obj, mode) {
-  const idOf = { 'diary-history': (x) => x.id, wordbook: (x) => x.zh, sentbook: (x) => x.zh, activity: (x) => x.d };
+  const idOf = { 'diary-history': (x) => x.id, wordbook: (x) => x.zh, sentbook: (x) => x.zh, activity: (x) => x.d, glossary: (x) => x.term };
   for (const k of SYNCED) {
     const inc = Array.isArray(obj.keys[k]) ? obj.keys[k] : [];
     if (mode === 'replace') { store.set(k, inc); continue; }
@@ -1848,7 +1875,7 @@ function applyImport(obj, mode) {
     if (k === 'diary-history') merged.sort((a, b) => String(b.at).localeCompare(String(a.at)));
     store.set(k, merged);
   }
-  renderHist(); renderWords(); renderCal(); refreshSaveButtons(); refreshSentButtons();
+  renderHist(); renderWords(); renderCal(); renderGlossary(); refreshSaveButtons(); refreshSentButtons();
 }
 $('exp-btn').addEventListener('click', exportData);
 $('imp-file').addEventListener('change', async () => {
@@ -1932,7 +1959,7 @@ $('hist').addEventListener('click', (e) => {
 });
 function saveHist(diary, result) {
   const list = loadHist(); list.unshift({ id: Date.now(), at: new Date().toISOString(), diary, result });
-  store.set(HIST_KEY, list.slice(0, 30)); renderHist(); bumpActivity('w');
+  store.set(HIST_KEY, list.slice(0, 300)); renderHist(); bumpActivity('w'); // 일기 1편이 약 5KB라 300편이면 약 1.5MB
 }
 // 화면 전환: 일기 쓰기 화면에서 번역 화면으로 넘어간다(스크롤이 아니라 화면이 바뀐다). 브라우저 뒤로 가기도 쓰기 화면으로 돌아온다.
 const appEl = document.querySelector('.app');
@@ -2086,6 +2113,33 @@ function writingStop() {
 }
 $('writing').addEventListener('click', (e) => { if (e.target.closest('#cancel') && controller) controller.abort('user'); });
 
+
+// ---------- 내 표현 사전 ----------
+// 자주 쓰는 이름·표현을 적어 두면 번역할 때마다 함께 보내 같은 방식으로 옮기게 한다. 이 기기에 저장하고(백업·내보내기에도 포함), 번역할 때만 AI에 전달된다.
+const GL_KEY = 'glossary', GL_MAX = 20;
+const loadGlossary = () => store.get(GL_KEY, []).filter((g) => g && g.term);
+function renderGlossary() {
+  const list = loadGlossary();
+  $('gl-list').innerHTML = list.length
+    ? list.map((g) => `<div class="gl-item"><div class="g"><b>${esc(g.term)}</b><span>${esc(g.note || '')}</span></div><button class="btn" data-gldel="${esc(g.term)}" aria-label="삭제: ${esc(g.term)}">삭제</button></div>`).join('')
+    : '<p class="hint" style="margin:8px 0 0">아직 없어요.</p>';
+  $('gl-count').textContent = `${list.length} / ${GL_MAX}`;
+}
+function addGlossary() {
+  const term = $('gl-term').value.trim().slice(0, 20), note = $('gl-note').value.trim().slice(0, 100), msg = $('gl-msg');
+  if (!term) { msg.textContent = '표현을 먼저 적어 주세요.'; $('gl-term').focus(); return; }
+  const list = loadGlossary().filter((g) => g.term !== term); // 같은 표현은 새 설명으로 바꾼다
+  if (list.length >= GL_MAX) { msg.textContent = `${GL_MAX}개까지 적을 수 있어요. 안 쓰는 것을 지워 주세요.`; return; }
+  list.push({ term, note, at: Date.now() }); store.set(GL_KEY, list);
+  $('gl-term').value = ''; $('gl-note').value = ''; msg.textContent = '저장했어요. 다음 번역부터 반영돼요.'; renderGlossary();
+}
+$('gl-add').addEventListener('click', addGlossary);
+$('gl-note').addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); addGlossary(); } });
+$('gl-list').addEventListener('click', (e) => {
+  const b = e.target.closest('[data-gldel]'); if (!b) return;
+  store.set(GL_KEY, loadGlossary().filter((g) => g.term !== b.dataset.gldel)); $('gl-msg').textContent = ''; renderGlossary();
+});
+
 let controller = null;
 const setGo = (busy) => { $('go').disabled = busy; $('go-label').textContent = busy ? '번역 중…' : '번역하고 공부하기'; $('diary').readOnly = busy; };
 $('go').addEventListener('click', async () => {
@@ -2100,7 +2154,7 @@ $('go').addEventListener('click', async () => {
   const tick = () => { $('w-s').textContent = `보통 30초 안팎 걸려요 · ${Math.floor((Date.now() - started) / 1000)}초`; };
   tick(); const iv = setInterval(tick, 1000);
   try {
-    const res = await fetch('/api/translate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ diary }), signal: controller.signal });
+    const res = await fetch('/api/translate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ diary, glossary: loadGlossary().map(({ term, note }) => ({ term, note })) }), signal: controller.signal });
     const raw = await res.text();
     let data; try { data = JSON.parse(raw); } catch { throw new Error('서버 응답을 읽지 못했어요. 잠시 후 다시 시도해 주세요.'); }
     if (!res.ok || data.error) throw new Error((data.error || '요청에 실패했어요.') + ' 입력한 일기는 그대로 남아 있어요.');
@@ -2118,7 +2172,7 @@ $('go').addEventListener('click', async () => {
 });
 $('status').addEventListener('click', (e) => { if (e.target.id === 'cancel' && controller) controller.abort('user'); });
 document.querySelectorAll('[data-i]').forEach((el) => { if (!el.innerHTML) el.innerHTML = ICON[el.dataset.i] || ''; });
-renderHist(); renderWords(); renderCal(); updateSyncUI(); pullFromServer();
+renderHist(); renderWords(); renderCal(); renderGlossary(); updateSyncUI(); pullFromServer();
 window.addEventListener('focus', () => { if (sync.pulled) pullFromServer(); });
 
 // ---------- 인트로(처음 한 번, 설정에서 다시 보기) ----------
