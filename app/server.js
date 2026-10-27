@@ -61,14 +61,21 @@ function checkTranslateLimit(req) {
   return null;
 }
 
+// ---------- 언어 설정 ----------
+// 입력 언어(일기를 쓰는 말)와 학습 언어(번역해서 배우는 말)를 고른다. 해설은 입력 언어로 쓴다.
+// PAIRS에 (입력>학습) 조합과 번역 규칙 파일을 적으면 그 조합이 켜진다. 새 언어는 규칙 파일(prompts/)을 만들어 여기에 추가한다.
+const LANGS = { ko: { name: '한국어', bcp: 'ko-KR' }, zh: { name: '중국어', bcp: 'zh-CN' }, ja: { name: '일본어', bcp: 'ja-JP' }, en: { name: '영어', bcp: 'en-US' } };
+const PAIRS = { 'ko>zh': 'system_prompt.md' };
+const pairOf = (src, tgt) => (LANGS[src] && LANGS[tgt] && src !== tgt && PAIRS[`${src}>${tgt}`]) ? { src, tgt, file: PAIRS[`${src}>${tgt}`] } : null;
+
 // 사용자가 앱에서 적은 "내 표현 사전"을 안전하게 다듬는다(길이 제한, 줄바꿈·코드 표시 제거, 최대 20개).
 const cleanGl = (v, n) => String(v || '').replace(/[\u0000-\u001f\u007f`*]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
 function cleanGlossary(raw) {
   if (!Array.isArray(raw)) return [];
   return raw.slice(0, 20).map((g) => ({ term: cleanGl(g && g.term, 20), note: cleanGl(g && g.note, 100) })).filter((g) => g.term);
 }
-function buildSystemPrompt(extra = []) {
-  const prompt = fs.readFileSync(path.join(PROMPT_DIR, 'system_prompt.md'), 'utf8');
+function buildSystemPrompt(extra = [], file = PAIRS['ko>zh']) {
+  const prompt = fs.readFileSync(path.join(PROMPT_DIR, file), 'utf8');
   let glossary = '';
   if (!PUBLIC_MODE) {
     try { glossary = fs.readFileSync(path.join(PROMPT_DIR, 'user_glossary.md'), 'utf8'); } catch { /* 용어집이 없어도 동작 */ }
@@ -117,12 +124,12 @@ function extractJson(text) {
   return JSON.parse(body.slice(start, end + 1));
 }
 
-async function translateWithGemini(userText, key, glossary = []) {
+async function translateWithGemini(userText, key, glossary = [], file) {
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
     body: JSON.stringify({
-      systemInstruction: { parts: [{ text: buildSystemPrompt(glossary) }] },
+      systemInstruction: { parts: [{ text: buildSystemPrompt(glossary, file) }] },
       contents: [{ role: 'user', parts: [{ text: userText }] }],
       generationConfig: { responseMimeType: 'application/json', maxOutputTokens: 8192 },
     }),
@@ -134,16 +141,16 @@ async function translateWithGemini(userText, key, glossary = []) {
   return { mock: false, result: extractJson(text) };
 }
 
-async function translate(diary, glossary = []) {
+async function translate(diary, glossary = [], file) {
   const parts = splitSentences(diary);
   const userText = parts.map((s, i) => `${i + 1}. ${s}`).join('\n');
-  const out = await callModel(userText, glossary);
+  const out = await callModel(userText, glossary, file);
   // 목업 응답은 입력과 무관하므로 원문 보존 처리를 하지 않는다.
   return out.mock ? out : { ...out, result: mergeOriginals(out.result, parts) };
 }
 
-async function callModel(userText, glossary = []) {
-  if (process.env.GEMINI_API_KEY) return translateWithGemini(userText, process.env.GEMINI_API_KEY, glossary);
+async function callModel(userText, glossary = [], file) {
+  if (process.env.GEMINI_API_KEY) return translateWithGemini(userText, process.env.GEMINI_API_KEY, glossary, file);
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) {
     const mock = JSON.parse(fs.readFileSync(path.join(PUBLIC, 'mock.json'), 'utf8'));
@@ -162,7 +169,7 @@ async function callModel(userText, glossary = []) {
       // Sonnet 5.5는 thinking이 기본 켜짐이며 {type:'disabled'}는 400. between_tools로 끄고 effort는 낮춘다.
       thinking: { type: 'between_tools' },
       output_config: { effort: 'low' },
-      system: buildSystemPrompt(glossary),
+      system: buildSystemPrompt(glossary, file),
       messages: [{ role: 'user', content: userText }],
     }),
   });
@@ -260,12 +267,19 @@ function readBody(req, limit = 20000) {
 // 설치: python3 -m venv ~/.chinese-diary-venv && ~/.chinese-diary-venv/bin/pip install edge-tts
 // 주의: 번역된 중국어 문장이 마이크로소프트 서버로 전송된다.
 const EDGE_BIN = process.env.EDGE_TTS_BIN || path.join(os.homedir(), '.chinese-diary-venv', 'bin', 'edge-tts');
-const EDGE_VOICES = [
-  { id: 'zh-CN-XiaoxiaoNeural', label: '샤오샤오 · 여성, 따뜻함' },
-  { id: 'zh-CN-YunxiNeural', label: '윈시 · 남성, 밝음' },
-  { id: 'zh-CN-YunyangNeural', label: '윈양 · 남성, 또박또박(뉴스)' },
-  { id: 'zh-CN-XiaoyiNeural', label: '샤오이 · 여성, 활발함' },
-];
+const EDGE_VOICES_BY_LANG = {
+  zh: [
+    { id: 'zh-CN-XiaoxiaoNeural', label: '샤오샤오 · 여성, 따뜻함' },
+    { id: 'zh-CN-YunxiNeural', label: '윈시 · 남성, 밝음' },
+    { id: 'zh-CN-YunyangNeural', label: '윈양 · 남성, 또박또박(뉴스)' },
+    { id: 'zh-CN-XiaoyiNeural', label: '샤오이 · 여성, 활발함' },
+  ],
+  ja: [{ id: 'ja-JP-NanamiNeural', label: '나나미 · 여성' }, { id: 'ja-JP-KeitaNeural', label: '케이타 · 남성' }],
+  ko: [{ id: 'ko-KR-SunHiNeural', label: '선히 · 여성' }, { id: 'ko-KR-InJoonNeural', label: '인준 · 남성' }],
+  en: [{ id: 'en-US-AriaNeural', label: '아리아 · 여성 (미국)' }, { id: 'en-US-GuyNeural', label: '가이 · 남성 (미국)' }],
+};
+const EDGE_VOICES = EDGE_VOICES_BY_LANG.zh; // 지금 화면이 쓰는 중국어 음성 목록
+const ALL_EDGE_VOICES = Object.values(EDGE_VOICES_BY_LANG).flat();
 const EDGE_RATES = { '0.75': '-25%', '0.9': '-10%', '1': '+0%' };
 const TTS_DIR = path.join(os.tmpdir(), 'chinese-diary-tts');
 const ttsInflight = new Map(); // 같은 문장을 동시에 두 번 만들지 않는다
@@ -436,13 +450,18 @@ const server = http.createServer(async (req, res) => {
       const diary = String(body.diary || '').trim();
       if (!diary) return sendJson(res, 400, { error: '일기를 입력해 주세요.' });
       if (diary.length > MAX_DIARY_CHARS) return sendJson(res, 400, { error: `일기는 ${MAX_DIARY_CHARS}자 이내로 입력해 주세요.` });
+      const pair = pairOf(String(body.srcLang || 'ko'), String(body.tgtLang || 'zh')); // 보내지 않으면 지금까지처럼 한국어 > 중국어
+      if (!pair) return sendJson(res, 400, { error: '아직 지원하지 않는 언어 조합이에요.', code: 'pair' });
       const blocked = checkTranslateLimit(req);
       if (blocked) return sendJson(res, 429, { error: blocked });
       running += 1;
-      try { return sendJson(res, 200, await translate(diary, cleanGlossary(body.glossary))); } finally { running -= 1; }
+      try { return sendJson(res, 200, await translate(diary, cleanGlossary(body.glossary), pair.file)); } finally { running -= 1; }
+    }
+    if (req.method === 'GET' && req.url === '/api/langs') {
+      return sendJson(res, 200, { langs: LANGS, pairs: Object.keys(PAIRS).map((k) => { const [src, tgt] = k.split('>'); return { src, tgt }; }) });
     }
     if (req.method === 'GET' && req.url.startsWith('/api/tts-status')) {
-      return sendJson(res, 200, { available: edgeAvailable(), voices: edgeAvailable() ? EDGE_VOICES : [] });
+      return sendJson(res, 200, { available: edgeAvailable(), voices: edgeAvailable() ? EDGE_VOICES : [], voicesByLang: edgeAvailable() ? EDGE_VOICES_BY_LANG : {} });
     }
     if (req.method === 'GET' && req.url.startsWith('/api/tts')) {
       const q = new URL(req.url, 'http://localhost').searchParams;
@@ -451,7 +470,7 @@ const server = http.createServer(async (req, res) => {
       const rate = EDGE_RATES[String(q.get('rate'))] || EDGE_RATES['0.9'];
       if (!edgeAvailable()) return sendJson(res, 503, { error: 'edge-tts가 설치되어 있지 않아요.' });
       if (!text || text.length > 300) return sendJson(res, 400, { error: '문장은 1~300자여야 해요.' });
-      if (!EDGE_VOICES.some((v) => v.id === voice)) return sendJson(res, 400, { error: '지원하지 않는 음성이에요.' });
+      if (!ALL_EDGE_VOICES.some((v) => v.id === voice)) return sendJson(res, 400, { error: '지원하지 않는 음성이에요.' });
       if (!ttsCached(text, voice, rate) && ttsLimited(req)) return sendJson(res, 429, { error: '잠시 후 다시 시도해 주세요. 음성을 너무 많이 요청했어요.' });
       try {
         const file = await makeSpeech(text, voice, rate);

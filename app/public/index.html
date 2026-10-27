@@ -752,6 +752,29 @@ const store = {
   },
 };
 
+// ---------- 언어 설정과 언어 팩 ----------
+// 입력 언어(일기를 쓰는 말)와 학습 언어(번역해서 배우는 말)를 이 기기에 저장한다. 해설은 입력 언어로 쓴다.
+// 지금 켜진 조합은 한국어 > 중국어뿐이다(서버의 PAIRS와 같다). 저장된 값이 올바르지 않으면 이 기본값으로 돌아간다.
+const LANGS = { ko: { name: '한국어', bcp: 'ko-KR' }, zh: { name: '중국어', bcp: 'zh-CN' }, ja: { name: '일본어', bcp: 'ja-JP' }, en: { name: '영어', bcp: 'en-US' } };
+function readLangPrefs() {
+  const src = store.get('lang-src', 'ko'), tgt = store.get('lang-tgt', 'zh');
+  return LANGS[src] && LANGS[tgt] && src !== tgt ? { src, tgt } : { src: 'ko', tgt: 'zh' };
+}
+let LANG = readLangPrefs();
+// 언어 팩: 학습 언어마다 읽기(발음 표기)를 만드는 방법을 담는다. 일본어·영어·한국어는 이 자리에 추가한다.
+const PACKS = { zh: { readTokens: (text) => pinyin(text, { type: 'all' }) } };
+const readTokens = (text) => (PACKS[LANG.tgt] || PACKS.zh).readTokens(text);
+const langTags = () => ({ srcLang: LANG.src, tgtLang: LANG.tgt, glossLang: LANG.src }); // 일기에 붙이는 꼬리표
+// 꼬리표가 없는 기존 기록은 한국어 > 중국어로 표시한다(이미 표시된 것은 건드리지 않는다).
+function tagLegacy() {
+  const hist = store.get('diary-history', []);
+  if (hist.some((h) => h && !h.tgtLang)) store.set('diary-history', hist.map((h) => (h && !h.tgtLang ? { ...h, srcLang: 'ko', tgtLang: 'zh', glossLang: 'ko' } : h)));
+  for (const k of ['wordbook', 'sentbook']) {
+    const list = store.get(k, []);
+    if (list.some((x) => x && !x.lang)) store.set(k, list.map((x) => (x && !x.lang ? { ...x, lang: 'zh' } : x)));
+  }
+}
+
 // ---------- 서버 저장 동기화 ----------
 // 키마다 마지막 수정 시각을 기록해 두고, 서버와 브라우저 중 더 최근 것을 따른다. 서버가 없으면 브라우저에만 저장된다.
 const sync = { dirty: new Set(), timer: null, lastOk: 0, error: '', pulled: false };
@@ -789,7 +812,7 @@ async function pullFromServer() {
     }
     sync.error = ''; sync.lastOk = sync.lastOk || Date.now(); sync.pulled = true;
     if (sync.dirty.size) await flushSync();
-    if (changed) { renderHist(); renderWords(); renderCal(); renderGlossary(); }
+    if (changed) { tagLegacy(); renderHist(); renderWords(); renderCal(); renderGlossary(); }
   } catch { sync.error = '서버에 연결하지 못했어요. 이 브라우저에만 저장돼요.'; }
   updateSyncUI();
 }
@@ -851,27 +874,27 @@ $('opt-bright').addEventListener('input', () => setBright(Number($('opt-bright')
 const cell = (t, mk) => t.isZh
   ? `<span class="c${mk ? ' mk' : ''}"><span class="p" aria-hidden="true">${esc(t.pinyin)}</span><span class="h">${esc(t.origin)}</span></span>`
   : `<span class="c pu"><span class="p" aria-hidden="true"></span><span class="h">${esc(t.origin)}</span></span>`;
-const cells = (text) => pinyin(text, { type: 'all' }).map((t) => cell(t)).join('');
+const cells = (text) => readTokens(text).map((t) => cell(t)).join('');
 const cellsFrom = (toks) => toks.map((t) => cell(t)).join('');
 // 단어를 하나씩 따로 계산하면 了(le/liǎo)·得(de/dé)·不·一처럼 앞뒤 글자에 따라 소리가 바뀌는 글자가 틀린다.
 // 그래서 문장 전체로 병음을 계산한 뒤 단어 길이대로 나눈다. 글자 수가 맞지 않을 때만 단어별로 따로 계산한다.
 function wordTokens(words) {
-  const whole = pinyin(words.map((w) => w.zh).join(''), { type: 'all' });
-  if (whole.length !== words.reduce((n, w) => n + [...w.zh].length, 0)) return words.map((w) => pinyin(w.zh, { type: 'all' }));
+  const whole = readTokens(words.map((w) => w.zh).join(''));
+  if (whole.length !== words.reduce((n, w) => n + [...w.zh].length, 0)) return words.map((w) => readTokens(w.zh));
   let pos = 0; return words.map((w) => { const n = [...w.zh].length; const t = whole.slice(pos, pos + n); pos += n; return t; });
 }
 // 문장 한 줄. 문장부호는 앞 글자에 붙여 줄 맨 앞에 혼자 오지 않게 하고, mark 단어가 있으면 형광펜으로 표시한다.
 function zhLine(text, size = 'mid', mark = '') {
   const start = mark ? text.indexOf(mark) : -1;
   const groups = [];
-  pinyin(text, { type: 'all' }).forEach((t, i) => {
+  readTokens(text).forEach((t, i) => {
     const html = cell(t, start >= 0 && i >= start && i < start + mark.length);
     if (!t.isZh && isPunct(t.origin) && groups.length) groups[groups.length - 1] += html; else groups.push(html);
   });
   return `<div class="zhline ${size}" lang="zh-CN">${groups.map((g) => `<span class="nw">${g}</span>`).join('')}</div>`;
 }
 function plainPinyin(text) {
-  return pinyin(text, { type: 'all' }).map((t) => t.isZh ? t.pinyin : t.origin).join(' ').replace(/\s+([，。？！、,.?!])/g, '$1');
+  return readTokens(text).map((t) => t.isZh ? t.pinyin : t.origin).join(' ').replace(/\s+([，。？！、,.?!])/g, '$1');
 }
 const isPunct = (t) => /^[\p{P}\p{S}\s]+$/u.test(t);
 const isLatin = (t) => /^[A-Za-z0-9\s]+$/.test(t);
@@ -1119,7 +1142,7 @@ function loadChars(words) {
   return Promise.all(uniq.filter((w) => !charCache[w]).map((w) => charPending.get(w)).filter(Boolean));
 }
 function charsHtml(w, err) {
-  const toks = w.tok || pinyin(w.zh, { type: 'all' }); const c = charCache[w.zh];
+  const toks = w.tok || readTokens(w.zh); const c = charCache[w.zh];
   const rows = [...w.zh].map((ch, i) => {
     const g = c && c.chars && c.chars[i]; const py = toks[i] && toks[i].isZh ? toks[i].pinyin : '';
     const body = g ? `<div class="chr-k">${g.hun ? `<b>${esc(g.hun)}</b>` : ''}${g.meaning ? `<span>${esc(g.meaning)}</span>` : ''}</div>` : (err ? '' : '<div class="chr-k mute">풀이를 불러오는 중…</div>');
@@ -1396,7 +1419,7 @@ document.querySelectorAll('[data-wb]').forEach((b) => b.addEventListener('click'
 function addOrRemoveWord(item) {
   let list = loadWords();
   if (list.some((w) => w.zh === item.zh)) list = list.filter((w) => w.zh !== item.zh);
-  else list.push({ zh: item.zh, ko: item.ko, ex_zh: item.ex_zh || '', ex_ko: item.ex_ko || '', box: 0, due: Date.now() });
+  else list.push({ zh: item.zh, ko: item.ko, ex_zh: item.ex_zh || '', ex_ko: item.ex_ko || '', lang: LANG.tgt, box: 0, due: Date.now() });
   saveWords(list); renderWords();
 }
 function refreshSaveButtons() {
@@ -1425,7 +1448,7 @@ function toggleSent(ref) {
   const d = sentDataFor(ref); if (!d || !d.zh) return;
   let list = loadSents();
   if (list.some((s) => s.zh === d.zh)) list = list.filter((s) => s.zh !== d.zh);
-  else list.push({ zh: d.zh, ko: d.ko || '', words: (d.words || []).map((w) => ({ zh: w.zh, ko: w.ko || '' })), box: 0, due: Date.now() });
+  else list.push({ zh: d.zh, ko: d.ko || '', words: (d.words || []).map((w) => ({ zh: w.zh, ko: w.ko || '' })), lang: LANG.tgt, box: 0, due: Date.now() });
   saveSents(list); renderWords(); refreshSentButtons();
 }
 $('wordlist').addEventListener('click', (e) => {
@@ -1875,7 +1898,7 @@ function applyImport(obj, mode) {
     if (k === 'diary-history') merged.sort((a, b) => String(b.at).localeCompare(String(a.at)));
     store.set(k, merged);
   }
-  renderHist(); renderWords(); renderCal(); renderGlossary(); refreshSaveButtons(); refreshSentButtons();
+  tagLegacy(); renderHist(); renderWords(); renderCal(); renderGlossary(); refreshSaveButtons(); refreshSentButtons();
 }
 $('exp-btn').addEventListener('click', exportData);
 $('imp-file').addEventListener('change', async () => {
@@ -1958,7 +1981,7 @@ $('hist').addEventListener('click', (e) => {
   }
 });
 function saveHist(diary, result) {
-  const list = loadHist(); list.unshift({ id: Date.now(), at: new Date().toISOString(), diary, result });
+  const list = loadHist(); list.unshift({ id: Date.now(), at: new Date().toISOString(), diary, result, ...langTags() });
   store.set(HIST_KEY, list.slice(0, 300)); renderHist(); bumpActivity('w'); // 일기 1편이 약 5KB라 300편이면 약 1.5MB
 }
 // 화면 전환: 일기 쓰기 화면에서 번역 화면으로 넘어간다(스크롤이 아니라 화면이 바뀐다). 브라우저 뒤로 가기도 쓰기 화면으로 돌아온다.
@@ -2154,7 +2177,7 @@ $('go').addEventListener('click', async () => {
   const tick = () => { $('w-s').textContent = `보통 30초 안팎 걸려요 · ${Math.floor((Date.now() - started) / 1000)}초`; };
   tick(); const iv = setInterval(tick, 1000);
   try {
-    const res = await fetch('/api/translate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ diary, glossary: loadGlossary().map(({ term, note }) => ({ term, note })) }), signal: controller.signal });
+    const res = await fetch('/api/translate', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ diary, srcLang: LANG.src, tgtLang: LANG.tgt, glossary: loadGlossary().map(({ term, note }) => ({ term, note })) }), signal: controller.signal });
     const raw = await res.text();
     let data; try { data = JSON.parse(raw); } catch { throw new Error('서버 응답을 읽지 못했어요. 잠시 후 다시 시도해 주세요.'); }
     if (!res.ok || data.error) throw new Error((data.error || '요청에 실패했어요.') + ' 입력한 일기는 그대로 남아 있어요.');
@@ -2172,7 +2195,7 @@ $('go').addEventListener('click', async () => {
 });
 $('status').addEventListener('click', (e) => { if (e.target.id === 'cancel' && controller) controller.abort('user'); });
 document.querySelectorAll('[data-i]').forEach((el) => { if (!el.innerHTML) el.innerHTML = ICON[el.dataset.i] || ''; });
-renderHist(); renderWords(); renderCal(); renderGlossary(); updateSyncUI(); pullFromServer();
+tagLegacy(); renderHist(); renderWords(); renderCal(); renderGlossary(); updateSyncUI(); pullFromServer();
 window.addEventListener('focus', () => { if (sync.pulled) pullFromServer(); });
 
 // ---------- 인트로(처음 한 번, 설정에서 다시 보기) ----------
