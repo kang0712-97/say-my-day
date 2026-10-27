@@ -797,6 +797,26 @@ const HIRA_RE = /^[ぁ-ゖー]+$/;
 const toHira = (s) => String(s || '').replace(/[ァ-ヶ]/g, (c) => String.fromCharCode(c.charCodeAt(0) - 0x60));
 const jaDict = new Map(); // 지금까지 본 단어의 읽기. 단어 단위가 아닌 글(예문 등)에 읽기를 붙일 때 쓴다
 function jaLearn(surface, reading) { const r = toHira(reading); if (surface && KANJI_RE.test(surface) && HIRA_RE.test(r)) jaDict.set(surface, r); }
+// 소리로 읽을 글: 음성이 잘못 읽기 쉬운 한자 단어(분석 도구와 AI의 읽기가 다른 `check` 단어, 아래 목록)는 AI의 히라가나로 바꿔 합성한다. 나머지는 원문 그대로라 억양이 자연스럽다.
+const JA_RISKY = new Set(['市場', '大人気', '十分']); // 소리를 측정해 틀리게 읽은 것만 넣는다(tests/ja/tts_reading_check.py)
+const jaFix = new Map(), jaAmbig = new Set(); // jaAmbig: 같은 글자인데 읽기가 서로 다르게 나온 단어(十分 じゅっぷん/じゅうぶん 등)는 바꾸지 않는다
+function jaFixLearn(surface, reading, check) {
+  const r = toHira(reading);
+  if (LANG.tgt === 'ja' && surface && KANJI_RE.test(surface) && HIRA_RE.test(r) && (check || JA_RISKY.has(surface)) && !jaAmbig.has(surface)) {
+    if (jaFix.has(surface) && jaFix.get(surface) !== r) { jaFix.delete(surface); jaAmbig.add(surface); } else jaFix.set(surface, r);
+  }
+}
+function spokenPlan(text) { // 원문의 글자마다 소리 글에서 차지하는 범위 {a,b,j,n}: 바꾼 단어는 n글자가 소리 글 [a,b)에 대응한다
+  if (LANG.tgt !== 'ja' || !jaFix.size) return null;
+  const chars = [...text], keys = [...jaFix.keys()].sort((x, y) => [...y].length - [...x].length), spans = []; let spoken = '', len = 0, changed = false;
+  for (let i = 0; i < chars.length;) {
+    const k = keys.find((w) => chars.slice(i, i + [...w].length).join('') === w);
+    if (k) { const n = [...k].length, rd = jaFix.get(k), m = [...rd].length; for (let j = 0; j < n; j++) spans.push({ a: len, b: len + m, j, n }); spoken += rd; len += m; i += n; changed = true; }
+    else { spans.push({ a: len, b: len + 1, j: 0, n: 1 }); spoken += chars[i]; len++; i++; }
+  }
+  return changed ? { spoken, spans } : null;
+}
+const spokenOf = (text) => { const p = spokenPlan(text); return p ? p.spoken : text; };
 function jaSplit(reading, n) {
   if (n <= 1) return [reading];
   const units = []; // 음절 단위: 요음(きょ)·촉음(っ)·ん·장음(ー)은 앞 글자에 붙인다
@@ -840,8 +860,8 @@ function jaReadTokens(text) {
 const PACKS = { zh: { readTokens: (text) => pinyin(text, { type: 'all' }) }, ja: { readTokens: jaReadTokens } };
 function learnReadings(r) {
   if (LANG.tgt !== 'ja') return;
-  (r.sentences || []).forEach((st) => (st.words || []).forEach((w) => jaLearn(w.zh, w.reading)));
-  (r.vocab || []).forEach((v) => jaLearn(v.zh, v.reading));
+  (r.sentences || []).forEach((st) => (st.words || []).forEach((w) => { jaLearn(w.zh, w.reading); jaFixLearn(w.zh, w.reading, w.check); }));
+  (r.vocab || []).forEach((v) => { jaLearn(v.zh, v.reading); jaFixLearn(v.zh, v.reading, v.check); });
 }
 function applyLangUI() {
   document.documentElement.dataset.tgt = LANG.tgt;
@@ -1046,7 +1066,7 @@ function stopSpeak() {
 // 서버가 소리를 만들 때 받아 둔 "단어별 시작 시각"(밀리초)을 가져온다. 없으면(null) 화면은 글자 수로 어림하거나 단어만 따로 들려 준다.
 const timingCache = new Map();
 function getTiming(text, voice, rate) {
-  const url = `/api/tts-timing?${new URLSearchParams({ text, voice, rate: rate || rateKey() })}`;
+  const url = `/api/tts-timing?${new URLSearchParams({ text: spokenOf(text), voice, rate: rate || rateKey() })}`;
   if (!timingCache.has(url)) timingCache.set(url, fetch(url).then((r) => (r.ok ? r.json() : null)).then((d) => (d && Array.isArray(d.bounds) && d.bounds.length ? d : null)).catch(() => null));
   return timingCache.get(url);
 }
@@ -1066,6 +1086,12 @@ function charTimes(text, bounds) {
   const found = chars.filter((c, i) => out[i] && !/[\s\p{P}\p{S}]/u.test(c)).length;
   if (!spoken || found < spoken) return null; // 하나라도 못 맞추면 믿지 않고 어림 계산으로 돌아간다
   let last = 0; return out.map((t) => { if (t) { last = t.e; return t; } return { s: last, e: last }; });
+}
+
+function timesFor(text, bounds) { // 소리 글(spokenOf)이 원문과 다르면, 소리 글의 시간을 원문 글자에 되돌려 매긴다
+  const p = spokenPlan(text); if (!p) return charTimes(text, bounds);
+  const ct = charTimes(p.spoken, bounds); if (!ct) return null;
+  return p.spans.map(({ a, b, j, n }) => { const s = ct[a].s, e = ct[b - 1].e, w = (e - s) / n; return { s: s + w * j, e: s + w * (j + 1) }; });
 }
 
 // ---------- 읽는 속도에 맞춰 글자 색이 변하는 표시 ----------
@@ -1119,7 +1145,7 @@ function karLineFor(btn) { // 듣기 버튼 주변에서, 읽는 문장과 글�
 }
 // 자연스러운 음성(edge-tts): 서버가 mp3를 만들어 주고 한 번 만든 문장은 캐시한다.
 const rateKey = () => String(Number($('opt-rate').value) || 0.9);
-const edgeUrl = (text, voice, rate) => `/api/tts?${new URLSearchParams({ text, voice, rate: rate || rateKey() })}`;
+const edgeUrl = (text, voice, rate) => `/api/tts?${new URLSearchParams({ text: spokenOf(text), voice, rate: rate || rateKey() })}`;
 function speakEdge(btn, voice) {
   const warn = $('voice-warn'); warn.classList.add('hidden');
   btn.dataset.html = btn.innerHTML; btn.classList.add('playing'); btn.innerHTML = `${ICON.stop}<span>불러오는 중…</span>`; playingBtn = btn;
@@ -1134,7 +1160,7 @@ function speakWhole(btn, voice, fail) { // 낱말·문장을 그대로 한 번�
   a.addEventListener('playing', () => {
     if (playingBtn !== btn) return;
     btn.innerHTML = `${ICON.stop}<span>정지</span>`; karBegin(karLineFor(btn), say, audioProgress(a));
-    tp.then((t) => { if (t && currentAudio === a && playingBtn === btn) karUpgrade(charTimes(say, t.bounds), audioClock(a)); });
+    tp.then((t) => { if (t && currentAudio === a && playingBtn === btn) karUpgrade(timesFor(say, t.bounds), audioClock(a)); });
   });
   a.addEventListener('ended', () => { if (playingBtn === btn) stopSpeak(); });
   a.addEventListener('error', () => fail('자연스러운 음성을 불러오지 못했어요. 인터넷 연결을 확인하거나 설정에서 다른 음성을 골라 주세요.'));
@@ -1184,7 +1210,7 @@ async function speakSegment(btn, voice, fail) {
   try {
     if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
     if (actx.state === 'suspended') actx.resume(); // 눌렀을 때 바로 풀어 둬야 브라우저가 소리를 막지 않는다
-    const timing = await getTiming(ctxText, voice, rate); const times = timing && charTimes(ctxText, timing.bounds);
+    const timing = await getTiming(ctxText, voice, rate); const times = timing && timesFor(ctxText, timing.bounds);
     if (!times || !times[ci] || !times[ci + len - 1]) return whole();
     const buf = await loadBuffer(edgeUrl(ctxText, voice, rate));
     if (playingBtn !== btn) return; // 그 사이 정지했거나 다른 소리를 눌렀다
@@ -1990,7 +2016,7 @@ function playOne(text) {
       const tp = getTiming(text, choice.slice(5), rate);
       a.onplaying = () => {
         karBegin(document.querySelectorAll('.rp-s')[rd.i]?.querySelector('.zhline'), text, audioProgress(a));
-        tp.then((t) => { if (t && rd.audio === a) karUpgrade(charTimes(text, t.bounds), audioClock(a)); });
+        tp.then((t) => { if (t && rd.audio === a) karUpgrade(timesFor(text, t.bounds), audioClock(a)); });
       };
       a.play().catch(() => resolve(false));
     } else if ('speechSynthesis' in window) {
@@ -2416,7 +2442,7 @@ $('go').addEventListener('click', async () => {
 });
 $('status').addEventListener('click', (e) => { if (e.target.id === 'cancel' && controller) controller.abort('user'); });
 document.querySelectorAll('[data-i]').forEach((el) => { if (!el.innerHTML) el.innerHTML = ICON[el.dataset.i] || ''; });
-applyLangUI(); for (const w of store.get('wordbook', [])) if (w && w.lang === 'ja') jaLearn(w.zh, w.reading); tagLegacy(); renderHist(); renderWords(); renderCal(); renderGlossary(); updateSyncUI(); pullFromServer();
+applyLangUI(); for (const w of store.get('wordbook', [])) if (w && w.lang === 'ja') { jaLearn(w.zh, w.reading); jaFixLearn(w.zh, w.reading, w.check); } tagLegacy(); renderHist(); renderWords(); renderCal(); renderGlossary(); updateSyncUI(); pullFromServer();
 window.addEventListener('focus', () => { if (sync.pulled) pullFromServer(); });
 
 // ---------- 인트로(처음 한 번, 설정에서 다시 보기) ----------
