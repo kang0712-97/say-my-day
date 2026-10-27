@@ -45,17 +45,17 @@ function clientIp(req) {
   return xff.length ? xff[xff.length - 1] : req.socket.remoteAddress || 'unknown';
 }
 
-// 허용되면 null, 막히면 사용자에게 보여 줄 메시지를 돌려준다.
+// 허용되면 null, 막히면 {code, msg(한국어 기본 문구), n?}를 돌려준다. 화면은 code로 입력 언어에 맞는 문구를 고른다.
 function checkTranslateLimit(req) {
   if (!PUBLIC_MODE) return null;
   const now = Date.now();
   const today = new Date(now + 9 * 3600e3).toISOString().slice(0, 10); // 한국 날짜 기준
   if (today !== dayKey) { dayKey = today; dayCount = 0; }
-  if (dayCount >= LIMIT_PER_DAY) return '오늘 쓸 수 있는 번역 횟수를 모두 사용했어요. 내일 다시 이용해 주세요.';
-  if (running >= MAX_CONCURRENT) return '지금 번역 요청이 몰려 있어요. 잠시 후 다시 시도해 주세요.';
+  if (dayCount >= LIMIT_PER_DAY) return { code: 'limit_day', msg: '오늘 쓸 수 있는 번역 횟수를 모두 사용했어요. 내일 다시 이용해 주세요.' };
+  if (running >= MAX_CONCURRENT) return { code: 'busy', msg: '지금 번역 요청이 몰려 있어요. 잠시 후 다시 시도해 주세요.' };
   const ip = clientIp(req);
   const recent = (ipHits.get(ip) || []).filter((t) => now - t < 3600e3);
-  if (recent.length >= LIMIT_PER_IP_HOUR) return `1시간에 ${LIMIT_PER_IP_HOUR}번까지 번역할 수 있어요. 잠시 후 다시 시도해 주세요.`;
+  if (recent.length >= LIMIT_PER_IP_HOUR) return { code: 'limit_ip', n: LIMIT_PER_IP_HOUR, msg: `1시간에 ${LIMIT_PER_IP_HOUR}번까지 번역할 수 있어요. 잠시 후 다시 시도해 주세요.` };
   recent.push(now); ipHits.set(ip, recent);
   if (ipHits.size > 5000) for (const [k, v] of ipHits) if (!v.some((t) => now - t < 3600e3)) ipHits.delete(k);
   dayCount += 1;
@@ -69,7 +69,7 @@ const LANGS = { ko: { name: '한국어', bcp: 'ko-KR' }, zh: { name: '중국어'
 const PAIRS = { 'ko>zh': 'system_prompt.md', 'ko>ja': 'system_prompt_ja.md', 'zh>ja': 'system_prompt_zh_ja.md' };
 const pairOf = (src, tgt) => (LANGS[src] && LANGS[tgt] && src !== tgt && PAIRS[`${src}>${tgt}`]) ? { src, tgt, file: PAIRS[`${src}>${tgt}`] } : null;
 
-// 입력 글이 고른 입력 언어와 맞는지 가볍게 검사한다. 맞지 않으면 안내 문구를 돌려주고, 괜찮으면 null.
+// 입력 글이 고른 입력 언어와 맞는지 가볍게 검사한다. 맞지 않으면 {code, msg}를 돌려주고, 괜찮으면 null.
 // 한국어 일기를 중국어 입력으로 보내는 식의 실수를 막는 용도라 기준은 느슨하다(섞여 쓴 글은 통과).
 function checkSourceLang(text, src) {
   const count = (re) => (text.match(re) || []).length;
@@ -77,11 +77,11 @@ function checkSourceLang(text, src) {
   const letters = hangul + kana + han + latin;
   if (letters < 4) return null;
   if (src === 'zh') {
-    if (hangul >= 0.3 * letters) return '한국어로 쓴 일기 같아요. 입력 언어를 한국어로 바꾸거나, 중국어로 일기를 써 주세요.';
-    if (kana >= 0.3 * letters) return '일본어로 쓴 일기 같아요. 입력 언어를 중국어로 두려면 중국어로 일기를 써 주세요.';
-    if (han < 0.3 * letters) return '중국어 한자가 거의 없어요. 중국어(간체·번체)로 일기를 써 주세요.';
+    if (hangul >= 0.3 * letters) return { code: 'src_ko_in_zh', msg: '한국어로 쓴 일기 같아요. 입력 언어를 한국어로 바꾸거나, 중국어로 일기를 써 주세요.' };
+    if (kana >= 0.3 * letters) return { code: 'src_ja_in_zh', msg: '일본어로 쓴 일기 같아요. 입력 언어를 중국어로 두려면 중국어로 일기를 써 주세요.' };
+    if (han < 0.3 * letters) return { code: 'src_nohan_zh', msg: '중국어 한자가 거의 없어요. 중국어(간체·번체)로 일기를 써 주세요.' };
   }
-  if (src === 'ko' && hangul === 0 && han + kana >= 0.5 * letters) return '한국어가 아닌 글 같아요. 입력 언어를 확인해 주세요(언어 바꾸기).';
+  if (src === 'ko' && hangul === 0 && han + kana >= 0.5 * letters) return { code: 'src_not_ko', msg: '한국어가 아닌 글 같아요. 입력 언어를 확인해 주세요(언어 바꾸기).' };
   return null;
 }
 
@@ -543,14 +543,14 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && req.url === '/api/translate') {
       const body = JSON.parse((await readBody(req)) || '{}');
       const diary = String(body.diary || '').trim();
-      if (!diary) return sendJson(res, 400, { error: '일기를 입력해 주세요.' });
-      if (diary.length > MAX_DIARY_CHARS) return sendJson(res, 400, { error: `일기는 ${MAX_DIARY_CHARS}자 이내로 입력해 주세요.` });
+      if (!diary) return sendJson(res, 400, { error: '일기를 입력해 주세요.', code: 'diary_empty' });
+      if (diary.length > MAX_DIARY_CHARS) return sendJson(res, 400, { error: `일기는 ${MAX_DIARY_CHARS}자 이내로 입력해 주세요.`, code: 'diary_long', n: MAX_DIARY_CHARS });
       const pair = pairOf(String(body.srcLang || 'ko'), String(body.tgtLang || 'zh')); // 보내지 않으면 지금까지처럼 한국어 > 중국어
       if (!pair) return sendJson(res, 400, { error: '아직 지원하지 않는 언어 조합이에요.', code: 'pair' });
       const mismatch = checkSourceLang(diary, pair.src);
-      if (mismatch) return sendJson(res, 400, { error: mismatch, code: 'srclang' });
+      if (mismatch) return sendJson(res, 400, { error: mismatch.msg, code: mismatch.code });
       const blocked = checkTranslateLimit(req);
-      if (blocked) return sendJson(res, 429, { error: blocked });
+      if (blocked) return sendJson(res, 429, { error: blocked.msg, code: blocked.code, n: blocked.n });
       running += 1;
       try { return sendJson(res, 200, await translate(diary, cleanGlossary(body.glossary), pair.file, pair.tgt, pair.src)); } finally { running -= 1; }
     }
