@@ -816,6 +816,11 @@ function spokenPlan(text) { // 원문의 글자마다 소리 글에서 차지하
   }
   return changed ? { spoken, spans } : null;
 }
+const JA_PARTICLE = { は: 'わ', へ: 'え', を: 'お' }; // 조사로 쓸 때의 소리
+function jaAloneText(word) { // 단어만 따로 들려 줄 글: 한자는 AI가 준 히라가나, 조사 は·へ·を는 실제 소리로
+  if (JA_PARTICLE[word]) return JA_PARTICLE[word];
+  return jaFix.get(word) || jaDict.get(word) || word;
+}
 const spokenOf = (text) => { const p = spokenPlan(text); return p ? p.spoken : text; };
 function jaSplit(reading, n) {
   if (n <= 1) return [reading];
@@ -1150,17 +1155,18 @@ function speakEdge(btn, voice) {
   const warn = $('voice-warn'); warn.classList.add('hidden');
   btn.dataset.html = btn.innerHTML; btn.classList.add('playing'); btn.innerHTML = `${ICON.stop}<span>불러오는 중…</span>`; playingBtn = btn;
   const fail = (msg) => { if (playingBtn === btn) stopSpeak(); warn.textContent = msg; warn.classList.remove('hidden'); };
+  if (btn.dataset.ctx && LANG.tgt === 'ja') return speakWhole(btn, voice, fail, jaAloneText(btn.dataset.say)); // 일본어: 문장에서 자르면 끊겨 들리고 소리가 어긋나므로 단어를 읽기(히라가나)로 따로 합성한다
   if (btn.dataset.ctx) return speakSegment(btn, voice, fail); // 문장 속 단어: 문장 소리에서 그 단어 구간만 들려 줘 문맥 발음을 유지한다
   speakWhole(btn, voice, fail);
 }
-function speakWhole(btn, voice, fail) { // 낱말·문장을 그대로 한 번에 재생(글자 색은 단어 시간이 있으면 그것으로 칠한다)
-  const rate = btn.dataset.rate || rateKey(), say = btn.dataset.say;
-  const a = new Audio(edgeUrl(say, voice, btn.dataset.rate)); currentAudio = a;
-  const tp = getTiming(say, voice, rate);
+function speakWhole(btn, voice, fail, text) { // 낱말·문장을 그대로 한 번에 재생(글자 색은 단어 시간이 있으면 그것으로 칠한다). text: 소리로 낼 글(없으면 data-say)
+  const rate = btn.dataset.rate || rateKey(), say = btn.dataset.say, voiceText = text || say;
+  const a = new Audio(edgeUrl(voiceText, voice, btn.dataset.rate)); currentAudio = a;
+  const tp = getTiming(voiceText, voice, rate);
   a.addEventListener('playing', () => {
     if (playingBtn !== btn) return;
     btn.innerHTML = `${ICON.stop}<span>정지</span>`; karBegin(karLineFor(btn), say, audioProgress(a));
-    tp.then((t) => { if (t && currentAudio === a && playingBtn === btn) karUpgrade(timesFor(say, t.bounds), audioClock(a)); });
+    tp.then((t) => { if (t && currentAudio === a && playingBtn === btn) karUpgrade(timesFor(voiceText, t.bounds), audioClock(a)); });
   });
   a.addEventListener('ended', () => { if (playingBtn === btn) stopSpeak(); });
   a.addEventListener('error', () => fail('자연스러운 음성을 불러오지 못했어요. 인터넷 연결을 확인하거나 설정에서 다른 음성을 골라 주세요.'));
