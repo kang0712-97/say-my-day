@@ -195,6 +195,7 @@ const CHARS_PER_IP_HOUR = Number(process.env.CHARS_PER_IP_HOUR) || 60;   // 공�
 const charsHits = new Map(), charsCache = new Map();
 let charsRunning = 0;
 const HAN_ONLY = /^[一-鿿·]+$/;
+const JA_WORD = /^[぀-ヿ一-鿿々ー]+$/, JA_KANJI = /[一-鿿々]/;
 const CHARS_SYSTEM = `너는 한국어 화자에게 중국어를 가르치는 교사다. 번호가 붙은 중국어 단어를 받으면, 단어를 이루는 글자를 한 글자씩 풀이한다.
 출력은 JSON 하나만 쓴다. 설명 문장이나 코드 블록 표시는 쓰지 않는다.
 형식: {"words":[{"word":"突然","chars":[{"ch":"突","hun":"갑자기 돌","meaning":"갑자기, 불쑥"},{"ch":"然","hun":"그럴 연","meaning":"~한 모양"}],"how":"突(갑자기) + 然(~한 모양) → 갑자기"}]}
@@ -204,6 +205,17 @@ const CHARS_SYSTEM = `너는 한국어 화자에게 중국어를 가르치는 �
 3. meaning: 이 단어 안에서 그 글자가 하는 뜻이나 역할을 한국어로 12자 안팎으로 쓴다. 뜻이 없는 조사는 기능을 쓴다(예: 了 → "변화·완료를 나타냄").
 4. how: 글자 뜻이 합쳐져 단어 뜻이 되는 과정을 한 줄(40자 안팎)로 쓴다. 글자 뜻을 합쳐도 단어 뜻이 나오지 않으면(예: 东西) "글자 뜻과 다르게 굳어진 단어예요."처럼 솔직하게 쓴다. 한 글자 단어는 how를 빈 문자열로 둔다.
 5. 한국어로 쓰고, 쉬운 말을 쓴다.`;
+
+const CHARS_SYSTEM_JA = `너는 한국어 화자에게 일본어를 가르치는 교사다. 번호가 붙은 일본어 단어를 받으면, 단어 안의 한자를 한 글자씩 풀이한다.
+출력은 JSON 하나만 쓴다. 설명 문장이나 코드 블록 표시는 쓰지 않는다.
+형식: {"words":[{"word":"勉強","whole":false,"chars":[{"ch":"勉","reading":"べん(음독)","hun":"힘쓸 면","meaning":"힘써 노력함"},{"ch":"強","reading":"きょう(음독)","hun":"강할 강","meaning":"강하게 익힘"}],"how":"勉(힘씀) + 強(강함) → 힘써 배움"}]}
+규칙:
+1. chars에는 단어 안의 한자 글자만 순서대로 넣는다. 히라가나·가타카나(활용 어미 등)는 넣지 않는다(예: 食べ物 → 食, 物 두 개). 한자가 없는 단어는 chars를 빈 배열로 둔다.
+2. reading: 먼저 단어 전체가 실제로 어떻게 읽히는지 정하고(예: 市場은 일반적으로 しじょう, 勉強는 べんきょう), 그 읽기를 글자별로 나눈다(市 → し, 場 → じょう). 글자 하나씩 따로 읽어 짜 맞추지 않는다. 그 글자가 이 단어에서 읽히는 히라가나와, 뒤에 (음독) 또는 (훈독)을 붙인다(예: 食 → "た(훈독)", 物 → "もの(훈독)"). 글자별로 나눌 수 없는 熟字訓(今日·大人·果物 등)은 whole을 true로 하고 reading은 빈 문자열로 둔다.
+3. hun: 같은 글자(일본 신자체면 한국에서 쓰는 한자)가 한국 한자로 쓰이면 한국 한자의 훈음을 쓴다(예: 友 → "벗 우", 国 → "나라 국"). 한국에서 쓰지 않는 글자(국자 등)이거나 확실하지 않으면 빈 문자열. 지어내지 않는다.
+4. meaning: 이 단어 안에서 그 글자가 하는 뜻이나 역할을 한국어로 12자 안팎으로 쓴다.
+5. how: 글자 뜻이 합쳐져 단어 뜻이 되는 과정을 한 줄(40자 안팎)로 쓴다. whole이 true이면 "이 단어는 글자별로 나누지 않고 통째로 읽어요."로 시작한다. 한 글자 단어는 how를 빈 문자열로 둔다.
+6. 한국어로 쓰고, 쉬운 말을 쓴다.`;
 
 function charsLimited(req) {
   if (!PUBLIC_MODE) return false;
@@ -234,20 +246,30 @@ async function callJsonModel(system, userText, maxTokens) {
   return extractJson((data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join(''));
 }
 
-async function explainChars(words) {
+async function explainChars(words, lang) {
+  const ja = lang === 'ja', ck = (w) => (ja ? 'ja:' : '') + w;
   const out = {}, need = [];
-  for (const w of words) { const c = charsCache.get(w); if (c) out[w] = c; else need.push(w); }
+  for (const w of words) { const c = charsCache.get(ck(w)); if (c) out[w] = c; else need.push(w); }
   if (need.length) {
-    const parsed = await callJsonModel(CHARS_SYSTEM, need.map((w, i) => `${i + 1}. ${w}`).join('\n'), 3000);
+    const parsed = await callJsonModel(ja ? CHARS_SYSTEM_JA : CHARS_SYSTEM, need.map((w, i) => `${i + 1}. ${w}`).join('\n'), 3000);
     const list = Array.isArray(parsed.words) ? parsed.words : [];
     const clip = (v, n) => String(v || '').trim().slice(0, n);
     for (const w of need) {
       const e = list.find((x) => x && x.word === w); if (!e) continue;
       const given = Array.isArray(e.chars) ? e.chars : [];
-      // 모델이 글자를 빠뜨리거나 순서를 바꿔도 단어의 글자 수·순서에 맞춰 정리한다
-      const chars = [...w].map((ch, i) => { const g = (given[i] && given[i].ch === ch) ? given[i] : (given.find((c) => c && c.ch === ch) || {}); return { ch, hun: clip(g.hun, 12), meaning: clip(g.meaning, 40) }; });
-      const val = { chars, how: clip(e.how, 90) };
-      charsCache.set(w, val); out[w] = val;
+      let val;
+      if (ja) { // 한자 글자 수와 풀이 개수가 다르면 버린다(캐시하지 않음)
+        const kan = [...w].filter((c) => JA_KANJI.test(c));
+        if (!kan.length || given.length !== kan.length || kan.some((c, i) => !given[i] || given[i].ch !== c)) continue;
+        const whole = e.whole === true;
+        val = { chars: kan.map((ch, i) => ({ ch, reading: whole ? '' : clip(given[i].reading, 14), hun: clip(given[i].hun, 12), meaning: clip(given[i].meaning, 40) })), how: clip(e.how, 90), whole };
+        if (whole && !val.how.startsWith('이 단어는')) val.how = ('이 단어는 글자별로 나누지 않고 통째로 읽어요. ' + val.how).trim();
+      } else {
+        // 모델이 글자를 빠뜨리거나 순서를 바꿔도 단어의 글자 수·순서에 맞춰 정리한다
+        const chars = [...w].map((ch, i) => { const g = (given[i] && given[i].ch === ch) ? given[i] : (given.find((c) => c && c.ch === ch) || {}); return { ch, hun: clip(g.hun, 12), meaning: clip(g.meaning, 40) }; });
+        val = { chars, how: clip(e.how, 90) };
+      }
+      charsCache.set(ck(w), val); out[w] = val;
       if (charsCache.size > 3000) charsCache.delete(charsCache.keys().next().value);
     }
   }
@@ -449,15 +471,16 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'POST' && req.url === '/api/chars') {
       const body = JSON.parse((await readBody(req)) || '{}');
-      const words = [...new Set((Array.isArray(body.words) ? body.words : []).map((w) => String(w || '').trim()).filter((w) => w && [...w].length <= 8 && HAN_ONLY.test(w)))].slice(0, 12);
+      const lang = body.lang === 'ja' ? 'ja' : 'zh', ck = (w) => (lang === 'ja' ? 'ja:' : '') + w;
+      const words = [...new Set((Array.isArray(body.words) ? body.words : []).map((w) => String(w || '').trim()).filter((w) => w && [...w].length <= 8 && (lang === 'ja' ? JA_WORD.test(w) && JA_KANJI.test(w) : HAN_ONLY.test(w))))].slice(0, 12);
       if (!words.length) return sendJson(res, 400, { error: '풀이할 단어가 없어요.' });
       if (!process.env.GEMINI_API_KEY && !process.env.ANTHROPIC_API_KEY) return sendJson(res, 503, { error: '글자 풀이는 API 키가 있을 때만 쓸 수 있어요.' });
-      if (!words.every((w) => charsCache.has(w))) { // 이미 풀이해 둔 단어만 요청하면 제한과 상관없이 바로 답한다
+      if (!words.every((w) => charsCache.has(ck(w)))) { // 이미 풀이해 둔 단어만 요청하면 제한과 상관없이 바로 답한다
         if (charsLimited(req)) return sendJson(res, 429, { error: '글자 풀이를 너무 많이 요청했어요. 잠시 후 다시 시도해 주세요.' });
         if (charsRunning >= MAX_CONCURRENT) return sendJson(res, 429, { error: '지금 요청이 몰려 있어요. 잠시 후 다시 시도해 주세요.' });
       }
       charsRunning += 1;
-      try { return sendJson(res, 200, { words: await explainChars(words) }); } finally { charsRunning -= 1; }
+      try { return sendJson(res, 200, { words: await explainChars(words, lang) }); } finally { charsRunning -= 1; }
     }
     if (req.method === 'POST' && req.url === '/api/translate') {
       const body = JSON.parse((await readBody(req)) || '{}');

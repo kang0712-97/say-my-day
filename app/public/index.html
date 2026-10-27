@@ -1358,40 +1358,52 @@ function renderWordPage() {
 
 // ---------- 글자별 풀이 ----------
 // 단어를 이루는 글자를 한 글자씩 보여 준다. 병음은 앱이 문맥에 맞게 계산하고, 한국 한자 훈음과 뜻은 서버(AI)에서 가져와 이 기기에 저장해 두고 다시 쓴다.
-const hasHan = (t) => LANG.tgt === 'zh' && /^[一-鿿·]+$/.test(String(t || '')); // 글자별 풀이는 중국어만
+const hasHan = (t) => LANG.tgt === 'ja' ? /^[぀-ヿ一-鿿々ー]+$/.test(String(t || '')) && /[一-鿿々]/.test(String(t || '')) : LANG.tgt === 'zh' && /^[一-鿿·]+$/.test(String(t || '')); // 글자별 풀이: 중국어는 한자만, 일본어는 한자가 하나라도 든 단어
+const chKey = (w) => (LANG.tgt === 'ja' ? 'ja:' : '') + w; // 같은 글자열이 중국어·일본어 캐시에서 섞이지 않게 일본어는 접두어를 붙인다
 const CH_KEY = 'char-cache'; const charCache = store.get(CH_KEY, {}); const charPending = new Map();
 function saveCharCache() { const ks = Object.keys(charCache); if (ks.length > 600) ks.slice(0, ks.length - 600).forEach((k) => delete charCache[k]); store.set(CH_KEY, charCache); }
 function loadChars(words) {
   const uniq = [...new Set(words)].filter(hasHan);
-  const need = uniq.filter((w) => !charCache[w] && !charPending.has(w)).slice(0, 12);
+  const lang = LANG.tgt, K = chKey; const need = uniq.filter((w) => !charCache[K(w)] && !charPending.has(K(w))).slice(0, 12);
   if (need.length) {
-    const p = fetch('/api/chars', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ words: need }) })
-      .then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || '글자 풀이를 불러오지 못했어요.'); Object.assign(charCache, d.words || {}); saveCharCache(); })
-      .finally(() => need.forEach((w) => charPending.delete(w)));
-    need.forEach((w) => charPending.set(w, p));
+    const p = fetch('/api/chars', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ words: need, lang }) })
+      .then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || '글자 풀이를 불러오지 못했어요.'); for (const [k, v] of Object.entries(d.words || {})) charCache[(lang === 'ja' ? 'ja:' : '') + k] = v; saveCharCache(); })
+      .finally(() => need.forEach((w) => charPending.delete(K(w))));
+    need.forEach((w) => charPending.set(K(w), p));
   }
-  return Promise.all(uniq.filter((w) => !charCache[w]).map((w) => charPending.get(w)).filter(Boolean));
+  return Promise.all(uniq.filter((w) => !charCache[chKey(w)]).map((w) => charPending.get(chKey(w))).filter(Boolean));
 }
 function charsHtml(w, err) {
-  const toks = w.tok || readTokens(w.zh); const c = charCache[w.zh];
-  const rows = [...w.zh].map((ch, i) => {
-    const g = c && c.chars && c.chars[i]; const py = toks[i] && toks[i].isZh ? toks[i].pinyin : '';
-    const body = g ? `<div class="chr-k">${g.hun ? `<b>${esc(g.hun)}</b>` : ''}${g.meaning ? `<span>${esc(g.meaning)}</span>` : ''}</div>` : (err ? '' : '<div class="chr-k mute">풀이를 불러오는 중…</div>');
-    return `<div class="chr"><div class="chr-h" lang="${BCP()}">${esc(ch)}</div><div class="chr-b"><div class="chr-py">${esc(py)}</div>${body}</div></div>`;
-  }).join('');
+  const c = charCache[chKey(w.zh)];
   const tail = c && c.how ? `<div class="chr-how">${esc(c.how)}</div>` : '';
   const fail = !c && err ? `<div class="chr-how">${esc(err)} <button class="btn" data-charsretry style="min-height:32px;padding:2px 12px;margin-left:6px">다시 불러오기</button></div>` : '';
+  const kb = (g) => `<div class="chr-k">${g.hun ? `<b>${esc(g.hun)}</b>` : ''}${g.meaning ? `<span>${esc(g.meaning)}</span>` : ''}</div>`;
+  const wait = err ? '' : '<div class="chr-k mute">풀이를 불러오는 중…</div>';
+  let rows;
+  if (LANG.tgt === 'ja') { // 일본어: 한자 글자만 풀이한다(가나는 건너뜀). 서버가 한자 글자 수와 같은 개수로 돌려준다
+    const kan = [...w.zh].filter((ch) => /[一-鿿々]/.test(ch));
+    rows = kan.map((ch, i) => {
+      const g = c && c.chars && c.chars[i];
+      return `<div class="chr"><div class="chr-h" lang="${BCP()}">${esc(ch)}</div><div class="chr-b"><div class="chr-py">${esc(g ? g.reading || '' : '')}</div>${g ? kb(g) : wait}</div></div>`;
+    }).join('');
+  } else {
+    const toks = w.tok || readTokens(w.zh);
+    rows = [...w.zh].map((ch, i) => {
+      const g = c && c.chars && c.chars[i]; const py = toks[i] && toks[i].isZh ? toks[i].pinyin : '';
+      return `<div class="chr"><div class="chr-h" lang="${BCP()}">${esc(ch)}</div><div class="chr-b"><div class="chr-py">${esc(py)}</div>${g ? kb(g) : wait}</div></div>`;
+    }).join('');
+  }
   return `<h4>글자별 풀이</h4>${rows}${tail}${fail}`;
 }
 function fillChars() {
-  const w = wp.list[wp.i]; if (!w || !$('wp-chars') || charCache[w.zh]) return;
+  const w = wp.list[wp.i]; if (!w || !$('wp-chars') || charCache[chKey(w.zh)]) return;
   const key = w.zh; const same = () => wp.list[wp.i] && wp.list[wp.i].zh === key && $('wp-chars');
-  loadChars([key]).then(() => { if (same()) $('wp-chars').innerHTML = charsHtml(wp.list[wp.i]); })
+  loadChars([key]).then(() => { if (same()) $('wp-chars').innerHTML = charsHtml(wp.list[wp.i], charCache[chKey(key)] ? '' : '이 단어는 풀이하지 못했어요.'); })
     .catch((e) => { if (same()) $('wp-chars').innerHTML = charsHtml(wp.list[wp.i], e.message); });
 }
 function prefetchChars() { const ws = currentVocab.map((v) => v.zh).filter(hasHan); if (ws.length) loadChars(ws).catch(() => {}); } // 번역 직후 핵심 단어를 한 번에 풀이해 둔다
 function miniChars(w) { // 미니 카드에는 이미 풀이해 둔 단어만 한 줄로 보여 준다(여기서는 새로 요청하지 않는다)
-  const c = charCache[w.zh]; if (!c || [...w.zh].length < 2) return '';
+  const c = charCache[chKey(w.zh)]; if (!c || [...w.zh].length < 2) return '';
   return `<div class="mchars">${c.chars.map((g) => `<span><b class="zh-font">${esc(g.ch)}</b> ${esc(g.hun || g.meaning)}</span>`).join('')}</div>`;
 }
 const wpSaveBtn = (w) => hasWord(w.zh)
