@@ -66,8 +66,24 @@ function checkTranslateLimit(req) {
 // 입력 언어(일기를 쓰는 말)와 학습 언어(번역해서 배우는 말)를 고른다. 해설은 입력 언어로 쓴다.
 // PAIRS에 (입력>학습) 조합과 번역 규칙 파일을 적으면 그 조합이 켜진다. 새 언어는 규칙 파일(prompts/)을 만들어 여기에 추가한다.
 const LANGS = { ko: { name: '한국어', bcp: 'ko-KR' }, zh: { name: '중국어', bcp: 'zh-CN' }, ja: { name: '일본어', bcp: 'ja-JP' }, en: { name: '영어', bcp: 'en-US' } };
-const PAIRS = { 'ko>zh': 'system_prompt.md', 'ko>ja': 'system_prompt_ja.md' };
+const PAIRS = { 'ko>zh': 'system_prompt.md', 'ko>ja': 'system_prompt_ja.md', 'zh>ja': 'system_prompt_zh_ja.md' };
 const pairOf = (src, tgt) => (LANGS[src] && LANGS[tgt] && src !== tgt && PAIRS[`${src}>${tgt}`]) ? { src, tgt, file: PAIRS[`${src}>${tgt}`] } : null;
+
+// 입력 글이 고른 입력 언어와 맞는지 가볍게 검사한다. 맞지 않으면 안내 문구를 돌려주고, 괜찮으면 null.
+// 한국어 일기를 중국어 입력으로 보내는 식의 실수를 막는 용도라 기준은 느슨하다(섞여 쓴 글은 통과).
+function checkSourceLang(text, src) {
+  const count = (re) => (text.match(re) || []).length;
+  const hangul = count(/[가-힣ㄱ-ㅎ]/g), kana = count(/[぀-ヿ]/g), han = count(/[一-鿿]/g), latin = count(/[A-Za-z]/g);
+  const letters = hangul + kana + han + latin;
+  if (letters < 4) return null;
+  if (src === 'zh') {
+    if (hangul >= 0.3 * letters) return '한국어로 쓴 일기 같아요. 입력 언어를 한국어로 바꾸거나, 중국어로 일기를 써 주세요.';
+    if (kana >= 0.3 * letters) return '일본어로 쓴 일기 같아요. 입력 언어를 중국어로 두려면 중국어로 일기를 써 주세요.';
+    if (han < 0.3 * letters) return '중국어 한자가 거의 없어요. 중국어(간체·번체)로 일기를 써 주세요.';
+  }
+  if (src === 'ko' && hangul === 0 && han + kana >= 0.5 * letters) return '한국어가 아닌 글 같아요. 입력 언어를 확인해 주세요(언어 바꾸기).';
+  return null;
+}
 
 // 사용자가 앱에서 적은 "내 표현 사전"을 안전하게 다듬는다(길이 제한, 줄바꿈·코드 표시 제거, 최대 20개).
 const cleanGl = (v, n) => String(v || '').replace(/[\u0000-\u001f\u007f`*]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
@@ -489,6 +505,8 @@ const server = http.createServer(async (req, res) => {
       if (diary.length > MAX_DIARY_CHARS) return sendJson(res, 400, { error: `일기는 ${MAX_DIARY_CHARS}자 이내로 입력해 주세요.` });
       const pair = pairOf(String(body.srcLang || 'ko'), String(body.tgtLang || 'zh')); // 보내지 않으면 지금까지처럼 한국어 > 중국어
       if (!pair) return sendJson(res, 400, { error: '아직 지원하지 않는 언어 조합이에요.', code: 'pair' });
+      const mismatch = checkSourceLang(diary, pair.src);
+      if (mismatch) return sendJson(res, 400, { error: mismatch, code: 'srclang' });
       const blocked = checkTranslateLimit(req);
       if (blocked) return sendJson(res, 429, { error: blocked });
       running += 1;
