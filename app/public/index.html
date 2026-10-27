@@ -299,6 +299,7 @@
   .build-ko { font-family: var(--f-hand); font-size: 1.7rem; text-align: center; line-height: 1.3; margin: 6px 0 16px; }
   .build-line { min-height: 72px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); display: flex; flex-wrap: wrap; gap: 8px; padding: 10px 0; align-items: center; justify-content: center; }
   .build-line:empty::before { content: "여기에 단어를 쌓아요"; color: var(--muted); font-family: var(--f-hand); font-size: 1.3rem; }
+  html[lang^="zh"] .build-line:empty::before { content: "在这里堆叠单词"; }
   .build-bank { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; justify-content: center; }
   .chipw { border: 1px solid var(--ink); background: var(--cell); color: var(--ink); padding: 6px 14px; font-family: var(--f-zh); font-size: 1.5rem; min-height: 52px; border-radius: 8px; cursor: pointer; }
   .chipw:hover { background: var(--hl); color: var(--hl-ink); }
@@ -582,7 +583,7 @@
       <h2 class="sec" id="sec-wrap"><span class="no">06</span>마무리<span class="en">Wrap-up</span></h2>
       <div class="cell">
         <ol class="steps">
-          <li><h4>오늘 일기를 <span data-tn>중국어</span>로 읽어 보세요</h4><p class="hint" style="margin:0 0 8px">처음부터 끝까지 듣고, 소리 내어 따라 읽어요.</p><button class="btn solid" id="wrap-read"><span data-i="speaker"></span>일기 전체 읽기</button></li>
+          <li><h4 data-th="wrap.read">오늘 일기를 <span data-tn>중국어</span>로 읽어 보세요</h4><p class="hint" style="margin:0 0 8px">처음부터 끝까지 듣고, 소리 내어 따라 읽어요.</p><button class="btn solid" id="wrap-read"><span data-i="speaker"></span>일기 전체 읽기</button></li>
           <li><h4>마음에 드는 단어·문장을 저장하세요</h4><p class="hint" style="margin:0" id="wrap-count"></p></li>
           <li><h4>저장한 것으로 바로 퀴즈를 풀어요</h4><p class="hint" style="margin:0 0 8px">방금 저장한 단어·문장을 한 번 더 익혀요.</p><button class="btn solid" id="wrap-quiz">퀴즈 시작</button></li>
         </ol>
@@ -622,7 +623,7 @@
         <label class="opt">밝기 <input type="range" id="opt-bright" min="50" max="100" step="5" value="100" aria-label="화면 밝기"></label>
         <div class="opt">배우는 말 <button class="btn" id="lang-set">바꾸기</button></div>
         <div class="opt">소개 화면 <button class="btn" id="intro-again">다시 보기</button></div>
-        <p class="hint" style="margin:6px 0 14px"><b>내 일기는 이 기기에 보관돼요.</b> 일기는 이 기기의 브라우저에만 저장돼요. 번역할 때만 일기 문장이 AI(Claude)에 전달되고, 음성을 만들 때는 번역된 <span data-tn>중국어</span> 문장이 음성 서비스에 전달돼요.</p>
+        <p class="hint" style="margin:6px 0 14px" data-th="set.privacy"><b>내 일기는 이 기기에 보관돼요.</b> 일기는 이 기기의 브라우저에만 저장돼요. 번역할 때만 일기 문장이 AI(Claude)에 전달되고, 음성을 만들 때는 번역된 <span data-tn>중국어</span> 문장이 음성 서비스에 전달돼요.</p>
         <div class="gl" id="gl-wrap">
           <div class="gl-head"><b>내 표현 사전</b><span class="hint" id="gl-count" style="margin:0"></span></div>
           <p class="hint" style="margin:4px 0 6px">자주 쓰는 이름이나 표현을 적어 두면 번역할 때 반영돼요. 이 기기에 저장되고, 번역할 때만 일기와 함께 AI에 전달돼요.</p>
@@ -709,7 +710,7 @@
         </g></g>
       </g>
     </svg>
-    <p class="w-t">내 이야기를 <span data-tn>중국어</span>로 옮겨 쓰고 있어요</p>
+    <p class="w-t" data-th="writing.t">내 이야기를 <span data-tn>중국어</span>로 옮겨 쓰고 있어요</p>
     <p class="w-s" id="w-s"></p>
     <button class="btn" id="cancel">취소</button>
   </div>
@@ -798,6 +799,9 @@ const T = {
     'intro.how.eyebrow': '이렇게 배워요',
     'intro.how.h': '{src}로 쓴 일기를<br><em>배우는 말로</em>',
     'intro.how.s1': '{src}로 한 줄 써요', 'intro.how.s2': '바뀐 내 문장을 듣고 읽어요', 'intro.how.s3': '내가 쓴 문장으로 퀴즈를 풀어요',
+    'wrap.read': '오늘 일기를 {tgt}로 읽어 보세요',
+    'set.privacy': '<b>내 일기는 이 기기에 보관돼요.</b> 일기는 이 기기의 브라우저에만 저장돼요. 번역할 때만 일기 문장이 AI(Claude)에 전달되고, 음성을 만들 때는 번역된 {tgt} 문장이 음성 서비스에 전달돼요.',
+    'writing.t': '내 이야기를 {tgt}로 옮겨 쓰고 있어요',
     'err.keep': '입력한 일기는 그대로 남아 있어요.',
     'err.limit_day': '오늘 쓸 수 있는 번역 횟수를 모두 사용했어요. 내일 다시 이용해 주세요.',
     'err.busy': '지금 번역 요청이 몰려 있어요. 잠시 후 다시 시도해 주세요.',
@@ -820,6 +824,9 @@ const T = {
     'intro.how.eyebrow': '这样学习',
     'intro.how.h': '把用{src}写的日记<br><em>变成要学的语言</em>',
     'intro.how.s1': '用{src}写一行', 'intro.how.s2': '听一听、读一读变成外语的句子', 'intro.how.s3': '用自己写的句子做测验',
+    'wrap.read': '用{tgt}朗读今天的日记',
+    'set.privacy': '<b>你的日记保存在这台设备上。</b>日记只保存在这台设备的浏览器里。只有翻译时，日记句子才会发送给 AI（Claude）；生成语音时，翻译好的{tgt}句子会发送给语音服务。',
+    'writing.t': '正在把我的故事写成{tgt}',
     'err.keep': '你输入的日记还在。',
     'err.limit_day': '今天可用的翻译次数已用完，请明天再来。',
     'err.busy': '现在翻译请求太多，请稍后再试。',
@@ -834,6 +841,22 @@ const T = {
 };
 T.zh['lp.tgt'] = '想学的语言 · <span lang="ko">배우고 싶은 말</span>';
 T.ko['lp.tgt'] = '배우고 싶은 말 · <span lang="zh-CN">想学的语言</span>';
+// 정적 화면 문구(한국어 원문 → 중국어). 문장마다 키를 만들지 않고 원문을 그대로 키로 쓴다(없으면 한국어 그대로 보인다).
+// 화면을 코드로 만드는 문구는 L('한국어 원문', {값})로 감싼다(아래 L). 중국어 번역은 AI 초안이라 중국어 화자 검수가 필요하다.
+const ZH = {"일기": "日记","오늘의 복습": "今日复习","복습 시작": "开始复习","어떤 하루를": "你度过了","보내셨나요?": "怎样的一天？","내 감정도, 일어났던 일도, 만났던 사람도. 어떤 이야기라도 괜찮아요.": "心情、发生的事、遇见的人，什么故事都可以。","오늘의 이야기": "今天的故事","한 줄이어도 좋아요": "只写一行也可以","막막하면 이렇게 시작해 보세요": "不知道写什么？可以这样开头","오늘 기분은": "今天的心情","오늘 먹은 것은": "今天吃的","오늘 만난 사람은": "今天见的人","오늘 본 것은": "今天看到的","번역하고 공부하기": "翻译并学习","번역": "翻译","단어": "单词","문법": "语法","활용": "运用","확인": "确认","마무리": "收尾","단어를 누르면 뜻과 발음이 나와요. 병음은 책처럼 본래 성조로 적어요. 3성이 이어지면 소리만 바뀌어요. 예) 你好 nǐ hǎo → 소리는 ní hǎo": "点一下单词就会显示意思和发音。拼音像书上一样标原本的声调，连续的三声只是读音会变。例）你好 nǐ hǎo → 读作 ní hǎo","목록": "列表","한 문장씩": "逐句","일기 전체 읽기": "朗读整篇日记","이전": "上一个","다음": "下一个","핵심 단어": "核心单词","문법 포인트": "语法要点","활용 문장": "运用句子","확인이 필요한 부분": "需要确认的地方","처음부터 끝까지 듣고, 소리 내어 따라 읽어요.": "从头听到尾，再出声跟读。","마음에 드는 단어·문장을 저장하세요": "把喜欢的单词和句子存起来","저장한 것으로 바로 퀴즈를 풀어요": "用存好的内容马上做测验","방금 저장한 단어·문장을 한 번 더 익혀요.": "把刚存的单词和句子再熟悉一遍。","퀴즈 시작": "开始测验","쓰기": "写作","일기장": "日记本","보관함": "收藏夹","설정": "设置","문장": "句子","단어 퀴즈 시작": "开始单词测验","테마": "主题","자동": "自动","라이트": "浅色","다크": "深色","밝기": "亮度","배우는 말": "学习的语言","바꾸기": "更换","소개 화면": "介绍页面","다시 보기": "再看一遍","내 표현 사전": "我的表达词典","자주 쓰는 이름이나 표현을 적어 두면 번역할 때 반영돼요. 이 기기에 저장되고, 번역할 때만 일기와 함께 AI에 전달돼요.": "记下常用的名字或表达，翻译时会参照。内容保存在这台设备上，只有翻译时才会和日记一起发送给 AI。","추가": "添加","보기": "显示","음성": "语音","속도": "速度","느리게": "慢","보통": "正常","빠르게": "快","내 데이터": "我的数据","일기·단어·문장은 이 컴퓨터의 chinese-diary/data 폴더에도 자동 저장돼요. 파일로 내보내 두면 더 안전해요.": "日记、单词和句子也会自动保存到这台电脑的 chinese-diary/data 文件夹。导出成文件会更安全。","내보내기": "导出","가져오기": "导入","취소": "取消","건너뛰기": "跳过","문장 사이 쉬는 시간": "句子之间的停顿","없음": "无","3초": "3秒","6초": "6秒","일기 쓰기 화면으로 돌아가기": "返回写日记页面","다크 모드로 전환": "切换到深色模式","배우는 말 바꾸기": "更换学习的语言","Say My Day · 오늘의 {tgt}": "Say My Day · 今日{tgt}"," (베타)": "（测试版）","후리가나": "振假名","병음": "拼音","한국어": "韩语","가리기": "隐藏","단어를 누르면 뜻과 발음이 나와요. 한자 위의 작은 글자가 읽는 법(후리가나)이고, 점선 밑줄이 있으면 읽기를 한 번 더 확인해 보세요.": "点一下单词就会显示意思和发音。汉字上方的小字是读音（振假名），带虚线下划线的请再确认一下读音。","예) 오늘은 아침에 빗소리를 들으며 깼다. 기분 좋은 시작이다.": "例）今天早上听着雨声醒来，是个好的开始。","오늘 기분은 ": "今天的心情是","오늘 먹은 것은 ": "今天吃的是","오늘 만난 사람은 ": "今天见到的人是","오늘 본 것은 ": "今天看到的是","결과 이동": "跳转到结果","보기 방식": "显示方式","메뉴": "菜单","닫기": "关闭","이전 달": "上个月","다음 달": "下个月","보관함 종류": "收藏夹类型","화면 밝기": "屏幕亮度","표현": "表达","표현 (예: 우동)": "表达（例：乌冬面）","어떻게 옮길지": "怎么翻译","어떻게 옮길지 (예: 사람 이름이에요. 항상 于桐로 써 주세요)": "怎么翻译（例：这是人名，请一律写成 于桐）","듣기 음성": "听力语音","듣기 속도": "听力速度","사용 안내": "使用说明","단어 뜻": "单词释义","단어 페이지": "单词页面","뒤로": "返回","오늘 일기 전체 읽기": "朗读整篇日记","번역문 전체 복사": "复制全部译文","이전 문장": "上一句","다음 문장": "下一句","읽기 속도": "朗读速度","카드 퀴즈": "卡片测验"};
+const L = (ko, vars) => { const v = UI === 'zh' && ZH[ko] != null ? ZH[ko] : ko; return vars ? v.replace(/\{(\w+)\}/g, (m, k) => (k in vars ? vars[k] : m)) : v; };
+function zhStatic() { // 처음 그릴 때 한 번, 화면 언어가 중국어면 정적 문구와 속성을 바꾼다(언어를 바꾸면 다시 불러오므로 한 번이면 충분하다)
+  if (UI !== 'zh') return;
+  const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT), nodes = [];
+  for (let n; (n = w.nextNode());) nodes.push(n);
+  for (const n of nodes) {
+    const p = n.parentElement; if (!p || p.closest('script,style,#intro,[data-t],[data-th]')) continue;
+    const k = n.nodeValue.trim(); if (ZH[k] != null) n.nodeValue = n.nodeValue.replace(k, ZH[k]);
+  }
+  document.querySelectorAll('body *').forEach((e) => { if (e.closest('#intro')) return;
+    for (const a of ['aria-label', 'placeholder', 'title', 'data-start']) { const v = e.getAttribute(a); if (v && ZH[v] != null) e.setAttribute(a, ZH[v]); } });
+  $('diary').lang = LANGS[LANG.src].bcp;
+}
 let UI = LANG.src; // 화면 언어. 언어 고르는 중에는 방금 고른 입력 언어를 바로 따라간다(setUI).
 const tr = (key, vars) => {
   const raw = (T[UI] && T[UI][key]) ?? T.ko[key] ?? key;
@@ -852,7 +875,7 @@ let introSrc = () => LANG.src, introTgt = () => LANG.tgt; // 인트로 아래에
 const tgtName = () => langName(LANG.tgt);
 const srcName = () => langName(LANG.src);
 const BCP = () => LANGS[LANG.tgt].bcp;
-const readLabel = () => (LANG.tgt === 'ja' ? '후리가나' : '병음');
+const readLabel = () => L(LANG.tgt === 'ja' ? '후리가나' : '병음');
 // 일본어 읽기: 번역 결과의 단어별 히라가나(AI)를 글자마다 나눠 붙인다. 한 글자 = 한 칸이라는 화면 구조(따라 읽기·형광펜)를 그대로 쓰기 위해
 // 한자 덩어리의 읽기를 글자 수만큼 나눠 각 칸 위에 올린다(예: 友達 ともだち → 友 とも / 達 だち).
 const KANJI_RE = /[一-鿿々〆]/;
@@ -942,10 +965,10 @@ function applyLangUI() {
   document.querySelectorAll('[data-tn]').forEach((el) => { el.textContent = tgtName(); });
   document.querySelectorAll('[data-sn]').forEach((el) => { el.textContent = srcName(); });
   document.querySelectorAll('[data-rl]').forEach((el) => { el.textContent = readLabel(); });
-  const rh = $('read-hint'); if (rh) { if (!rh.dataset.zh) rh.dataset.zh = rh.textContent; rh.textContent = LANG.tgt === 'ja' ? '단어를 누르면 뜻과 발음이 나와요. 한자 위의 작은 글자가 읽는 법(후리가나)이고, 점선 밑줄이 있으면 읽기를 한 번 더 확인해 보세요.' : rh.dataset.zh; }
+  const rh = $('read-hint'); if (rh) { if (!rh.dataset.zh) rh.dataset.zh = rh.textContent; rh.textContent = LANG.tgt === 'ja' ? L('단어를 누르면 뜻과 발음이 나와요. 한자 위의 작은 글자가 읽는 법(후리가나)이고, 점선 밑줄이 있으면 읽기를 한 번 더 확인해 보세요.') : rh.dataset.zh; }
   applyInputUI();
-  $('ring-text').textContent = `Say My Day · 오늘의 ${tgtName()} · Say My Day · 오늘의 ${tgtName()} ·`;
-  $('lang-chip').textContent = `${LANGS[LANG.src].name} → ${tgtName()}${LANG.tgt === 'ja' ? ' (베타)' : ''} · 바꾸기`;
+  { const rt = L('Say My Day · 오늘의 {tgt}', { tgt: tgtName() }); $('ring-text').textContent = `${rt} · ${rt} ·`; }
+  $('lang-chip').textContent = `${srcName()} → ${tgtName()}${LANG.tgt === 'ja' ? L(' (베타)') : ''} · ${L('바꾸기')}`;
 }
 // 입력 언어에 맞춰 일기 입력란의 예시 문구·언어 속성·시작 버튼을 바꾼다.
 const INPUT_UI = {
@@ -2621,7 +2644,7 @@ document.addEventListener('keydown', (e) => {
   el.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
   el.addEventListener('touchend', (e) => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (intro.pickerOnly || Math.abs(dx) <= 50) return; const to = intro.i + (dx < 0 ? 1 : -1); if (!(intro.i === 0 && dx < 0)) introShow(to); }, { passive: true }); }
 if (!store.get('intro-seen', '')) introOpen();
-setUI(LANG.src);
+setUI(LANG.src); zhStatic();
 
 // ---------- 첫 사용 안내: 예시로 둘러보기 + 첫 번역 직후 말풍선 ----------
 // 말풍선 3개를 한 번만 보여 준다. 끝까지 보거나 "건너뛰기"를 누르면 다시 나오지 않는다.
