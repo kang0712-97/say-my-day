@@ -7,3 +7,4 @@ tests/
 backup/
 prompts/user_glossary.md
 prompts/system_prompt_v*.md
+node_modules/

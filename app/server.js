@@ -6,6 +6,7 @@ const os = require('os');
 const path = require('path');
 const crypto = require('crypto');
 const { execFile, spawn } = require('child_process');
+const { normalizeJa, checkJa } = require('./ja_reading');
 
 const ROOT = __dirname;
 const PUBLIC = path.join(ROOT, 'public');
@@ -65,7 +66,7 @@ function checkTranslateLimit(req) {
 // 입력 언어(일기를 쓰는 말)와 학습 언어(번역해서 배우는 말)를 고른다. 해설은 입력 언어로 쓴다.
 // PAIRS에 (입력>학습) 조합과 번역 규칙 파일을 적으면 그 조합이 켜진다. 새 언어는 규칙 파일(prompts/)을 만들어 여기에 추가한다.
 const LANGS = { ko: { name: '한국어', bcp: 'ko-KR' }, zh: { name: '중국어', bcp: 'zh-CN' }, ja: { name: '일본어', bcp: 'ja-JP' }, en: { name: '영어', bcp: 'en-US' } };
-const PAIRS = { 'ko>zh': 'system_prompt.md' };
+const PAIRS = { 'ko>zh': 'system_prompt.md', 'ko>ja': 'system_prompt_ja.md' };
 const pairOf = (src, tgt) => (LANGS[src] && LANGS[tgt] && src !== tgt && PAIRS[`${src}>${tgt}`]) ? { src, tgt, file: PAIRS[`${src}>${tgt}`] } : null;
 
 // 사용자가 앱에서 적은 "내 표현 사전"을 안전하게 다듬는다(길이 제한, 줄바꿈·코드 표시 제거, 최대 20개).
@@ -141,12 +142,18 @@ async function translateWithGemini(userText, key, glossary = [], file) {
   return { mock: false, result: extractJson(text) };
 }
 
-async function translate(diary, glossary = [], file) {
+async function translate(diary, glossary = [], file, tgt = 'zh') {
   const parts = splitSentences(diary);
   const userText = parts.map((s, i) => `${i + 1}. ${s}`).join('\n');
   const out = await callModel(userText, glossary, file);
   // 목업 응답은 입력과 무관하므로 원문 보존 처리를 하지 않는다.
-  return out.mock ? out : { ...out, result: mergeOriginals(out.result, parts) };
+  if (out.mock) return out;
+  let result = out.result;
+  if (tgt === 'ja') { // 일본어: 키 변환 → 구조·읽기 교차 검사
+    const checked = await checkJa(mergeOriginals(normalizeJa(result), parts));
+    return { ...out, result: checked.result, check: checked.stats };
+  }
+  return { ...out, result: mergeOriginals(result, parts) };
 }
 
 async function callModel(userText, glossary = [], file) {
@@ -462,7 +469,7 @@ const server = http.createServer(async (req, res) => {
       const blocked = checkTranslateLimit(req);
       if (blocked) return sendJson(res, 429, { error: blocked });
       running += 1;
-      try { return sendJson(res, 200, await translate(diary, cleanGlossary(body.glossary), pair.file)); } finally { running -= 1; }
+      try { return sendJson(res, 200, await translate(diary, cleanGlossary(body.glossary), pair.file, pair.tgt)); } finally { running -= 1; }
     }
     if (req.method === 'GET' && req.url === '/api/langs') {
       return sendJson(res, 200, { langs: LANGS, pairs: Object.keys(PAIRS).map((k) => { const [src, tgt] = k.split('>'); return { src, tgt }; }) });
