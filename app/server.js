@@ -164,6 +164,72 @@ async function callModel(userText) {
   return { mock: false, result: extractJson(text) };
 }
 
+// ---------- 글자별 풀이 (/api/chars) ----------
+// 단어를 이루는 글자를 한 글자씩 풀이한다(한국 한자 훈음·뜻·글자 뜻이 합쳐지는 방식). 같은 단어는 서버 메모리에 저장해 다시 묻지 않는다.
+const CHARS_MODEL = process.env.CHARS_MODEL || MODEL;
+const CHARS_PER_IP_HOUR = Number(process.env.CHARS_PER_IP_HOUR) || 60;   // 공개 모드에서 한 사람이 1시간에 새로 풀이를 요청할 수 있는 횟수
+const charsHits = new Map(), charsCache = new Map();
+let charsRunning = 0;
+const HAN_ONLY = /^[一-鿿·]+$/;
+const CHARS_SYSTEM = `너는 한국어 화자에게 중국어를 가르치는 교사다. 번호가 붙은 중국어 단어를 받으면, 단어를 이루는 글자를 한 글자씩 풀이한다.
+출력은 JSON 하나만 쓴다. 설명 문장이나 코드 블록 표시는 쓰지 않는다.
+형식: {"words":[{"word":"突然","chars":[{"ch":"突","hun":"갑자기 돌","meaning":"갑자기, 불쑥"},{"ch":"然","hun":"그럴 연","meaning":"~한 모양"}],"how":"突(갑자기) + 然(~한 모양) → 갑자기"}]}
+규칙:
+1. chars는 단어의 글자 수와 같고 순서도 같다. ch는 단어의 글자(간체)를 그대로 쓴다.
+2. hun: 같은 글자(또는 번체에서 대응하는 글자)가 한국 한자로 쓰이면 한국 한자의 훈음을 쓴다(예: 天 → "하늘 천", 气 → "기운 기"). 한국에서 쓰지 않는 글자(们, 吗, 么 등)이거나 확실하지 않으면 빈 문자열로 둔다. 지어내지 않는다.
+3. meaning: 이 단어 안에서 그 글자가 하는 뜻이나 역할을 한국어로 12자 안팎으로 쓴다. 뜻이 없는 조사는 기능을 쓴다(예: 了 → "변화·완료를 나타냄").
+4. how: 글자 뜻이 합쳐져 단어 뜻이 되는 과정을 한 줄(40자 안팎)로 쓴다. 글자 뜻을 합쳐도 단어 뜻이 나오지 않으면(예: 东西) "글자 뜻과 다르게 굳어진 단어예요."처럼 솔직하게 쓴다. 한 글자 단어는 how를 빈 문자열로 둔다.
+5. 한국어로 쓰고, 쉬운 말을 쓴다.`;
+
+function charsLimited(req) {
+  if (!PUBLIC_MODE) return false;
+  const now = Date.now(), ip = clientIp(req);
+  const recent = (charsHits.get(ip) || []).filter((t) => now - t < 3600e3);
+  if (recent.length >= CHARS_PER_IP_HOUR) return true;
+  recent.push(now); charsHits.set(ip, recent);
+  if (charsHits.size > 5000) for (const [k, v] of charsHits) if (!v.some((t) => now - t < 3600e3)) charsHits.delete(k);
+  return false;
+}
+
+async function callJsonModel(system, userText, maxTokens) {
+  if (process.env.GEMINI_API_KEY) {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
+      method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
+      body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: userText }] }], generationConfig: { responseMimeType: 'application/json', maxOutputTokens: maxTokens } }),
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(`Gemini 오류 ${res.status}`);
+    return extractJson((data.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join(''));
+  }
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({ model: CHARS_MODEL, max_tokens: maxTokens, thinking: { type: 'between_tools' }, output_config: { effort: 'low' }, system, messages: [{ role: 'user', content: userText }] }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(`API 오류 ${res.status}`);
+  return extractJson((data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join(''));
+}
+
+async function explainChars(words) {
+  const out = {}, need = [];
+  for (const w of words) { const c = charsCache.get(w); if (c) out[w] = c; else need.push(w); }
+  if (need.length) {
+    const parsed = await callJsonModel(CHARS_SYSTEM, need.map((w, i) => `${i + 1}. ${w}`).join('\n'), 3000);
+    const list = Array.isArray(parsed.words) ? parsed.words : [];
+    const clip = (v, n) => String(v || '').trim().slice(0, n);
+    for (const w of need) {
+      const e = list.find((x) => x && x.word === w); if (!e) continue;
+      const given = Array.isArray(e.chars) ? e.chars : [];
+      // 모델이 글자를 빠뜨리거나 순서를 바꿔도 단어의 글자 수·순서에 맞춰 정리한다
+      const chars = [...w].map((ch, i) => { const g = (given[i] && given[i].ch === ch) ? given[i] : (given.find((c) => c && c.ch === ch) || {}); return { ch, hun: clip(g.hun, 12), meaning: clip(g.meaning, 40) }; });
+      const val = { chars, how: clip(e.how, 90) };
+      charsCache.set(w, val); out[w] = val;
+      if (charsCache.size > 3000) charsCache.delete(charsCache.keys().next().value);
+    }
+  }
+  return out;
+}
+
 function readBody(req, limit = 20000) {
   return new Promise((resolve, reject) => {
     let size = 0;
@@ -342,6 +408,18 @@ const server = http.createServer(async (req, res) => {
       d.keys[body.key] = { value: body.value, at: Number(body.at) || Date.now() };
       writeData(d);
       return sendJson(res, 200, { ok: true, at: d.keys[body.key].at });
+    }
+    if (req.method === 'POST' && req.url === '/api/chars') {
+      const body = JSON.parse((await readBody(req)) || '{}');
+      const words = [...new Set((Array.isArray(body.words) ? body.words : []).map((w) => String(w || '').trim()).filter((w) => w && [...w].length <= 8 && HAN_ONLY.test(w)))].slice(0, 12);
+      if (!words.length) return sendJson(res, 400, { error: '풀이할 단어가 없어요.' });
+      if (!process.env.GEMINI_API_KEY && !process.env.ANTHROPIC_API_KEY) return sendJson(res, 503, { error: '글자 풀이는 API 키가 있을 때만 쓸 수 있어요.' });
+      if (!words.every((w) => charsCache.has(w))) { // 이미 풀이해 둔 단어만 요청하면 제한과 상관없이 바로 답한다
+        if (charsLimited(req)) return sendJson(res, 429, { error: '글자 풀이를 너무 많이 요청했어요. 잠시 후 다시 시도해 주세요.' });
+        if (charsRunning >= MAX_CONCURRENT) return sendJson(res, 429, { error: '지금 요청이 몰려 있어요. 잠시 후 다시 시도해 주세요.' });
+      }
+      charsRunning += 1;
+      try { return sendJson(res, 200, { words: await explainChars(words) }); } finally { charsRunning -= 1; }
     }
     if (req.method === 'POST' && req.url === '/api/translate') {
       const body = JSON.parse((await readBody(req)) || '{}');

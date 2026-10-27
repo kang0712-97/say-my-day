@@ -474,6 +474,20 @@
   .w-line #w-left path, .w-line #w-right path, .w-line #w-sheet-rows path { stroke-width: 2; }
   .w-t { font-family: var(--f-serif); font-size: var(--fs-l); margin: 18px 0 4px; word-break: keep-all; }
   .w-s { color: var(--muted); font-family: var(--f-ui); font-size: var(--fs-s); margin: 0 0 18px; }
+
+  /* 글자별 풀이 */
+  .chr { display: flex; align-items: center; gap: 14px; padding: 10px 0; }
+  .chr + .chr { border-top: 1px solid var(--line); }
+  .chr-h { font-family: var(--f-zh); font-size: 2.3rem; line-height: 1.2; min-width: 1.5em; text-align: center; }
+  .chr-b { min-width: 0; }
+  .chr-py { font-family: var(--f-py); color: var(--accent); font-size: var(--fs-s); }
+  .chr-k { font-family: var(--f-ui); line-height: 1.5; }
+  .chr-k b { font-family: var(--f-serif); font-weight: 600; margin-right: 8px; }
+  .chr-k span { color: var(--muted); font-size: var(--fs-s); }
+  .chr-k.mute { color: var(--muted); font-size: var(--fs-s); }
+  .chr-how { margin-top: 6px; padding-top: 10px; border-top: 1px solid var(--line); font-family: var(--f-ui); font-size: var(--fs-s); line-height: 1.6; }
+  .mchars { display: flex; flex-wrap: wrap; gap: 4px 14px; margin-top: 6px; font-family: var(--f-ui); font-size: var(--fs-s); color: var(--muted); }
+  .mchars b { color: var(--ink); font-weight: 400; font-size: 1.1em; }
 </style>
 </head>
 <body>
@@ -811,6 +825,14 @@ const cell = (t, mk) => t.isZh
   ? `<span class="c${mk ? ' mk' : ''}"><span class="p" aria-hidden="true">${esc(t.pinyin)}</span><span class="h">${esc(t.origin)}</span></span>`
   : `<span class="c pu"><span class="p" aria-hidden="true"></span><span class="h">${esc(t.origin)}</span></span>`;
 const cells = (text) => pinyin(text, { type: 'all' }).map((t) => cell(t)).join('');
+const cellsFrom = (toks) => toks.map((t) => cell(t)).join('');
+// 단어를 하나씩 따로 계산하면 了(le/liǎo)·得(de/dé)·不·一처럼 앞뒤 글자에 따라 소리가 바뀌는 글자가 틀린다.
+// 그래서 문장 전체로 병음을 계산한 뒤 단어 길이대로 나눈다. 글자 수가 맞지 않을 때만 단어별로 따로 계산한다.
+function wordTokens(words) {
+  const whole = pinyin(words.map((w) => w.zh).join(''), { type: 'all' });
+  if (whole.length !== words.reduce((n, w) => n + [...w.zh].length, 0)) return words.map((w) => pinyin(w.zh, { type: 'all' }));
+  let pos = 0; return words.map((w) => { const n = [...w.zh].length; const t = whole.slice(pos, pos + n); pos += n; return t; });
+}
 // 문장 한 줄. 문장부호는 앞 글자에 붙여 줄 맨 앞에 혼자 오지 않게 하고, mark 단어가 있으면 형광펜으로 표시한다.
 function zhLine(text, size = 'mid', mark = '') {
   const start = mark ? text.indexOf(mark) : -1;
@@ -998,12 +1020,12 @@ let extraState = [], gramState = []; // 활용 문장·문법 예문도 같은 �
 const unitState = (kind) => (kind === 'x' ? extraState : kind === 'g' ? gramState : sentState);
 function sentenceHtml(words, si, kind = 's') {
   // 문장부호는 앞 단어와 한 묶음(.nw)으로 만들어 줄바꿈 때 혼자 다음 줄로 떨어지지 않게 한다.
-  const groups = [];
+  const groups = []; const toks = wordTokens(words);
   words.forEach((w, k) => {
     const punct = isPunct(w.zh);
     const html = (punct || isLatin(w.zh))
-      ? cells(w.zh)
-      : `<button class="wd" data-kind="${kind}" data-s="${si}" data-k="${k}" aria-label="단어 뜻 보기: ${esc(w.zh)}">${cells(w.zh)}</button>`;
+      ? cellsFrom(toks[k])
+      : `<button class="wd" data-kind="${kind}" data-s="${si}" data-k="${k}" aria-label="단어 뜻 보기: ${esc(w.zh)}">${cellsFrom(toks[k])}</button>`;
     if (punct && groups.length) groups[groups.length - 1] += html; else groups.push(html);
   });
   return groups.map((g) => `<span class="nw">${g}</span>`).join('');
@@ -1040,15 +1062,56 @@ function renderWordPage() {
   const w = wp.list[wp.i]; const n = wp.list.length;
   $('wp-save-slot').innerHTML = wpSaveBtn(w);
   $('wp-body').innerHTML = `
-    <div class="zhline xl" lang="zh-CN">${cells(w.zh)}</div>
+    <div class="zhline xl" lang="zh-CN">${w.tok ? cellsFrom(w.tok) : cells(w.zh)}</div>
     <div class="wp-ko ${w.ko ? '' : 'none'}">${w.ko ? esc(w.ko) : '이 단어의 뜻 정보가 없어요. 발음은 들을 수 있어요.'}</div>
     <div class="actions">${playBtn(w.zh, '발음 듣기', true)}${playBtn(w.zh, '느리게', false, false, '0.75')}</div>
+    ${hasHan(w.zh) ? `<section class="cell chars" id="wp-chars" style="margin-top:22px">${charsHtml(w)}</section>` : ''}
     ${w.ctx_zh ? `<section class="cell" style="margin-top:22px"><h4>이 문장에서</h4>${zhLine(w.ctx_zh, 'mid', w.zh)}<div class="ex-ko">${esc(w.ctx_ko)}</div><div class="actions">${playBtn(w.ctx_zh, '문장 듣기')}${sentSaveBtn('ctx', w.ctx_zh, true)}</div></section>` : ''}
     ${w.ex_zh ? `<section class="cell" style="${w.ctx_zh ? '' : 'margin-top:22px'}"><h4>예문</h4>${zhLine(w.ex_zh, 'mid')}<div class="ex-ko">${esc(w.ex_ko)}</div><div class="actions">${playBtn(w.ex_zh, '예문 듣기')}</div></section>` : ''}`;
   $('wp-nav').innerHTML = n > 1
     ? `<button class="btn" data-wnav="-1" ${wp.i === 0 ? 'disabled style="opacity:.35"' : ''}>${ICON.back}<span>이전</span></button><span class="n">${wp.i + 1} / ${n}</span><button class="btn solid" data-wnav="1" ${wp.i === n - 1 ? 'disabled style="opacity:.35"' : ''}><span>다음</span>${ICON.arrow}</button>`
     : '';
   $('wp-nav').classList.toggle('hidden', n <= 1);
+  fillChars();
+}
+
+// ---------- 글자별 풀이 ----------
+// 단어를 이루는 글자를 한 글자씩 보여 준다. 병음은 앱이 문맥에 맞게 계산하고, 한국 한자 훈음과 뜻은 서버(AI)에서 가져와 이 기기에 저장해 두고 다시 쓴다.
+const hasHan = (t) => /^[一-鿿·]+$/.test(String(t || ''));
+const CH_KEY = 'char-cache'; const charCache = store.get(CH_KEY, {}); const charPending = new Map();
+function saveCharCache() { const ks = Object.keys(charCache); if (ks.length > 600) ks.slice(0, ks.length - 600).forEach((k) => delete charCache[k]); store.set(CH_KEY, charCache); }
+function loadChars(words) {
+  const uniq = [...new Set(words)].filter(hasHan);
+  const need = uniq.filter((w) => !charCache[w] && !charPending.has(w)).slice(0, 12);
+  if (need.length) {
+    const p = fetch('/api/chars', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ words: need }) })
+      .then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || '글자 풀이를 불러오지 못했어요.'); Object.assign(charCache, d.words || {}); saveCharCache(); })
+      .finally(() => need.forEach((w) => charPending.delete(w)));
+    need.forEach((w) => charPending.set(w, p));
+  }
+  return Promise.all(uniq.filter((w) => !charCache[w]).map((w) => charPending.get(w)).filter(Boolean));
+}
+function charsHtml(w, err) {
+  const toks = w.tok || pinyin(w.zh, { type: 'all' }); const c = charCache[w.zh];
+  const rows = [...w.zh].map((ch, i) => {
+    const g = c && c.chars && c.chars[i]; const py = toks[i] && toks[i].isZh ? toks[i].pinyin : '';
+    const body = g ? `<div class="chr-k">${g.hun ? `<b>${esc(g.hun)}</b>` : ''}${g.meaning ? `<span>${esc(g.meaning)}</span>` : ''}</div>` : (err ? '' : '<div class="chr-k mute">풀이를 불러오는 중…</div>');
+    return `<div class="chr"><div class="chr-h" lang="zh-CN">${esc(ch)}</div><div class="chr-b"><div class="chr-py">${esc(py)}</div>${body}</div></div>`;
+  }).join('');
+  const tail = c && c.how ? `<div class="chr-how">${esc(c.how)}</div>` : '';
+  const fail = !c && err ? `<div class="chr-how">${esc(err)} <button class="btn" data-charsretry style="min-height:32px;padding:2px 12px;margin-left:6px">다시 불러오기</button></div>` : '';
+  return `<h4>글자별 풀이</h4>${rows}${tail}${fail}`;
+}
+function fillChars() {
+  const w = wp.list[wp.i]; if (!w || !$('wp-chars') || charCache[w.zh]) return;
+  const key = w.zh; const same = () => wp.list[wp.i] && wp.list[wp.i].zh === key && $('wp-chars');
+  loadChars([key]).then(() => { if (same()) $('wp-chars').innerHTML = charsHtml(wp.list[wp.i]); })
+    .catch((e) => { if (same()) $('wp-chars').innerHTML = charsHtml(wp.list[wp.i], e.message); });
+}
+function prefetchChars() { const ws = currentVocab.map((v) => v.zh).filter(hasHan); if (ws.length) loadChars(ws).catch(() => {}); } // 번역 직후 핵심 단어를 한 번에 풀이해 둔다
+function miniChars(w) { // 미니 카드에는 이미 풀이해 둔 단어만 한 줄로 보여 준다(여기서는 새로 요청하지 않는다)
+  const c = charCache[w.zh]; if (!c || [...w.zh].length < 2) return '';
+  return `<div class="mchars">${c.chars.map((g) => `<span><b class="zh-font">${esc(g.ch)}</b> ${esc(g.hun || g.meaning)}</span>`).join('')}</div>`;
 }
 const wpSaveBtn = (w) => hasWord(w.zh)
   ? `<button class="btn saved" data-wpsave aria-label="단어장에서 빼기: ${esc(w.zh)}">${ICON.starFill}<span>저장됨</span></button>`
@@ -1058,7 +1121,7 @@ let mini = null; // { si, k, w, el }
 function miniWord(kind, si, k) {
   const { s, words } = unitState(kind)[si]; const w = words[k];
   const v = currentVocab.find((x) => x.zh === w.zh);
-  return { zh: w.zh, ko: w.ko || '', ctx_zh: s.zh, ctx_ko: s.ko, ex_zh: v?.example_zh || '', ex_ko: v?.example_ko || '' };
+  return { zh: w.zh, ko: w.ko || '', tok: wordTokens(words)[k], ctx_zh: s.zh, ctx_ko: s.ko, ex_zh: v?.example_zh || '', ex_ko: v?.example_ko || '' };
 }
 const miniSaveBtn = (zh) => hasWord(zh)
   ? `<button class="btn saved" data-msave aria-label="단어장에서 빼기: ${esc(zh)}">${ICON.starFill}<span>저장됨</span></button>`
@@ -1073,8 +1136,9 @@ function showMini(kind, si, k, el) {
   const w = miniWord(kind, si, k); mini = { kind, si, k, w, el }; el.classList.add('sel');
   const box = $('wmini');
   box.innerHTML = `<button class="btn icon mx" data-mclose aria-label="닫기">${ICON.close}</button>
-    <div class="mtop"><div class="zhline mid" lang="zh-CN">${cells(w.zh)}</div>
+    <div class="mtop"><div class="zhline mid" lang="zh-CN">${cellsFrom(w.tok)}</div>
     <div class="mko ${w.ko ? '' : 'none'}">${w.ko ? esc(w.ko) : '이 단어의 뜻 정보가 없어요. 발음은 들을 수 있어요.'}</div></div>
+    ${miniChars(w)}
     <div class="actions">${playBtn(w.zh, '듣기', true)}${miniSaveBtn(w.zh)}<button class="btn" data-mmore>${ICON.list}<span>자세히</span></button></div>`;
   box.style.bottom = (document.querySelector('.tabbar')?.offsetHeight || 56) + 24 + 'px';
   box.classList.remove('hidden');
@@ -1083,12 +1147,12 @@ function showMini(kind, si, k, el) {
   box.querySelector('.play')?.click(); // 누르면 발음을 바로 들려 준다
 }
 function openSentenceWord(kind, si, k, from) {
-  const { s, words } = unitState(kind)[si]; const items = []; let idx = 0;
+  const { s, words } = unitState(kind)[si]; const items = []; let idx = 0; const toks = wordTokens(words);
   words.forEach((w, kk) => {
     if (isPunct(w.zh) || isLatin(w.zh)) return;
     if (kk === k) idx = items.length;
     const v = currentVocab.find((x) => x.zh === w.zh);
-    items.push(wordItem(w.zh, w.ko, { ctx_zh: s.zh, ctx_ko: s.ko, ex_zh: v?.example_zh || '', ex_ko: v?.example_ko || '' }));
+    items.push(wordItem(w.zh, w.ko, { tok: toks[kk], ctx_zh: s.zh, ctx_ko: s.ko, ex_zh: v?.example_zh || '', ex_ko: v?.example_ko || '' }));
   });
   openWord(items, idx, from);
 }
@@ -1185,6 +1249,7 @@ document.addEventListener('click', (e) => {
   const say = e.target.closest('[data-say]'); if (say) return speak(say);
   const cp = e.target.closest('[data-copy]'); if (cp) return copyText(cp);
   const wd = e.target.closest('.wd'); if (wd) return showMini(wd.dataset.kind || 's', Number(wd.dataset.s), Number(wd.dataset.k), wd);
+  if (e.target.closest('[data-charsretry]')) { const w = wp.list[wp.i]; if (w && $('wp-chars')) { $('wp-chars').innerHTML = charsHtml(w); fillChars(); } return; }
   if (e.target.closest('[data-mclose]')) return hideMini();
   if (e.target.closest('[data-mmore]') && mini) { const { kind, si, k, el } = mini; hideMini(); return openSentenceWord(kind, si, k, el); }
   if (e.target.closest('[data-msave]') && mini) {
@@ -2041,7 +2106,7 @@ $('go').addEventListener('click', async () => {
     if (!res.ok || data.error) throw new Error((data.error || '요청에 실패했어요.') + ' 입력한 일기는 그대로 남아 있어요.');
     if (!data.result || !Array.isArray(data.result.sentences)) throw new Error('번역 결과가 비어 있어요. 다시 시도해 주세요.');
     render(data.result, !!data.mock); setStatus(''); if (!data.mock) saveHist(diary, data.result);
-    showResult(); if (!data.mock) maybeHints();
+    showResult(); if (!data.mock) { maybeHints(); prefetchChars(); }
   } catch (err) {
     const msg = controller.signal.aborted
       ? (controller.signal.reason === 'timeout' ? '2분이 지나도 응답이 없어서 멈췄어요. 잠시 후 다시 시도해 주세요. 일기는 그대로 남아 있어요.' : '취소했어요. 일기는 그대로 남아 있어요.')
