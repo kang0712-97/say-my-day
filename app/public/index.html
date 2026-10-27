@@ -947,15 +947,41 @@ function stopSpeak() {
   if (currentAudio) { currentAudio.pause(); currentAudio = null; }
   if (playingBtn) { playingBtn.classList.remove('playing'); playingBtn.innerHTML = playingBtn.dataset.html; playingBtn = null; }
 }
+// ---------- 단어 경계 시간 ----------
+// 서버가 소리를 만들 때 받아 둔 "단어별 시작 시각"(밀리초)을 가져온다. 없으면(null) 화면은 글자 수로 어림하거나 단어만 따로 들려 준다.
+const timingCache = new Map();
+function getTiming(text, voice, rate) {
+  const url = `/api/tts-timing?${new URLSearchParams({ text, voice, rate: rate || rateKey() })}`;
+  if (!timingCache.has(url)) timingCache.set(url, fetch(url).then((r) => (r.ok ? r.json() : null)).then((d) => (d && Array.isArray(d.bounds) && d.bounds.length ? d : null)).catch(() => null));
+  return timingCache.get(url);
+}
+// 단어 경계를 글자별 [시작ms, 끝ms]로 나눈다. 경계 단어는 서비스가 나눈 것이라 우리 단어와 다를 수 있어 글자 위치로 맞추고,
+// 한 경계 안의 글자들은 길이를 똑같이 나눈다. 문장부호·공백처럼 소리가 없는 글자는 앞 글자가 끝난 시각에 길이 0으로 둔다.
+function charTimes(text, bounds) {
+  const chars = [...text], out = chars.map(() => null); let pos = 0;
+  for (const b of bounds) {
+    const bt = [...String(b.t)]; if (!bt.length) continue;
+    let idx = -1;
+    for (let i = pos; i < Math.min(chars.length, pos + 8); i++) if (chars.slice(i, i + bt.length).join('') === b.t) { idx = i; break; } // 앞의 부호·공백은 건너뛴다
+    if (idx < 0) continue;
+    bt.forEach((_, j) => { out[idx + j] = { s: b.o + (b.d * j) / bt.length, e: b.o + (b.d * (j + 1)) / bt.length }; });
+    pos = idx + bt.length;
+  }
+  const spoken = chars.filter((c) => !/[\s\p{P}\p{S}]/u.test(c)).length;
+  const found = chars.filter((c, i) => out[i] && !/[\s\p{P}\p{S}]/u.test(c)).length;
+  if (!spoken || found < spoken) return null; // 하나라도 못 맞추면 믿지 않고 어림 계산으로 돌아간다
+  let last = 0; return out.map((t) => { if (t) { last = t.e; return t; } return { s: last, e: last }; });
+}
+
 // ---------- 읽는 속도에 맞춰 글자 색이 변하는 표시 ----------
-// 소리의 재생 위치(현재 시간 ÷ 전체 길이)를 글자 수로 나눠 지금 읽는 글자를 찾는다. 속도를 바꾸거나 일시정지해도 소리와 같이 움직인다.
-const kar = { raf: 0, cells: [], cum: [], total: 0, progress: null, last: [] };
+// 단어 시간이 있으면 소리의 재생 시각과 글자별 시간을 맞춰 지금 읽는 글자를 찾는다. 없으면 재생 위치(현재 시간 ÷ 전체 길이)를 글자 수로 나눠 어림한다. 속도를 바꾸거나 일시정지해도 소리와 같이 움직인다.
+const kar = { raf: 0, cells: [], cum: [], total: 0, progress: null, times: null, clock: null, last: [] };
 function karStop() {
   cancelAnimationFrame(kar.raf);
   kar.cells.forEach((c) => { c.classList.remove('kar'); c.style.removeProperty('--f'); });
-  Object.assign(kar, { raf: 0, cells: [], cum: [], total: 0, progress: null, last: [] });
+  Object.assign(kar, { raf: 0, cells: [], cum: [], total: 0, progress: null, times: null, clock: null, last: [] });
 }
-function karBegin(line, say, progress) {
+function karBegin(line, say, progress, timed) {
   karStop();
   if (!line) return;
   const cells = [...line.querySelectorAll('.c')];
@@ -964,23 +990,33 @@ function karBegin(line, say, progress) {
   let sum = 0; // 글자 1 = 1, 쉼표·마침표는 잠깐 쉬므로 더 길게 센다
   kar.cum = cells.map((c) => { const t = c.querySelector('.h').textContent; sum += c.classList.contains('pu') ? (/[。？！?!]/.test(t) ? 1.4 : /[，、；：,;:]/.test(t) ? 0.8 : 0.3) : 1; return sum; });
   kar.cells = cells; kar.total = sum; kar.progress = progress; kar.last = cells.map(() => -1);
+  karUpgrade(timed && timed.times, timed && timed.clock);
   cells.forEach((c) => c.classList.add('kar'));
   const tick = () => { // 글자마다 "얼마나 읽었는지(0~1)"를 정해 색이 왼쪽에서 오른쪽으로 끊김 없이 차오르게 한다
-    const pos = Math.max(0, Math.min(1, kar.progress() || 0)) * kar.total;
+    const real = kar.times && kar.clock ? kar.clock() : null; // 실제 단어 시간(ms)
+    const pos = real == null ? Math.max(0, Math.min(1, kar.progress() || 0)) * kar.total : 0;
     kar.cells.forEach((c, i) => {
-      const start = i ? kar.cum[i - 1] : 0, f = Math.max(0, Math.min(1, (pos - start) / (kar.cum[i] - start))), r = Math.round(f * 100) / 100;
+      let f;
+      if (real != null) { const { s, e } = kar.times[i]; f = e > s ? (real - s) / (e - s) : (real >= s ? 1 : 0); }
+      else { const start = i ? kar.cum[i - 1] : 0; f = (pos - start) / (kar.cum[i] - start); }
+      const r = Math.round(Math.max(0, Math.min(1, f)) * 100) / 100;
       if (r !== kar.last[i]) { kar.last[i] = r; c.style.setProperty('--f', r); }
     });
     kar.raf = requestAnimationFrame(tick);
   };
   tick();
 }
-const audioProgress = (a) => { // 재생 위치(currentTime)는 띄엄띄엄 바뀌므로, 바뀐 뒤 흐른 시간만큼 이어서 계산해 움직임이 부드럽다
+function karUpgrade(times, clock) { // 시간 정보가 도착하면 어림 계산을 실제 단어 시간으로 바꾼다(글자 수가 맞을 때만)
+  if (kar.cells.length && times && clock && times.length === kar.cells.length) { kar.times = times; kar.clock = clock; }
+}
+const audioClock = (a) => { // 재생 위치(currentTime)는 띄엄띄엄 바뀌므로, 바뀐 뒤 흐른 시간만큼 이어서 계산해 움직임이 부드럽다. 단위는 ms
   let last = -1, at = 0;
-  return () => { const d = a.duration; if (!d || !isFinite(d)) return 0; const now = performance.now();
-    if (a.currentTime !== last) { last = a.currentTime; at = now; }
-    const t = a.paused ? last : last + Math.min((now - at) / 1000, 0.3) * (a.playbackRate || 1);
-    return (t - 0.12) / Math.max(0.2, d - 0.32); }; }; // 앞뒤 무음을 조금 뺀다
+  return () => { const now = performance.now(); if (a.currentTime !== last) { last = a.currentTime; at = now; }
+    return (a.paused ? last : last + Math.min((now - at) / 1000, 0.3) * (a.playbackRate || 1)) * 1000; };
+};
+const audioProgress = (a) => { // (어림 계산용) 재생 위치를 0~1로
+  const clock = audioClock(a);
+  return () => { const d = a.duration; if (!d || !isFinite(d)) return 0; return (clock() / 1000 - 0.12) / Math.max(0.2, d - 0.32); }; }; // 앞뒤 무음을 조금 뺀다
 function karLineFor(btn) { // 듣기 버튼 주변에서, 읽는 문장과 글자가 같은 줄을 찾는다
   const box = btn.closest('.cardx, .cell, .vrow, .wp-body, .wmini, .quiz-box, .rp-s'); if (!box) return null;
   const say = String(btn.dataset.say || '').replace(/\s/g, '');
@@ -993,11 +1029,46 @@ function speakEdge(btn, voice) {
   const warn = $('voice-warn'); warn.classList.add('hidden');
   btn.dataset.html = btn.innerHTML; btn.classList.add('playing'); btn.innerHTML = `${ICON.stop}<span>불러오는 중…</span>`; playingBtn = btn;
   const fail = (msg) => { if (playingBtn === btn) stopSpeak(); warn.textContent = msg; warn.classList.remove('hidden'); };
-  const a = new Audio(edgeUrl(btn.dataset.say, voice, btn.dataset.rate)); currentAudio = a;
-  a.addEventListener('playing', () => { if (playingBtn === btn) { btn.innerHTML = `${ICON.stop}<span>정지</span>`; karBegin(karLineFor(btn), btn.dataset.say, audioProgress(a)); } });
+  if (btn.dataset.ctx) return speakSegment(btn, voice, fail); // 문장 속 단어: 문장 소리에서 그 단어 구간만 들려 줘 문맥 발음을 유지한다
+  speakWhole(btn, voice, fail);
+}
+function speakWhole(btn, voice, fail) { // 낱말·문장을 그대로 한 번에 재생(글자 색은 단어 시간이 있으면 그것으로 칠한다)
+  const rate = btn.dataset.rate || rateKey(), say = btn.dataset.say;
+  const a = new Audio(edgeUrl(say, voice, btn.dataset.rate)); currentAudio = a;
+  const tp = getTiming(say, voice, rate);
+  a.addEventListener('playing', () => {
+    if (playingBtn !== btn) return;
+    btn.innerHTML = `${ICON.stop}<span>정지</span>`; karBegin(karLineFor(btn), say, audioProgress(a));
+    tp.then((t) => { if (t && currentAudio === a && playingBtn === btn) karUpgrade(charTimes(say, t.bounds), audioClock(a)); });
+  });
   a.addEventListener('ended', () => { if (playingBtn === btn) stopSpeak(); });
   a.addEventListener('error', () => fail('자연스러운 음성을 불러오지 못했어요. 인터넷 연결을 확인하거나 설정에서 다른 음성을 골라 주세요.'));
   a.play().catch((err) => { if (err && err.name === 'NotAllowedError') fail('브라우저가 자동 재생을 막았어요. 듣기 버튼을 직접 눌러 주세요.'); });
+}
+// 문장 소리를 한 번 내려받아 풀어 두고(AudioBuffer), 단어의 시작~끝 구간만 정확히 재생한다. 문장에서 잘라 쓰므로 了처럼 문맥에 따라 소리가 달라지는 글자도 문장 속 발음 그대로 나온다.
+let actx = null; const bufCache = new Map();
+function loadBuffer(url) {
+  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+  if (!bufCache.has(url)) bufCache.set(url, fetch(url).then((r) => { if (!r.ok) throw new Error(String(r.status)); return r.arrayBuffer(); }).then((ab) => actx.decodeAudioData(ab)).catch((e) => { bufCache.delete(url); throw e; }));
+  return bufCache.get(url);
+}
+async function speakSegment(btn, voice, fail) {
+  const ctxText = btn.dataset.ctx, ci = Number(btn.dataset.ci), len = [...btn.dataset.say].length, rate = btn.dataset.rate || rateKey();
+  const whole = () => { if (playingBtn === btn) speakWhole(btn, voice, fail); }; // 문장 소리를 쓸 수 없으면 단어만 따로 듣는다
+  try {
+    if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
+    if (actx.state === 'suspended') actx.resume(); // 눌렀을 때 바로 풀어 둬야 브라우저가 소리를 막지 않는다
+    const timing = await getTiming(ctxText, voice, rate); const times = timing && charTimes(ctxText, timing.bounds);
+    if (!times || !times[ci] || !times[ci + len - 1]) return whole();
+    const buf = await loadBuffer(edgeUrl(ctxText, voice, rate));
+    if (playingBtn !== btn) return; // 그 사이 정지했거나 다른 소리를 눌렀다
+    const start = Math.max(0, times[ci].s / 1000 - 0.04), end = Math.min(buf.duration, times[ci + len - 1].e / 1000 + 0.08);
+    const src = actx.createBufferSource(); src.buffer = buf; src.connect(actx.destination);
+    currentAudio = { pause() { try { src.stop(); } catch { /* 이미 끝남 */ } } }; // stopSpeak()가 멈출 수 있게 한다
+    src.onended = () => { if (playingBtn === btn) stopSpeak(); };
+    btn.innerHTML = `${ICON.stop}<span>정지</span>`;
+    src.start(0, start, Math.max(0.05, end - start));
+  } catch { whole(); }
 }
 let prefetchToken = 0;
 async function prefetchSentences() { // 번역 직후 문장·단어 음성을 미리 만들어 두면 듣기를 눌렀을 때 바로 나온다
@@ -1005,8 +1076,7 @@ async function prefetchSentences() { // 번역 직후 문장·단어 음성을 �
   const voice = choice.slice(5); const mine = ++prefetchToken;
   const texts = [];
   const add = (zh) => { if (zh && !isPunct(zh) && !isLatin(zh) && !texts.includes(zh)) texts.push(zh); };
-  sentState.forEach(({ words }) => words.forEach((w) => add(w.zh))); // 눌러 볼 가능성이 큰 문장 속 단어부터, 그다음 문장·핵심 단어
-  sentState.forEach(({ s }) => add(s.zh));
+  sentState.forEach(({ s }) => add(s.zh)); // 문장 속 단어는 문장 소리에서 잘라 쓰므로 문장을 먼저 만든다. 문장 소리에는 단어 시간도 함께 저장된다
   currentVocab.forEach((v) => { add(v.zh); add(v.example_zh); });
   let next = 0;
   const worker = async () => { // 서버가 한꺼번에 몰리지 않게 4개씩만 만든다
@@ -1046,8 +1116,8 @@ async function copyText(btn) {
   const old = btn.innerHTML; btn.innerHTML = ICON.check; setTimeout(() => { btn.innerHTML = old; }, 1400);
 }
 const short = (t) => String(t).slice(0, 24);
-const playBtn = (zh, label = '듣기', solid = false, iconOnly = false, rate = '') => {
-  const r = rate ? ` data-rate="${rate}"` : '';
+const playBtn = (zh, label = '듣기', solid = false, iconOnly = false, rate = '', ctx = null) => {
+  const r = (rate ? ` data-rate="${rate}"` : '') + (ctx ? ` data-ctx="${esc(ctx.zh)}" data-ci="${ctx.i}"` : ''); // ctx: 이 단어가 들어 있는 문장과 그 안의 글자 위치
   return iconOnly
     ? `<button class="btn icon play" data-say="${esc(zh)}"${r} aria-label="${label}: ${esc(short(zh))}">${ICON.speaker}</button>`
     : `<button class="btn play${solid ? ' solid' : ''}" data-say="${esc(zh)}"${r} aria-label="${label}: ${esc(short(zh))}">${ICON.speaker}<span>${label}</span></button>`;
@@ -1114,7 +1184,7 @@ function renderWordPage() {
   $('wp-body').innerHTML = `
     <div class="zhline xl" lang="zh-CN">${w.tok ? cellsFrom(w.tok) : cells(w.zh)}</div>
     <div class="wp-ko ${w.ko ? '' : 'none'}">${w.ko ? esc(w.ko) : '이 단어의 뜻 정보가 없어요. 발음은 들을 수 있어요.'}</div>
-    <div class="actions">${playBtn(w.zh, '발음 듣기', true)}${playBtn(w.zh, '느리게', false, false, '0.75')}</div>
+    <div class="actions">${playBtn(w.zh, '발음 듣기', true, false, '', ctxOf(w))}${playBtn(w.zh, '느리게', false, false, '0.75', ctxOf(w))}</div>
     ${hasHan(w.zh) ? `<section class="cell chars" id="wp-chars" style="margin-top:22px">${charsHtml(w)}</section>` : ''}
     ${w.ctx_zh ? `<section class="cell" style="margin-top:22px"><h4>이 문장에서</h4>${zhLine(w.ctx_zh, 'mid', w.zh)}<div class="ex-ko">${esc(w.ctx_ko)}</div><div class="actions">${playBtn(w.ctx_zh, '문장 듣기')}${sentSaveBtn('ctx', w.ctx_zh, true)}</div></section>` : ''}
     ${w.ex_zh ? `<section class="cell" style="${w.ctx_zh ? '' : 'margin-top:22px'}"><h4>예문</h4>${zhLine(w.ex_zh, 'mid')}<div class="ex-ko">${esc(w.ex_ko)}</div><div class="actions">${playBtn(w.ex_zh, '예문 듣기')}</div></section>` : ''}`;
@@ -1171,8 +1241,9 @@ let mini = null; // { si, k, w, el }
 function miniWord(kind, si, k) {
   const { s, words } = unitState(kind)[si]; const w = words[k];
   const v = currentVocab.find((x) => x.zh === w.zh);
-  return { zh: w.zh, ko: w.ko || '', tok: wordTokens(words)[k], ctx_zh: s.zh, ctx_ko: s.ko, ex_zh: v?.example_zh || '', ex_ko: v?.example_ko || '' };
+  return { zh: w.zh, ko: w.ko || '', tok: wordTokens(words)[k], ctx_i: words.slice(0, k).reduce((n, x) => n + [...x.zh].length, 0), ctx_zh: s.zh, ctx_ko: s.ko, ex_zh: v?.example_zh || '', ex_ko: v?.example_ko || '' };
 }
+const ctxOf = (w) => (w.ctx_zh && w.ctx_i != null ? { zh: w.ctx_zh, i: w.ctx_i } : null); // 문장 속 단어면 문장 정보를 돌려준다
 const miniSaveBtn = (zh) => hasWord(zh)
   ? `<button class="btn saved" data-msave aria-label="단어장에서 빼기: ${esc(zh)}">${ICON.starFill}<span>저장됨</span></button>`
   : `<button class="btn" data-msave aria-label="단어장에 저장: ${esc(zh)}">${ICON.star}<span>단어장</span></button>`;
@@ -1189,7 +1260,7 @@ function showMini(kind, si, k, el) {
     <div class="mtop"><div class="zhline mid" lang="zh-CN">${cellsFrom(w.tok)}</div>
     <div class="mko ${w.ko ? '' : 'none'}">${w.ko ? esc(w.ko) : '이 단어의 뜻 정보가 없어요. 발음은 들을 수 있어요.'}</div></div>
     ${miniChars(w)}
-    <div class="actions">${playBtn(w.zh, '듣기', true)}${miniSaveBtn(w.zh)}<button class="btn" data-mmore>${ICON.list}<span>자세히</span></button></div>`;
+    <div class="actions">${playBtn(w.zh, '듣기', true, false, '', ctxOf(w))}${miniSaveBtn(w.zh)}<button class="btn" data-mmore>${ICON.list}<span>자세히</span></button></div>`;
   box.style.bottom = (document.querySelector('.tabbar')?.offsetHeight || 56) + 24 + 'px';
   box.classList.remove('hidden');
   const gap = el.getBoundingClientRect().bottom - box.getBoundingClientRect().top; // 카드가 단어를 가리면 위로 밀어 올린다
@@ -1198,11 +1269,13 @@ function showMini(kind, si, k, el) {
 }
 function openSentenceWord(kind, si, k, from) {
   const { s, words } = unitState(kind)[si]; const items = []; let idx = 0; const toks = wordTokens(words);
+  let pos = 0; // 문장 안에서 이 단어가 시작하는 글자 위치
   words.forEach((w, kk) => {
+    const here = pos; pos += [...w.zh].length;
     if (isPunct(w.zh) || isLatin(w.zh)) return;
     if (kk === k) idx = items.length;
     const v = currentVocab.find((x) => x.zh === w.zh);
-    items.push(wordItem(w.zh, w.ko, { tok: toks[kk], ctx_zh: s.zh, ctx_ko: s.ko, ex_zh: v?.example_zh || '', ex_ko: v?.example_ko || '' }));
+    items.push(wordItem(w.zh, w.ko, { tok: toks[kk], ctx_i: here, ctx_zh: s.zh, ctx_ko: s.ko, ex_zh: v?.example_zh || '', ex_ko: v?.example_ko || '' }));
   });
   openWord(items, idx, from);
 }
@@ -1770,7 +1843,11 @@ function playOne(text) {
     if (choice.startsWith('edge:')) {
       const a = new Audio(edgeUrl(text, choice.slice(5), rate)); rd.audio = a;
       a.onended = () => { karStop(); resolve(true); }; a.onerror = () => { karStop(); resolve(false); };
-      a.onplaying = () => karBegin(document.querySelectorAll('.rp-s')[rd.i]?.querySelector('.zhline'), text, audioProgress(a));
+      const tp = getTiming(text, choice.slice(5), rate);
+      a.onplaying = () => {
+        karBegin(document.querySelectorAll('.rp-s')[rd.i]?.querySelector('.zhline'), text, audioProgress(a));
+        tp.then((t) => { if (t && rd.audio === a) karUpgrade(charTimes(text, t.bounds), audioClock(a)); });
+      };
       a.play().catch(() => resolve(false));
     } else if ('speechSynthesis' in window) {
       zhVoice().then((v) => {

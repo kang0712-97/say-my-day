@@ -320,7 +320,7 @@ function ttsWorkerAlive() {
       if (m.ready) { ttsWorkerReady = true; continue; }
       const p = ttsPending.get(m.id); if (!p) continue;
       ttsPending.delete(m.id); clearTimeout(p.timer);
-      m.ok ? p.resolve() : p.reject(new Error(m.error || '음성 변환 실패'));
+      m.ok ? p.resolve(m.bounds) : p.reject(new Error(m.error || '음성 변환 실패'));
     }
   });
   const gone = () => {
@@ -346,17 +346,24 @@ function execSpeech(text, voice, rate, out) {
   });
 }
 
-function makeSpeech(text, voice, rate) {
+const timingPath = (file) => file.replace(/\.mp3$/, '.json');
+function makeSpeech(text, voice, rate, needTiming = false) {
   const key = ttsKey(text, voice, rate);
   const file = path.join(TTS_DIR, `${key}.mp3`);
-  if (fs.existsSync(file) && fs.statSync(file).size > 0) return Promise.resolve(file);
+  // 시간 정보가 필요한데 옛 저장본에 없으면 한 번 다시 만든다
+  if (fs.existsSync(file) && fs.statSync(file).size > 0 && (!needTiming || fs.existsSync(timingPath(file)))) return Promise.resolve(file);
   if (ttsInflight.has(key)) return ttsInflight.get(key);
   fs.mkdirSync(TTS_DIR, { recursive: true });
   const tmp = `${file}.${process.pid}.part`;
   const run = ttsWorkerAlive() ? workerSpeech(text, voice, rate, tmp).catch(() => execSpeech(text, voice, rate, tmp)) : execSpeech(text, voice, rate, tmp);
-  const job = run.then(() => {
+  const job = run.then((bounds) => {
     if (!fs.existsSync(tmp) || fs.statSync(tmp).size === 0) throw new Error('빈 음성 파일');
-    fs.renameSync(tmp, file); return file;
+    fs.renameSync(tmp, file);
+    // 단어별 시작 시각은 소리 파일 옆에 저장한다(단어 경계가 없으면 저장하지 않는다 → 화면은 어림 계산으로 대신함)
+    // 단어 경계를 못 받았으면 빈 목록을 적어 둬서 "이 소리는 시간 정보가 없다"는 것을 기억한다(매번 다시 만들지 않게)
+    const words = Array.isArray(bounds) ? bounds.filter((b) => b && b.k === 'W') : [];
+    try { fs.writeFileSync(timingPath(file), JSON.stringify({ bounds: words })); } catch { /* 시간 정보 없이도 소리는 나간다 */ }
+    return file;
   }).catch((err) => { fs.rmSync(tmp, { force: true }); throw err; }).finally(() => ttsInflight.delete(key));
   ttsInflight.set(key, job);
   return job;
@@ -463,7 +470,8 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url.startsWith('/api/tts-status')) {
       return sendJson(res, 200, { available: edgeAvailable(), voices: edgeAvailable() ? EDGE_VOICES : [], voicesByLang: edgeAvailable() ? EDGE_VOICES_BY_LANG : {} });
     }
-    if (req.method === 'GET' && req.url.startsWith('/api/tts')) {
+    if (req.method === 'GET' && (req.url.startsWith('/api/tts-timing') || req.url.startsWith('/api/tts'))) {
+      const wantTiming = req.url.startsWith('/api/tts-timing');
       const q = new URL(req.url, 'http://localhost').searchParams;
       const text = String(q.get('text') || '').trim();
       const voice = String(q.get('voice') || '');
@@ -473,7 +481,13 @@ const server = http.createServer(async (req, res) => {
       if (!ALL_EDGE_VOICES.some((v) => v.id === voice)) return sendJson(res, 400, { error: '지원하지 않는 음성이에요.' });
       if (!ttsCached(text, voice, rate) && ttsLimited(req)) return sendJson(res, 429, { error: '잠시 후 다시 시도해 주세요. 음성을 너무 많이 요청했어요.' });
       try {
-        const file = await makeSpeech(text, voice, rate);
+        const file = await makeSpeech(text, voice, rate, wantTiming);
+        if (wantTiming) { // 단어별 시작 시각(밀리초). 없으면 404 — 화면이 어림 계산으로 대신한다
+          const tp = timingPath(file);
+          let tj = null; try { tj = JSON.parse(fs.readFileSync(tp, 'utf8')); } catch { /* 없음 */ }
+          if (!tj || !Array.isArray(tj.bounds) || !tj.bounds.length) return sendJson(res, 404, { error: '단어 시간 정보가 없어요.' });
+          return sendJson(res, 200, tj);
+        }
         res.writeHead(200, { 'content-type': 'audio/mpeg', 'cache-control': 'public, max-age=86400' });
         return fs.createReadStream(file).pipe(res);
       } catch (err) {
