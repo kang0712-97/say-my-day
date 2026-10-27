@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>듣기 비교 (임시)</title>
+<style>
+body{font:15px/1.5 system-ui,sans-serif;margin:16px;max-width:760px;color:#222}
+h2{margin:22px 0 6px;font-size:16px} .s{background:#f4f1ea;padding:8px 10px;border-radius:8px;margin:6px 0}
+table{border-collapse:collapse;width:100%} td,th{border-bottom:1px solid #ddd;padding:5px 6px;text-align:left;font-size:14px}
+button{font:inherit;padding:4px 10px;margin:2px;border:1px solid #888;border-radius:6px;background:#fff;cursor:pointer}
+button.on{background:#222;color:#fff} .m{color:#777;font-size:13px}
+</style></head><body>
+<h1 style="font-size:19px">일본어 음성 비교 (임시 페이지)</h1>
+<p class="m">내 컴퓨터에서만 열립니다. 버튼을 눌러 들어 보고, 마음에 드는 조합(음성·음높이·속도)을 알려 주세요. 속도: 느림 -20% / 보통 -10% / 0 / 빠름 +10%. 음높이는 0Hz가 기본입니다.</p>
+<div id="app"></div>
+<audio id="au"></audio>
+<script>
+const SENT = [
+  ['일기체 짧은 문장', '今日は友達と一緒にカフェでコーヒーを飲みました。'],
+  ['조사가 많은 문장', '私は妹に本を貸して、母には花を買ってあげました。'],
+  ['읽기 까다로운 문장', '市場で二日分の食材を買って、大人二人で十分に食べました。'],
+];
+const VOICES = [['ja-JP-NanamiNeural', '나나미(여)'], ['ja-JP-KeitaNeural', '케이타(남)']];
+const RATES = [-20, -10, 0, 10];
+const PITCHES = [-10, 0, 10];
+const au = document.getElementById('au'); let cur = null;
+function play(btn, text, voice, rate, pitch) {
+  if (cur) cur.classList.remove('on'); cur = btn; btn.classList.add('on');
+  au.src = `/api/tts-test?voice=${voice}&rate=${rate}&pitch=${pitch}&text=${encodeURIComponent(text)}`;
+  au.play().catch(() => { btn.textContent += ' ✗'; });
+}
+const app = document.getElementById('app');
+SENT.forEach(([name, text]) => {
+  const h = document.createElement('h2'); h.textContent = name; app.append(h);
+  const d = document.createElement('div'); d.className = 's'; d.textContent = text; app.append(d);
+  const t = document.createElement('table');
+  t.innerHTML = '<tr><th>음성</th><th>음높이</th><th>속도 (느림 → 빠름)</th></tr>';
+  VOICES.forEach(([vid, vname]) => PITCHES.forEach((p) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${vname}</td><td>${p > 0 ? '+' : ''}${p}Hz</td><td></td>`;
+    RATES.forEach((r) => {
+      const b = document.createElement('button'); b.textContent = `${r > 0 ? '+' : ''}${r}%`;
+      b.onclick = () => play(b, text, vid, r, p); tr.lastChild.append(b);
+    });
+    t.append(tr);
+  }));
+  app.append(t);
+});
+// 이 기기(브라우저)에 있는 일본어 음성
+const hd = document.createElement('h2'); hd.textContent = '이 기기의 기본 일본어 음성 (브라우저)'; app.append(hd);
+const box = document.createElement('div'); app.append(box);
+function loadLocal() {
+  box.textContent = '';
+  const list = speechSynthesis.getVoices().filter((v) => /^ja/i.test(v.lang));
+  if (!list.length) { box.textContent = '일본어 기본 음성이 없습니다.'; return; }
+  list.forEach((v) => SENT.forEach(([name, text]) => {
+    const b = document.createElement('button'); b.textContent = `${v.name} · ${name}`;
+    b.onclick = () => { speechSynthesis.cancel(); const u = new SpeechSynthesisUtterance(text); u.lang = v.lang; u.voice = v; speechSynthesis.speak(u); };
+    box.append(b);
+  }));
+}
+if ('speechSynthesis' in window) { loadLocal(); speechSynthesis.addEventListener('voiceschanged', loadLocal); } else box.textContent = '지원하지 않는 브라우저입니다.';
+</script></body></html>

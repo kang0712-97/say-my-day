@@ -477,6 +477,26 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url.startsWith('/api/tts-status')) {
       return sendJson(res, 200, { available: edgeAvailable(), voices: edgeAvailable() ? EDGE_VOICES : [], voicesByLang: edgeAvailable() ? EDGE_VOICES_BY_LANG : {} });
     }
+    // 듣기 비교 전용(내 컴퓨터에서만): 속도·음높이를 자유롭게 바꿔 만든다. 공개 서버에서는 열리지 않는다.
+    if (!PUBLIC_MODE && req.method === 'GET' && req.url.startsWith('/api/tts-test')) {
+      const q = new URL(req.url, 'http://localhost').searchParams;
+      const text = String(q.get('text') || '').trim().slice(0, 300);
+      const voice = String(q.get('voice') || '');
+      const pct = (v) => Math.max(-50, Math.min(50, Math.round(Number(v) || 0)));
+      const sign = (n) => (n >= 0 ? '+' : '') + n;
+      const rate = `${sign(pct(q.get('rate')))}%`;
+      const pitch = `${sign(pct(q.get('pitch')))}Hz`;
+      if (!edgeAvailable() || !text || !ALL_EDGE_VOICES.some((v) => v.id === voice)) return sendJson(res, 400, { error: '음성·문장을 확인해 주세요.' });
+      const file = path.join(TTS_DIR, `test-${ttsKey(text, voice, rate + pitch)}.mp3`);
+      fs.mkdirSync(TTS_DIR, { recursive: true });
+      if (!fs.existsSync(file) || fs.statSync(file).size === 0) {
+        const tmp = `${file}.${process.pid}.part`;
+        try { await new Promise((ok, no) => execFile(EDGE_BIN, [`--voice=${voice}`, `--rate=${rate}`, `--pitch=${pitch}`, `--text=${text}`, `--write-media=${tmp}`], { timeout: 25000 }, (e) => (e ? no(e) : ok()))); fs.renameSync(tmp, file); }
+        catch { fs.rmSync(tmp, { force: true }); return sendJson(res, 502, { error: '음성을 만들지 못했어요.' }); }
+      }
+      res.writeHead(200, { 'content-type': 'audio/mpeg' });
+      return fs.createReadStream(file).pipe(res);
+    }
     if (req.method === 'GET' && (req.url.startsWith('/api/tts-timing') || req.url.startsWith('/api/tts'))) {
       const wantTiming = req.url.startsWith('/api/tts-timing');
       const q = new URL(req.url, 'http://localhost').searchParams;
@@ -505,6 +525,7 @@ const server = http.createServer(async (req, res) => {
       const urlPath = decodeURIComponent(req.url.split('?')[0]);
       const rel = urlPath === '/' ? 'index.html' : urlPath.replace(/^\/+/, '');
       const file = path.join(PUBLIC, rel);
+      if (PUBLIC_MODE && rel === 'voice-test.html') { res.writeHead(404); return res.end('Not found'); } // 듣기 비교 페이지는 내 컴퓨터 전용
       if (!file.startsWith(PUBLIC + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
         res.writeHead(404); return res.end('Not found');
       }
