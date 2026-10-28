@@ -383,7 +383,8 @@ const EDGE_RATES = { '0.75': '-25%', '0.9': '-10%', '1': '+0%' };
 const TTS_DIR = path.join(os.tmpdir(), 'chinese-diary-tts');
 const ttsInflight = new Map(); // 같은 문장을 동시에 두 번 만들지 않는다
 
-function edgeAvailable() { return fs.existsSync(EDGE_BIN); }
+// EDGE_TTS_ENABLED=0 이면 향상된 음성을 끄고 화면이 기기 음성만 쓰게 한다(비공식 서비스라 막히거나 중단될 때 쓰는 스위치)
+function edgeAvailable() { return process.env.EDGE_TTS_ENABLED !== '0' && fs.existsSync(EDGE_BIN); }
 
 const ttsKey = (text, voice, rate) => crypto.createHash('sha1').update(`${voice}|${rate}|${text}`).digest('hex');
 const ttsCached = (text, voice, rate) => { const f = path.join(TTS_DIR, `${ttsKey(text, voice, rate)}.mp3`); return fs.existsSync(f) && fs.statSync(f).size > 0; };
