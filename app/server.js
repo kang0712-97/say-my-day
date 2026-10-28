@@ -530,6 +530,10 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && req.url.startsWith('/api/data')) {
       return sendJson(res, 200, readData());
     }
+    if (req.method === 'POST' && req.url === '/api/data/clear') { // 설정의 '내 데이터 모두 지우기'
+      req.resume(); writeData({ keys: {} });
+      return sendJson(res, 200, { ok: true });
+    }
     if (req.method === 'POST' && req.url === '/api/data') {
       const body = JSON.parse((await readBody(req, DATA_LIMIT)) || '{}');
       if (!DATA_KEYS.has(body.key)) return sendJson(res, 400, { error: '저장할 수 없는 항목이에요.' });
