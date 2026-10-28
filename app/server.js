@@ -197,7 +197,7 @@ async function translateWithGemini(userText, key, glossary = [], file) {
   if (!res.ok) throw new Error(`Gemini 오류 ${res.status}: ${data?.error?.message || '알 수 없음'}`);
   const text = (data.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join('');
   if (!text) throw new Error('Gemini가 빈 응답을 보냈습니다. (안전 필터이거나 한도 초과일 수 있습니다.)');
-  return { mock: false, result: extractJson(text) };
+  return { mock: false, result: extractJson(text), usage: { in: data.usageMetadata?.promptTokenCount, out: data.usageMetadata?.candidatesTokenCount } };
 }
 
 async function translate(diary, glossary = [], file, tgt = 'zh', src = 'ko') {
@@ -243,7 +243,7 @@ async function callModel(userText, glossary = [], file) {
   const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
   if (!text) throw new Error(`Claude가 빈 응답을 보냈습니다. (stop_reason: ${data.stop_reason})`);
   if (data.stop_reason === 'max_tokens') throw new Error('응답이 길이 제한에서 잘렸습니다. 일기를 줄여 다시 시도해 주세요.');
-  return { mock: false, result: extractJson(text) };
+  return { mock: false, result: extractJson(text), usage: { in: data.usage?.input_tokens, out: data.usage?.output_tokens } };
 }
 
 // ---------- 글자별 풀이 (/api/chars) ----------
@@ -518,7 +518,16 @@ function sendJson(res, status, obj) {
   res.end(JSON.stringify(obj));
 }
 
+// 요청 기록: 한 줄 JSON. 일기·문장·단어 같은 내용은 절대 남기지 않는다(쿼리 문자열도 버린다). 오류도 이름만 남긴다.
+const QUIET_PATHS = new Set(['/api/tts', '/api/tts-timing', '/api/tts-status', '/api/data', '/api/langs']); // 자주 불려서 오류일 때만 기록
+function logRequest(req, res, t0) {
+  const p = String(req.url).split('?')[0];
+  if (!p.startsWith('/api/') || (QUIET_PATHS.has(p) && res.statusCode < 400)) return;
+  const i = req.logInfo || {};
+  console.log(JSON.stringify({ t: new Date().toISOString(), path: p, status: res.statusCode, ms: Date.now() - t0, ...i }));
+}
 const server = http.createServer(async (req, res) => {
+  const t0 = Date.now(); req.logInfo = {}; res.on('finish', () => logRequest(req, res, t0));
   try {
     if ((req.method === 'POST' || req.url.startsWith('/api/data')) && !localOnly(req)) return sendJson(res, 403, { error: '허용되지 않은 요청이에요.' });
     if (req.method === 'POST' && !isJsonRequest(req)) return sendJson(res, 415, { error: 'JSON 요청만 받아요.' });
@@ -567,9 +576,14 @@ const server = http.createServer(async (req, res) => {
       const mismatch = checkSourceLang(diary, pair.src);
       if (mismatch) return sendJson(res, 400, { error: mismatch.msg, code: mismatch.code });
       const blocked = checkTranslateLimit(req);
-      if (blocked) return sendJson(res, 429, { error: blocked.msg, code: blocked.code, n: blocked.n });
+      req.logInfo = { pair: `${pair.src}>${pair.tgt}`, chars: diary.length };
+      if (blocked) { req.logInfo.limited = blocked.code; return sendJson(res, 429, { error: blocked.msg, code: blocked.code, n: blocked.n }); }
       running += 1;
-      try { return sendJson(res, 200, await translate(diary, cleanGlossary(body.glossary), pair.file, pair.tgt, pair.src)); } finally { running -= 1; }
+      try {
+        const { usage, ...out } = await translate(diary, cleanGlossary(body.glossary), pair.file, pair.tgt, pair.src);
+        if (usage) req.logInfo.tokens = usage; // 응답에는 싣지 않는다
+        return sendJson(res, 200, out);
+      } finally { running -= 1; }
     }
     if (req.method === 'GET' && req.url === '/api/langs') {
       return sendJson(res, 200, { langs: LANGS, pairs: Object.keys(PAIRS).map((k) => { const [src, tgt] = k.split('>'); return { src, tgt }; }) });
@@ -634,6 +648,7 @@ const server = http.createServer(async (req, res) => {
     }
     res.writeHead(405); res.end();
   } catch (err) {
+    req.logInfo.err = err && err.name; // 메시지에는 입력 일부가 섞일 수 있어 기록하지 않는다
     sendJson(res, 500, { error: err.message });
   }
 });
