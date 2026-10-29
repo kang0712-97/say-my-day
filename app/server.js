@@ -511,7 +511,7 @@ function localOnly(req) {
 }
 const isJsonRequest = (req) => String(req.headers['content-type'] || '').toLowerCase().startsWith('application/json');
 
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.webp': 'image/webp' };
 
 function sendJson(res, status, obj) {
   res.writeHead(status, { 'content-type': 'application/json; charset=utf-8' });
@@ -643,7 +643,7 @@ const server = http.createServer(async (req, res) => {
       if (!file.startsWith(PUBLIC + path.sep) || !fs.existsSync(file) || !fs.statSync(file).isFile()) {
         res.writeHead(404); return res.end('Not found');
       }
-      res.writeHead(200, { 'content-type': TYPES[path.extname(file)] || 'application/octet-stream' });
+      res.writeHead(200, { 'content-type': TYPES[path.extname(file)] || 'application/octet-stream', ...(path.extname(file) === '.webp' ? { 'cache-control': 'public, max-age=86400' } : {}) });
       return res.end(fs.readFileSync(file));
     }
     res.writeHead(405); res.end();

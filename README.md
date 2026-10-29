@@ -98,3 +98,4 @@ python3 -m venv ~/.chinese-diary-venv
 - T17 번역 품질 세트·문구 검수표(2026-10-29, 일부 완료): `design/zh-review.csv`(ZH 304+T 32, 중국인 친구에게 보낼 파일), `npm run quality`(조합별 20문장, 실제 API) 작성. 첫 실행은 세 조합 모두 번역됐으나 채점 오류(쉼표 분할 문장)를 고쳤고, 고친 뒤 재실행 3회는 AI 호출 시간 초과로 실패해 기준 결과 파일이 아직 없음.
 - T18 접근성(2026-10-29, 배포 전): `tests/a11y` 자동 검사를 `npm test`에 추가(이름 없음·lang·200% 글자·24px·포커스), 546건→0건. 일본어 읽기 lang, 긴 단어 줄바꿈, 인트로 제목 넘침 수정. 색 대비 전부 통과. 기기 확인표 `design/device-matrix.md`.
 - 그림일기 개편 준비(2026-10-29, 구현 전): 최종 디자인 시스템(`design-system-final-2026-10-29`, 작은 새) 기준으로 `design/redesign-plan.md`(충돌 정리·기능 확인표·상태별 이미지), 카드 T19~T28, 프로젝트 스킬 `/say-my-day-design`, CLAUDE.md 안내 추가. 이전 '차분한 저널'과 스킨 시험은 대체 대상(T19에서 제거).
+- T19 그림일기 개편 ① 토대(2026-10-29, 배포 전): 디자인 토큰(`--smd-*`, 라이트·다크)·Pretendard/Noto Sans KR·SC·JP로 교체, 세리프·손글씨·붉은 포인트·스킨 시험 삭제, 작은 새 12종 WebP 200KB(`app/public/img/bird/`, `bird()` 도우미), 버튼 56/44px·포커스 2px. 레이아웃은 아직 이전 구성(T21~). 대비 17쌍 통과, `npm test` 통과. 백업 `backup/index_foundation_v34.html`.
