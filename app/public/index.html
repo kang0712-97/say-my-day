@@ -68,9 +68,10 @@
   .hero { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 26px 20px 8px; }
   .eyebrow { font-family: var(--f-serif); font-style: italic; color: var(--muted); font-size: var(--fs-s); margin: 0 0 6px; }
   .lead { font-family: var(--f-serif); font-weight: 700; font-size: 2.35rem; line-height: 1.22; margin: 0; letter-spacing: -.01em; }
-  .circled { position: relative; display: inline-block; padding: 0 .12em; white-space: nowrap; }
+  .circled { position: relative; display: inline-block; max-width: 100%; padding: 0 .12em; }
   .scribble { position: absolute; left: -10px; top: -6px; width: calc(100% + 20px); height: calc(100% + 12px); stroke: var(--accent); fill: none; stroke-width: 2; stroke-linecap: round; pointer-events: none; }
   .lead-sub { color: var(--muted); font-size: var(--fs-s); margin: 14px 0 0; max-width: 28em; }
+  .hero > div:first-child { min-width: 0; }
   .ring { flex: none; position: relative; width: 92px; height: 92px; margin-top: 4px; }
   .ring svg.spin { position: absolute; inset: 0; width: 100%; height: 100%; animation: spin 28s linear infinite; }
   .ring text { font-family: var(--f-ui); font-size: 9.5px; fill: var(--ink); text-transform: uppercase; }
@@ -170,8 +171,8 @@
   .c .rg { position: absolute; top: 0; left: 0; width: calc(var(--n) * 1.45em / .44 + (var(--n) - 1) * 2px); /* .p 글꼴이 .44em이라 칸 폭(1.45em)을 나눠서 맞춘다 */ text-align: center; overflow: visible; }
   .c .h { line-height: 1.3; }
   .c.mk .h { background: var(--hl); color: var(--hl-ink); }
-  .nw { display: inline-flex; align-items: flex-end; }
-  .wd { background: none; border: 0; padding: 0 1px; margin: 0; font: inherit; color: inherit; cursor: pointer; display: inline-flex; border-bottom: 2px dotted var(--dot); }
+  .nw { display: inline-flex; flex-wrap: wrap; max-width: 100%; align-items: flex-end; }
+  .wd { background: none; border: 0; padding: 0 1px; min-width: 24px; max-width: 100%; flex-wrap: wrap; margin: 0; font: inherit; color: inherit; cursor: pointer; display: inline-flex; border-bottom: 2px dotted var(--dot); }
   .wd.sel { background: var(--hl); border-bottom: 2px solid var(--accent); }
   .wd:hover { background: var(--accent-soft); border-bottom: 2px solid var(--accent); }
   .zlink { background: none; border: 0; padding: 0; margin: 0; font: inherit; color: inherit; cursor: pointer; text-align: left; border-bottom: 1px solid var(--line); line-height: inherit; }
@@ -1617,20 +1618,20 @@ function render(r, isMock) {
   $('vocab').innerHTML = `<div class="grid">${feat.map((v, i) => `
     <div class="cell">
       <button class="zlink vocab-zh" data-vw="${i}" lang="${BCP()}" aria-label="${L('단어 페이지 열기')}: ${esc(v.zh)}">${esc(v.zh)}</button>
-      <div class="py">${esc(plainPinyin(v.zh))}</div>
+      <div class="py" lang="${BCP()}">${esc(plainPinyin(v.zh))}</div>
       <div class="maskable" style="margin:2px 0 8px">${esc(v.ko)}</div>
       <div class="zh-font" lang="${BCP()}">${esc(v.example_zh)}</div>
-      <div class="py">${esc(plainPinyin(v.example_zh || ''))}</div>
+      <div class="py" lang="${BCP()}">${esc(plainPinyin(v.example_zh || ''))}</div>
       <div class="ex-ko maskable">${esc(v.example_ko)}</div>
       <div class="actions">${playBtn(v.zh, '단어')}${v.example_zh ? playBtn(v.example_zh, '예문') : ''}${saveBtn(i, v.zh)}</div>
     </div>`).join('')}</div>
     ${rest.length ? `<div class="vlist">${rest.map((v, j) => `
       <div class="vrow">
-        <div class="vtop"><button class="zlink vz" data-vw="${j + 2}" lang="${BCP()}" aria-label="${L('단어 페이지 열기')}: ${esc(v.zh)}">${esc(v.zh)}</button><span class="py">${esc(plainPinyin(v.zh))}</span><span class="vk maskable">${esc(v.ko)}</span>
+        <div class="vtop"><button class="zlink vz" data-vw="${j + 2}" lang="${BCP()}" aria-label="${L('단어 페이지 열기')}: ${esc(v.zh)}">${esc(v.zh)}</button><span class="py" lang="${BCP()}">${esc(plainPinyin(v.zh))}</span><span class="vk maskable">${esc(v.ko)}</span>
           ${playBtn(v.zh, '단어 듣기', false, true)}${saveBtn(j + 2, v.zh, true)}</div>
         ${v.example_zh ? `<details class="more"><summary>${L('예문')}</summary>
           <div class="zh-font" lang="${BCP()}">${esc(v.example_zh)} ${playBtn(v.example_zh, '예문 듣기', false, true)}</div>
-          <div class="py">${esc(plainPinyin(v.example_zh))}</div><div class="ex-ko maskable">${esc(v.example_ko)}</div></details>` : ''}
+          <div class="py" lang="${BCP()}">${esc(plainPinyin(v.example_zh))}</div><div class="ex-ko maskable">${esc(v.example_ko)}</div></details>` : ''}
       </div>`).join('')}</div>` : ''}`;
 
   // 활용 문장·문법 예문의 단어 뜻은 이 일기에서 이미 아는 단어(핵심 단어, 번역 문장 속 단어)에서 찾는다
@@ -1638,7 +1639,7 @@ function render(r, isMock) {
   const lineOf = (zh, ko, kind, i, state) => { state[i] = { s: { zh, ko: ko || '' }, words: wordsOf({ zh }, gloss) }; return `<div class="zhline mid" lang="${BCP()}">${sentenceHtml(state[i].words, i, kind)}</div>`; };
   gramState = []; extraState = [];
   $('grammar').innerHTML = (r.grammar || []).map((g, gi) => `
-    <div class="cell"><div class="pat">${esc(g.pattern)}</div>
+    <div class="cell"><div class="pat" lang="${BCP()}">${esc(g.pattern)}</div>
       <div>${esc(g.explanation_ko)}</div>
       ${g.example_zh ? lineOf(g.example_zh, g.example_ko, 'g', gi, gramState) : ''}
       ${g.example_ko ? `<div class="ex-ko maskable">${esc(g.example_ko)}</div>` : ''}
@@ -1773,7 +1774,7 @@ function renderWords() {
     <div class="word-item">
       <button class="wlink" data-wopen="${i}" aria-label="${L('단어 페이지 열기')}: ${esc(w.zh)}">
         <span class="w" lang="${BCP()}">${esc(w.zh)}</span>
-        <span class="m"><span class="py">${esc(plainPinyin(w.zh))}</span><br>${esc(w.ko)}<span class="due">${esc(dueLabel(w))}</span></span>
+        <span class="m"><span class="py" lang="${BCP()}">${esc(plainPinyin(w.zh))}</span><br>${esc(w.ko)}<span class="due">${esc(dueLabel(w))}</span></span>
       </button>
       ${playBtn(w.zh, L('단어 듣기'), false, true)}
       <button class="btn icon" data-delword="${esc(w.zh)}" aria-label="${L('단어장에서 삭제')}: ${esc(w.zh)}">${ICON.close}</button>
@@ -1781,7 +1782,7 @@ function renderWords() {
   $('sentlist').innerHTML = sents.length ? sents.map((s) => `
     <div class="word-item">
       <div class="wlink" style="cursor:default">
-        <span class="m"><span class="zh-font" lang="${BCP()}" style="font-size:var(--fs-l)">${esc(s.zh)}</span><br><span class="py">${esc(plainPinyin(s.zh))}</span><br><span class="maskable">${esc(s.ko)}</span><span class="due">${esc(dueLabel(s))}</span></span>
+        <span class="m"><span class="zh-font" lang="${BCP()}" style="font-size:var(--fs-l)">${esc(s.zh)}</span><br><span class="py" lang="${BCP()}">${esc(plainPinyin(s.zh))}</span><br><span class="maskable">${esc(s.ko)}</span><span class="due">${esc(dueLabel(s))}</span></span>
       </div>
       ${playBtn(s.zh, L('문장 듣기'), false, true)}
       <button class="btn icon" data-delsent="${esc(s.zh)}" aria-label="${L('문장 보관함에서 삭제')}">${ICON.close}</button>
