@@ -1,0 +1,118 @@
+/* 디자인 시험용 스킨(skins.js가 <html data-skin>을 정한다). 기본 화면은 건드리지 않고 색 토큰·글꼴·모양만 덮어쓴다.
+   다크 모드는 기본 다크 색을 그대로 쓰고(더 높은 우선순위) 글꼴·모양만 스킨을 따른다. */
+#skin-picker { position: fixed; top: 4px; left: 4px; z-index: 300; display: flex; gap: 2px; padding: 2px; background: rgba(0, 0, 0, .78); border-radius: 999px; font: 11px/1 system-ui, sans-serif; }
+#skin-picker button { border: 0; background: transparent; color: #fff; padding: 6px 9px; border-radius: 999px; font: inherit; min-height: 24px; cursor: pointer; }
+#skin-picker button[aria-pressed="true"] { background: #fff; color: #000; }
+
+/* ===== LINE: 가는 검은 선 격자 + 알약 윤곽 + 얇은 산세리프 + 주황 포인트 (레퍼런스 2·3) ===== */
+html[data-skin="line"] {
+  --desk: #e3e8ed; --paper: #f1f6fb; --cell: #f1f6fb; --ink: #101214; --muted: #56616d; --dot: rgba(16, 18, 20, .4); --soft: rgba(16, 18, 20, .1); --line: #101214;
+  --accent: #c2410c; --accent-soft: #fde3d2; --hl: #ffd9b8; --hl-ink: #3b1500;
+  --f-body: "Outfit", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; --f-serif: var(--f-body); --f-ui: var(--f-body); --f-hand: var(--f-body);
+  --f-zh: "Noto Sans SC", "PingFang SC", "Noto Sans KR", sans-serif;
+}
+html[data-skin="line"][data-tgt="ja"] { --f-zh: "Noto Sans JP", "Hiragino Sans", "Noto Sans KR", sans-serif; }
+html[data-skin="line"] body { font-weight: 300; }
+html[data-skin="line"] header.top h1 { font-weight: 400; letter-spacing: .12em; text-transform: uppercase; color: var(--ink); font-size: 1rem; }
+html[data-skin="line"] .eyebrow { font-style: normal; text-transform: uppercase; letter-spacing: .12em; font-size: .75rem; }
+html[data-skin="line"] .lead { font-weight: 300; letter-spacing: -.02em; }
+html[data-skin="line"] .circled { border: 1px solid var(--ink); border-radius: 999px; padding: 0 .3em; }
+html[data-skin="line"] .scribble, html[data-skin="line"] .ring { display: none; }
+html[data-skin="line"] .write label.lbl { font-size: 1rem; font-weight: 500; text-transform: uppercase; letter-spacing: .08em; }
+html[data-skin="line"] textarea { background-image: none; line-height: 1.9; padding: 12px 2px; }
+html[data-skin="line"] .primary { border-radius: 0; padding: 0 0 0 22px; gap: 18px; }
+html[data-skin="line"] .primary .arrow { width: 50px; height: 50px; border-radius: 0; margin: -1px; background: var(--accent); color: #fff; }
+html[data-skin="line"] .btn, html[data-skin="line"] .chip { font-weight: 400; }
+html[data-skin="line"] .toolbar-wrap { border-color: var(--ink); }
+html[data-skin="line"] .toolbar nav a { font-weight: 400; }
+html[data-skin="line"] .sec { font-weight: 300; font-size: 1.25rem; text-transform: uppercase; letter-spacing: .06em; }
+html[data-skin="line"] .sec .no { border: 1px solid var(--ink); border-radius: 999px; padding: 0 .6em; font-style: normal; color: var(--ink); font-size: .8rem; letter-spacing: 0; }
+html[data-skin="line"] .sec .en { font-style: normal; }
+html[data-skin="line"] .cardx, html[data-skin="line"] .cell, html[data-skin="line"] .vlist { border-radius: 0; border: 0; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); background: transparent; }
+html[data-skin="line"] .cardx .idx b, html[data-skin="line"] .cell h4 { font-style: normal; }
+html[data-skin="line"] .cell h4 { text-transform: uppercase; letter-spacing: .1em; font-size: .72rem; }
+html[data-skin="line"] .ko { font-size: 1.1rem; }
+html[data-skin="line"] .lp-card { border-radius: 0; border-color: var(--ink); background: transparent; }
+html[data-skin="line"] .lp-card.sel { background: var(--accent-soft); box-shadow: none; border-color: var(--ink); }
+html[data-skin="line"] .q-opts button { border-radius: 999px; border-color: var(--ink); }
+html[data-skin="line"] .q-input { border-radius: 0; border-color: var(--ink); }
+html[data-skin="line"] .tabbar { bottom: 0; width: min(560px, 100%); border: 0; border-top: 1px solid var(--ink); border-radius: 0; background: var(--paper); box-shadow: none; }
+html[data-skin="line"] .tabbar button { border-radius: 0; border-right: 1px solid var(--soft); font-weight: 400; }
+html[data-skin="line"] .sheet-card { border-radius: 0; border: 0; border-top: 1px solid var(--ink); box-shadow: none; }
+html[data-skin="line"] .sheet-head h3 { font-weight: 300; text-transform: uppercase; letter-spacing: .08em; font-size: 1.05rem; }
+
+/* ===== MONO: 도트·고정폭 글꼴 + 크림 종이 + 사각 검정 윤곽 (레퍼런스 4·5) ===== */
+html[data-skin="mono"] {
+  --desk: #dcdad4; --paper: #f7f4ec; --cell: #fbf9f3; --ink: #111111; --muted: #5a5750; --dot: rgba(17, 17, 17, .4); --soft: rgba(17, 17, 17, .1); --line: #111111;
+  --accent: #b3261e; --accent-soft: #f4dad6; --hl: #e9e2b2; --hl-ink: #3a3300;
+  --f-body: "IBM Plex Mono", "Noto Sans KR", "Apple SD Gothic Neo", monospace; --f-serif: var(--f-body); --f-ui: var(--f-body); --f-hand: var(--f-body);
+  --f-zh: "Noto Sans SC", "PingFang SC", "Noto Sans KR", sans-serif;
+}
+html[data-skin="mono"][data-tgt="ja"] { --f-zh: "Noto Sans JP", "Hiragino Sans", "Noto Sans KR", sans-serif; }
+html[data-skin="mono"] body { font-size: .98rem; }
+html[data-skin="mono"] header.top h1 { font-family: "Doto", var(--f-body); font-weight: 700; font-size: 1.5rem; letter-spacing: .06em; color: var(--ink); line-height: 1.1; }
+html[data-skin="mono"] .eyebrow, html[data-skin="mono"] .cell h4, html[data-skin="mono"] .count, html[data-skin="mono"] .hint { font-style: normal; text-transform: uppercase; letter-spacing: .08em; }
+html[data-skin="mono"] .lead { font-weight: 500; letter-spacing: -.03em; font-size: 2rem; }
+html[data-skin="mono"] .circled { background: var(--ink); color: var(--paper); padding: 0 .25em; }
+html[data-skin="mono"] .scribble { display: none; }
+html[data-skin="mono"] .ring .day { font-family: "Doto", var(--f-body); font-style: normal; font-weight: 700; font-size: 1.8rem; }
+html[data-skin="mono"] .write label.lbl { font-size: .85rem; text-transform: uppercase; letter-spacing: .1em; }
+html[data-skin="mono"] textarea { background-image: none; line-height: 1.9; padding: 12px 2px; }
+html[data-skin="mono"] .primary, html[data-skin="mono"] .btn, html[data-skin="mono"] .chip { border-radius: 2px; }
+html[data-skin="mono"] .primary .arrow { border-radius: 2px; }
+html[data-skin="mono"] .btn.icon { border-radius: 2px; }
+html[data-skin="mono"] .toolbar nav a { text-transform: uppercase; letter-spacing: .06em; font-size: .8rem; }
+html[data-skin="mono"] .sec { font-weight: 500; font-size: 1.1rem; text-transform: uppercase; letter-spacing: .08em; }
+html[data-skin="mono"] .sec .no, html[data-skin="mono"] .sec .en, html[data-skin="mono"] .cardx .idx b { font-style: normal; }
+html[data-skin="mono"] .cardx, html[data-skin="mono"] .cell, html[data-skin="mono"] .vlist { border-radius: 0; border: 1px solid var(--ink); background: var(--cell); }
+html[data-skin="mono"] .ko { font-size: 1.05rem; }
+html[data-skin="mono"] .lp-card, html[data-skin="mono"] .q-opts button, html[data-skin="mono"] .q-input { border-radius: 0; border-color: var(--ink); }
+html[data-skin="mono"] .lp-card.sel { background: var(--ink); color: var(--paper); box-shadow: none; }
+html[data-skin="mono"] .lp-card.sel .lp-k { color: var(--paper); }
+html[data-skin="mono"] .tabbar { bottom: 0; width: min(560px, 100%); border: 0; border-top: 1px solid var(--ink); border-radius: 0; background: var(--paper); box-shadow: none; }
+html[data-skin="mono"] .tabbar button { border-radius: 0; text-transform: uppercase; font-size: .72rem; letter-spacing: .04em; }
+html[data-skin="mono"] .sheet-card { border-radius: 0; border: 0; border-top: 1px solid var(--ink); box-shadow: none; }
+html[data-skin="mono"] .sheet-head h3 { font-weight: 500; text-transform: uppercase; letter-spacing: .08em; font-size: 1.05rem; }
+
+/* ===== SOFT: 따뜻한 흰 카드 + 큰 둥근 모서리 + 부드러운 그림자 + 주황 포인트 (레퍼런스 1) ===== */
+html[data-skin="soft"] {
+  --desk: #e6e1d8; --paper: #f3f0ea; --cell: #fffdf9; --ink: #2a2622; --muted: #6a6258; --dot: rgba(42, 38, 34, .35); --soft: rgba(42, 38, 34, .08); --line: rgba(42, 38, 34, .14);
+  --accent: #b04512; --accent-soft: #fbe4d6; --hl: #fbe3a8; --hl-ink: #4a3600;
+  --f-body: "Manrope", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif; --f-serif: var(--f-body); --f-ui: var(--f-body); --f-hand: var(--f-body);
+  --f-zh: "Noto Sans SC", "PingFang SC", "Noto Sans KR", sans-serif;
+  --shadow: 0 6px 22px rgba(70, 45, 20, .09), 0 1px 3px rgba(70, 45, 20, .06);
+}
+html[data-skin="soft"][data-tgt="ja"] { --f-zh: "Noto Sans JP", "Hiragino Sans", "Noto Sans KR", sans-serif; }
+html[data-skin="soft"] header.top { border-bottom: 0; }
+html[data-skin="soft"] header.top h1 { font-weight: 700; font-size: 1.05rem; }
+html[data-skin="soft"] .eyebrow { font-style: normal; }
+html[data-skin="soft"] .lead { font-weight: 700; letter-spacing: -.03em; }
+html[data-skin="soft"] .circled { background: var(--accent-soft); border-radius: 16px; padding: 0 .3em; }
+html[data-skin="soft"] .scribble, html[data-skin="soft"] .ring { display: none; }
+html[data-skin="soft"] .write label.lbl { font-size: 1rem; font-weight: 700; }
+html[data-skin="soft"] textarea { background: var(--cell); background-image: none; border: 0; border-radius: 22px; box-shadow: var(--shadow); padding: 16px 18px; line-height: 1.8; }
+html[data-skin="soft"] .primary { background: var(--accent); border-color: var(--accent); color: #fff; border-radius: 20px; box-shadow: var(--shadow); }
+html[data-skin="soft"] .primary .arrow { background: rgba(255, 255, 255, .25); color: #fff; }
+html[data-skin="soft"] .btn, html[data-skin="soft"] .chip { border: 0; background: var(--cell); border-radius: 16px; box-shadow: var(--shadow); }
+html[data-skin="soft"] .btn.solid { background: var(--accent); color: #fff; }
+html[data-skin="soft"] .btn.playing { background: var(--accent); color: #fff; }
+html[data-skin="soft"] .toolbar-wrap { border: 0; background: transparent; padding: 6px 0; }
+html[data-skin="soft"] .toolbar nav { gap: 8px; padding: 0 20px; }
+html[data-skin="soft"] .toolbar nav a { border: 0; border-radius: 999px; background: var(--cell); box-shadow: var(--shadow); }
+html[data-skin="soft"] .sec { font-weight: 700; font-size: 1.25rem; }
+html[data-skin="soft"] .sec::after { display: none; }
+html[data-skin="soft"] .sec .no, html[data-skin="soft"] .sec .en, html[data-skin="soft"] .cardx .idx b, html[data-skin="soft"] .cell h4 { font-style: normal; }
+html[data-skin="soft"] .cardx { border: 0; border-radius: 24px; box-shadow: var(--shadow); overflow: hidden; }
+html[data-skin="soft"] .cardx .idx { border-right: 0; background: var(--accent-soft); }
+html[data-skin="soft"] .cell, html[data-skin="soft"] .vlist { border: 0; border-radius: 24px; box-shadow: var(--shadow); }
+html[data-skin="soft"] .ko { font-size: 1.1rem; }
+html[data-skin="soft"] .lp-card { border: 0; border-radius: 18px; box-shadow: var(--shadow); }
+html[data-skin="soft"] .lp-card.sel { box-shadow: inset 0 0 0 2px var(--accent), var(--shadow); }
+html[data-skin="soft"] .q-opts button, html[data-skin="soft"] .q-input { border: 0; border-radius: 18px; background: var(--cell); box-shadow: var(--shadow); }
+html[data-skin="soft"] .tabbar { border: 0; background: var(--cell); box-shadow: 0 10px 30px rgba(70, 45, 20, .16); }
+html[data-skin="soft"] .sheet-card { border-radius: 28px 28px 0 0; }
+html[data-skin="soft"] .sheet-head { border-bottom: 0; }
+html[data-skin="soft"] .sheet-head h3 { font-weight: 700; font-size: 1.15rem; }
+
+/* 공통: 큰 글자에서 섹션 제목이 줄바꿈되고, 포커스를 받는 제목도 24px 이상 */
+html[data-skin] .sec { flex-wrap: wrap; min-height: 24px; }
