@@ -1,16 +1,16 @@
-// 디자인 시험용 스킨 선택기. 주소에 ?skin=line|mono|soft|base 를 붙이면 그 스킨으로 보이고, 이후 화면 왼쪽 위의 작은 선택기로 바꿔 비교한다.
+// 디자인 시험용 스킨 선택기. 주소에 ?skin=index|player|notes|base 를 붙이면 그 스킨으로 보이고, 이후 화면 왼쪽 위의 작은 선택기로 바꿔 비교한다.
 // 시험이 끝나면 index.html의 skins.js·skins.css 두 줄과 이 두 파일을 지우면 원래대로 돌아간다.
 (function () {
-  var K = 'skin', P = 'skin-picker', NAMES = ['base', 'line', 'mono', 'soft'];
+  var K = 'skin', P = 'skin-picker', NAMES = ['base', 'index', 'player', 'notes'];
   var get = function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } };
   var set = function (k, v) { try { localStorage.setItem(k, v); } catch (e) {} };
   var q = new URLSearchParams(location.search).get('skin');
   if (q && NAMES.indexOf(q) >= 0) { set(K, q); set(P, '1'); }
   var cur = get(K);
   var FONTS = {
-    line: 'Outfit:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500&family=Noto+Sans+SC:wght@300;400&family=Noto+Sans+JP:wght@300;400',
-    mono: 'IBM+Plex+Mono:wght@400;500&family=Doto:wght@400;700&family=Noto+Sans+KR:wght@400;500&family=Noto+Sans+SC:wght@400&family=Noto+Sans+JP:wght@400',
-    soft: 'Manrope:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+SC:wght@400;500&family=Noto+Sans+JP:wght@400;500'
+    index: 'Outfit:wght@300;400;500&family=Noto+Sans+KR:wght@300;400;500&family=Noto+Sans+SC:wght@300;400&family=Noto+Sans+JP:wght@300;400',
+    notes: 'IBM+Plex+Mono:wght@400;500&family=Doto:wght@400;700&family=Noto+Sans+KR:wght@400;500&family=Noto+Sans+SC:wght@400&family=Noto+Sans+JP:wght@400',
+    player: 'Manrope:wght@400;500;700&family=Noto+Sans+KR:wght@400;500;700&family=Noto+Sans+SC:wght@400;500&family=Noto+Sans+JP:wght@400;500'
   };
   if (FONTS[cur]) {
     document.documentElement.setAttribute('data-skin', cur);
