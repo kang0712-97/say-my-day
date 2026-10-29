@@ -100,3 +100,4 @@ python3 -m venv ~/.chinese-diary-venv
 - 그림일기 개편 준비(2026-10-29, 구현 전): 최종 디자인 시스템(`design-system-final-2026-10-29`, 작은 새) 기준으로 `design/redesign-plan.md`(충돌 정리·기능 확인표·상태별 이미지), 카드 T19~T28, 프로젝트 스킬 `/say-my-day-design`, CLAUDE.md 안내 추가. 이전 '차분한 저널'과 스킨 시험은 대체 대상(T19에서 제거).
 - T19 그림일기 개편 ① 토대(2026-10-29, 배포 전): 디자인 토큰(`--smd-*`, 라이트·다크)·Pretendard/Noto Sans KR·SC·JP로 교체, 세리프·손글씨·붉은 포인트·스킨 시험 삭제, 작은 새 12종 WebP 200KB(`app/public/img/bird/`, `bird()` 도우미), 버튼 56/44px·포커스 2px. 레이아웃은 아직 이전 구성(T21~). 대비 17쌍 통과, `npm test` 통과. 백업 `backup/index_foundation_v34.html`.
 - T20 읽기 표시(2026-10-30, 배포 전): `.c` 구조 유지 결정(형광펜·단어 누르기 의존), 읽기 12/18·학습 문장 26/46, 일본어 `.rg` 폭 분리, 단어 버튼 `aria-label`에 읽기 포함. 겹침 0·200% 넘침 0, `npm test` 통과. 백업 `backup/index_ruby_v35.html`.
+- T21 쓰기 화면·상단 바(2026-10-30, 배포 전): 하단 탭 폐지→상단 바+☰ 메뉴, 결과 복귀=← 및 "방금 번역 보기", 쓰기 화면 재구성(날짜·언어 칩·복습 링크·새 02·큰 입력 상자·지우기·2×2 칩·56px CTA), 오류 재시도·새 03/10/11, 키보드 여백. `npm test` 통과. 백업 `backup/index_write_v36.html`.
