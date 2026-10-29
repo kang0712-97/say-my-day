@@ -190,14 +190,16 @@
 
   /* 한자 한 글자 = 한 칸. 병음이 길어도 칸 너비가 일정해서 간격이 고르다 */
   .zhline { font-family: var(--f-zh); display: flex; flex-wrap: wrap; align-items: flex-end; gap: 4px 2px; }
-  .zhline.big { font-size: var(--fs-xl); }
+  .zhline.big { font-size: 1.625rem; } /* 학습 대상 문장 26/46 */
+  .zhline.big .h { line-height: 1.77; }
   .zhline.mid { font-size: var(--fs-l); }
   .zhline.xl { font-size: 3.4rem; }
   .c { display: inline-flex; flex-direction: column; align-items: center; min-width: 1.45em; }
   .c.pu { min-width: .55em; }
-  .c .p { font-family: var(--f-py); font-size: .44em; line-height: 1.5; height: 1.5em; color: var(--muted); white-space: nowrap; letter-spacing: .01em; }
+  /* 읽기(병음·후리가나) = ruby 12/18. 글자 위에 얹히고, 글자 칸(.c)·단어(.nw/.wd)와 함께 줄바꿈된다 */
+  .c .p { font-family: var(--f-py); font-size: .75rem; line-height: 1.125rem; height: 1.125rem; color: var(--muted); white-space: nowrap; letter-spacing: .01em; }
   .c { position: relative; }
-  .c .rg { position: absolute; top: 0; left: 0; width: calc(var(--n) * 1.45em / .44 + (var(--n) - 1) * 2px); /* .p 글꼴이 .44em이라 칸 폭(1.45em)을 나눠서 맞춘다 */ text-align: center; overflow: visible; }
+  .c .rg { position: absolute; top: 0; left: 0; width: calc(var(--n) * 1.45em + (var(--n) - 1) * 2px); /* 여러 글자(--n칸)에 걸치는 일본어 읽기 한 덩어리. 칸 폭은 .c 글자 크기 기준 */ text-align: center; overflow: visible; }
   .c .h { line-height: 1.3; }
   .c.mk .h { background: var(--hl); color: var(--hl-ink); }
   .nw { display: inline-flex; flex-wrap: wrap; max-width: 100%; align-items: flex-end; }
@@ -233,7 +235,7 @@
   .vtop .vk { flex: 1; min-width: 5em; }
   .vrow details.more { margin: 0; border: 0; padding: 0; }
   .vrow details.more > summary { padding: 0 0 4px; min-height: 32px; font-size: var(--fs-xs); }
-  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } .zhline.big { font-size: 1.8rem; } .zhline.xl { font-size: 2.8rem; } }
+  @media (max-width: 480px) { .grid { grid-template-columns: 1fr; } .zhline.xl { font-size: 2.8rem; } }
 
   /* 하단 탭바 */
   .tabbar { position: fixed; left: 50%; bottom: 0; transform: translateX(-50%); width: min(560px, 100%); z-index: 10; display: grid; grid-template-columns: repeat(5, 1fr); background: var(--paper); border-top: 1px solid var(--ink); padding-bottom: env(safe-area-inset-bottom); }
@@ -1107,10 +1109,11 @@ $('opt-bright').addEventListener('input', () => setBright(Number($('opt-bright')
 // 병음은 모델이 아니라 pinyin-pro(+교정 사전)가 생성한다.
 const cell = (t, mk) => t.isZh
   ? (t.rd !== undefined
-    ? `<span class="c${mk ? ' mk' : ''}"><span class="p" aria-hidden="true"></span><span class="rg p${t.chk ? ' chk' : ''}" style="--n:${t.rn}" aria-hidden="true">${esc(t.rd)}</span><span class="h">${esc(t.origin)}</span></span>`
+    ? `<span class="c${mk ? ' mk' : ''}"><span class="p" aria-hidden="true"></span><span class="rg" style="--n:${t.rn}" aria-hidden="true"><span class="p${t.chk ? ' chk' : ''}">${esc(t.rd)}</span></span><span class="h">${esc(t.origin)}</span></span>`
     : `<span class="c${mk ? ' mk' : ''}"><span class="p${t.chk ? ' chk' : ''}" aria-hidden="true">${t.cont ? '' : esc(t.pinyin)}</span><span class="h">${esc(t.origin)}</span></span>`)
   : `<span class="c pu"><span class="p" aria-hidden="true"></span><span class="h">${esc(t.origin)}</span></span>`;
 const cells = (text) => readTokens(text).map((t) => cell(t)).join('');
+const tokReading = (toks) => toks.filter((t) => t.isZh).map((t) => (t.rd !== undefined ? t.rd : t.cont ? '' : t.pinyin) || '').join(' ').replace(/\s+/g, ' ').trim(); // 단어 하나의 읽기(병음·후리가나) 글자
 const cellsFrom = (toks) => toks.map((t) => cell(t)).join('');
 // 단어를 하나씩 따로 계산하면 了(le/liǎo)·得(de/dé)·不·一처럼 앞뒤 글자에 따라 소리가 바뀌는 글자가 틀린다.
 // 그래서 문장 전체로 병음을 계산한 뒤 단어 길이대로 나눈다. 글자 수가 맞지 않을 때만 단어별로 따로 계산한다.
@@ -1433,7 +1436,7 @@ function sentenceHtml(words, si, kind = 's') {
     const punct = isPunct(w.zh);
     const html = (punct || isLatin(w.zh))
       ? cellsFrom(toks[k])
-      : `<button class="wd" data-kind="${kind}" data-s="${si}" data-k="${k}" aria-label="${L('단어 뜻 보기')}: ${esc(w.zh)}">${cellsFrom(toks[k])}</button>`;
+      : `<button class="wd" data-kind="${kind}" data-s="${si}" data-k="${k}" aria-label="${L('단어 뜻 보기')}: ${esc(w.zh)}${tokReading(toks[k]) ? ' (' + esc(tokReading(toks[k])) + ')' : ''}">${cellsFrom(toks[k])}</button>`;
     if (punct && groups.length) groups[groups.length - 1] += html; else groups.push(html);
   });
   return groups.map((g) => `<span class="nw">${g}</span>`).join('');
