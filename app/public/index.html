@@ -221,7 +221,8 @@
   .hist-item:first-child { border-top: 0; }
   .hist-item button.open { flex: 1; text-align: left; background: none; border: 0; color: var(--ink); padding: 6px 0; min-height: 44px; font-family: var(--f-ui); font-size: var(--fs-m); }
   .hist-date { color: var(--muted); font-size: var(--fs-xs); display: block; font-family: var(--f-ui); }
-  .word-item { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .word-item { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 0; border-top: 1px solid var(--line); }
+  .word-item .vex { flex: 1 1 100%; display: flex; align-items: center; gap: 8px; justify-content: space-between; color: var(--muted); font-size: var(--fs-s, 0.9rem); }
   .word-item:first-child { border-top: 0; }
   .word-item .wlink { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; text-align: left; background: none; border: 0; color: var(--ink); padding: 4px 0; min-height: 48px; font-family: var(--f-ui); }
   .word-item .w { font-size: var(--fs-l); min-width: 3.6em; font-family: var(--f-zh); }
@@ -2054,6 +2055,7 @@ function renderWords() {
       </button>
       ${playBtn(w.zh, L('단어 듣기'), false, true)}
       ${moreBtn(w)}${vMenu('word', w)}
+      ${w.ex_zh ? `<div class="vex"><span class="zh-font" lang="${BCP()}">${esc(w.ex_zh)}</span>${playBtn(w.ex_zh, L('예문 듣기'), false, true)}</div>` : ''}
     </div>`).join('') : `<p class="vempty"><b>${L('저장한 단어가 아직 없어요.')}</b><br>${L('단어 카드나 문장 속 단어 페이지에서')}<br>${L('단어장 버튼을 눌러 저장하세요.')}<br>${L('이 브라우저 안에만 남아요.')}</p>`;
   $('sentlist').innerHTML = sents.length ? sents.map((s) => `
     <div class="word-item sent">
@@ -2271,7 +2273,7 @@ function showFeedback(t, ok, note = '') {
   t.answered = true; t.ok = ok;
   const last = quiz.queue.length === 1 && (ok || t.tries >= 2);
   $('q-fb').innerHTML = `<div class="fb ${ok ? 'ok' : 'no'}" role="status"><div class="fb-h"><span class="fb-i">${ok ? ICON.check : ICON.close}</span><b>${ok ? L('정답이에요!') : L('다시 한번 들어 볼까요? 정답은 이거예요.')}</b></div>${note ? `<p class="fb-n">${note}</p>` : ''}<div class="fb-a">${answerSummary(t.item, t.kind)}</div></div>
-    ${center(playBtn(t.item.zh, '발음 듣기') + '<button class="btn solid" id="q-next">' + (last ? L('결과 보기') : L('계속')) + '</button>')}`;
+    ${center(playBtn(t.item.zh, '발음 듣기') + (t.kind === 'word' && t.item.ex_zh ? playBtn(t.item.ex_zh, '예문 듣기') : '') + '<button class="btn solid" id="q-next">' + (last ? L('결과 보기') : L('계속')) + '</button>')}`;
   setTimeout(() => $('q-fb')?.querySelector('.play')?.click(), 150);
   $('q-next').focus();
 }
