@@ -491,30 +491,29 @@
   .btn.icon.play { padding: 0; width: var(--smd-hit-area); height: var(--smd-hit-area); border-radius: 50%; background: var(--ink); color: var(--paper); border-color: var(--ink); flex: none; order: 2; }
   .btn.icon.play span { display: none; }
   .cardx .actions { margin: 10px 0 0; }
-  .tools { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 0; }
-  .tchip { min-height: var(--smd-hit-area); padding: 4px 16px; border: 1px solid var(--line); border-radius: var(--smd-radius-pill); background: var(--cell); color: var(--ink); font-size: var(--fs-s); font-family: var(--f-ui); }
-  .tchip b { font-weight: 600; margin-left: 4px; }
+  .learn:empty { display: none; }
+  .learn-grp { margin-top: 22px; }
+  .learn-grp .cnt { font-weight: 600; margin-left: 4px; color: var(--muted); }
+  .acc { border: 1px solid var(--line); border-radius: var(--smd-radius-surface); background: var(--cell); margin-bottom: 8px; }
+  .acc > summary { list-style: none; cursor: pointer; min-height: var(--smd-hit-area); padding: 8px 14px; display: flex; align-items: center; gap: 10px; font-family: var(--f-ui); }
+  .acc > summary::-webkit-details-marker { display: none; }
+  .acc > summary::after { content: ""; margin-left: auto; flex: none; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); transition: transform var(--smd-motion-fast, .15s); }
+  .acc[open] > summary::after { transform: rotate(-135deg); }
+  .acc > summary b { font-family: var(--f-zh); font-weight: 500; font-size: var(--fs-m); }
+  .acc > summary span { font-size: var(--fs-s); color: var(--muted); min-width: 0; overflow-wrap: anywhere; }
+  .acc-body { padding: 0 14px 14px; }
+  .acc-body .pn-sec:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+  .wdetail { margin-top: 12px; padding: 12px 14px; border: 1px solid var(--ink); border-radius: var(--smd-radius-surface); background: var(--cell); }
+  .wdetail .wd-head { display: flex; justify-content: flex-end; margin: -4px -6px 0 0; }
+  .wdetail:focus { outline: none; }
   .wrapup { margin-top: 28px; padding-top: 4px; border-top: 1px solid var(--line); }
-  .wpanel { position: fixed; left: 50%; bottom: 0; z-index: 12; width: min(680px, 100%); max-height: 64vh; max-height: 64dvh; transform: translateX(-50%); display: flex; flex-direction: column; background: var(--cell); border: 1px solid var(--line); border-bottom: 0; border-radius: var(--smd-radius-sheet) var(--smd-radius-sheet) 0 0; box-shadow: 0 -8px 40px rgba(0, 0, 0, .16); padding-bottom: env(safe-area-inset-bottom); animation: pnup var(--smd-motion-sheet) ease-out; }
-  @keyframes pnup { from { transform: translate(-50%, 24px); opacity: 0; } }
-  .wp-grab { width: 36px; height: 4px; border-radius: 2px; background: var(--line); margin: 8px auto 0; flex: none; }
-  .wpn-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px 12px 8px 20px; flex: none; }
-  .wpn-body { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 4px 20px 20px; }
-  .wpn-body:focus { outline: none; }
-  body.pn-open .app { padding-bottom: calc(var(--pn-h, 0px) + 24px); }
   .pn-main { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
   .pn-w { display: flex; align-items: center; gap: 8px; min-width: 0; flex-wrap: wrap; }
   .zhline.pn { font-size: 2.25rem; font-weight: 700; }
   .pn-ko { font-family: var(--f-ui); font-size: var(--fs-l); line-height: 1.4; margin-top: 4px; overflow-wrap: anywhere; }
   .pn-ko.none { font-size: var(--fs-s); color: var(--muted); }
   .pn-sec { border-top: 1px solid var(--line); margin-top: 14px; padding-top: 12px; }
-  .pn-sec h4, .wpn-body > h4 { margin: 0 0 6px; font-family: var(--f-ui); font-weight: 600; font-size: var(--fs-s); color: var(--muted); }
-  .wpn-body > h4 { margin-top: 18px; }
-  .pn-chips { display: flex; flex-wrap: wrap; gap: 8px; }
-  .pchip { min-height: var(--smd-hit-area); padding: 4px 12px; border: 1px solid var(--line); border-radius: var(--smd-radius-control); background: none; color: var(--ink); display: inline-flex; align-items: center; gap: 8px; font-family: var(--f-ui); }
-  .pchip b { font-family: var(--f-zh); font-weight: 500; font-size: var(--fs-m); }
-  .pchip span { font-size: var(--fs-s); color: var(--muted); }
-  .pchip.on { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+  .pn-sec h4 { margin: 0 0 6px; font-family: var(--f-ui); font-weight: 600; font-size: var(--fs-s); color: var(--muted); }
 
   /* T23 따라 읽기: 지금 문장 강조(면+왼쪽 막대+밑줄 글자), 하단 조작 줄(재생 72px) */
   .rp-s { position: relative; padding: 14px 14px 14px 18px; margin-bottom: 8px; border: 1px solid var(--line); border-radius: var(--smd-radius-surface); background: var(--cell); }
@@ -777,7 +776,7 @@
       <div id="sentences"></div>
       <div id="onebar" class="onebar hidden"><button class="btn" data-one="-1"><span data-i="back"></span>이전</button><span id="one-n"></span><button class="btn solid" data-one="1">다음<span data-i="arrow"></span></button></div>
       <div id="amb-wrap"><h3 class="sub" id="sec-amb">확인이 필요한 부분</h3><div id="amb"></div></div>
-      <div class="tools" id="tools" role="group" aria-label="학습 도구"></div>
+      <div class="learn" id="tools" role="group" aria-label="학습 도구"></div>
       <section class="wrapup" id="sec-wrap" aria-labelledby="wrap-h">
         <h3 class="sub" id="wrap-h">마무리</h3>
         <p class="hint" id="wrap-count" style="margin:0 0 10px"></p>
@@ -936,15 +935,6 @@
 </div>
 <div id="toast" class="toast hidden" role="status"></div>
 <div id="sbar" class="sbar" aria-hidden="true"><i></i></div>
-
-<div id="wpanel" class="wpanel hidden" role="region" aria-label="단어 설명">
-  <div class="wp-grab" aria-hidden="true"></div>
-  <div class="wpn-head">
-    <div class="seg" role="tablist" aria-label="설명 종류"><button role="tab" id="pn-t-word" data-ptab="word" aria-selected="true">단어</button><button role="tab" id="pn-t-gram" data-ptab="gram" aria-selected="false">문법</button><button role="tab" id="pn-t-extra" data-ptab="extra" aria-selected="false">활용</button></div>
-    <button class="btn icon" data-pclose aria-label="닫기"><span data-i="close"></span></button>
-  </div>
-  <div class="wpn-body" id="wpn-body" tabindex="-1"></div>
-</div>
 
 <div id="wpage" class="wpage hidden" role="dialog" aria-modal="true" aria-label="단어 페이지">
   <div class="wp-in">
@@ -1687,7 +1677,7 @@ function hideWordPage() {
   if (wp.from && document.contains(wp.from)) wp.from.focus({ preventScroll: true });
 }
 function closeWordPage() { if (history.state && history.state.wp) history.back(); else hideWordPage(); }
-window.addEventListener('popstate', () => { if (panelSkip) { panelSkip = false; return; } if (rp.open) hideRead(); else if (wp.open) hideWordPage(); else if (panel) hidePanel(true); else if (rp.open) hideRead(); else if (onResultPage()) showWritePage(true); });
+window.addEventListener('popstate', () => { if (rp.open) hideRead(); else if (wp.open) hideWordPage(); else if (rp.open) hideRead(); else if (onResultPage()) showWritePage(true); });
 function renderWordPage() {
   const w = wp.list[wp.i]; const n = wp.list.length;
   $('wp-save-slot').innerHTML = wpSaveBtn(w);
@@ -1723,9 +1713,10 @@ function loadChars(words) {
   }
   return Promise.all(uniq.filter((w) => !charCache[chKey(w)]).map((w) => charPending.get(chKey(w))).filter(Boolean));
 }
+const kanaLang = (t) => LANG.tgt === 'ja' ? esc(t).replace(/[぀-ヿ一-鿿ー々]+/g, (m) => /[぀-ヿ]/.test(m) ? `<span lang="ja">${m}</span>` : m) : esc(t); // 중국어 설명 속 가나 조각에 lang=ja
 function charsHtml(w, err) {
   const c = charCache[chKey(w.zh)];
-  const tail = c && c.how ? `<div class="chr-how">${esc(c.how)}</div>` : '';
+  const tail = c && c.how ? `<div class="chr-how">${kanaLang(c.how)}</div>` : '';
   const fail = !c && err ? `<div class="chr-how">${esc(err)} <button class="btn" data-charsretry style="min-height:32px;padding:2px 12px;margin-left:6px">${L('다시 불러오기')}</button></div>` : '';
   const kb = (g) => `<div class="chr-k">${g.hun ? `<b>${esc(g.hun)}</b>` : ''}${g.meaning ? `<span>${esc(g.meaning)}</span>` : ''}</div>`;
   const wait = err ? '' : `<div class="chr-k mute">${L('풀이를 불러오는 중…')}</div>`;
@@ -1734,7 +1725,7 @@ function charsHtml(w, err) {
     const kan = [...w.zh].filter((ch) => /[一-鿿々]/.test(ch));
     rows = kan.map((ch, i) => {
       const g = c && c.chars && c.chars[i];
-      return `<div class="chr"><div class="chr-h" lang="${BCP()}">${esc(ch)}</div><div class="chr-b"><div class="chr-py">${esc(g ? g.reading || '' : '')}</div>${g ? kb(g) : wait}</div></div>`;
+      return `<div class="chr"><div class="chr-h" lang="${BCP()}">${esc(ch)}</div><div class="chr-b"><div class="chr-py">${kanaLang(g ? g.reading || '' : '')}</div>${g ? kb(g) : wait}</div></div>`;
     }).join('');
   } else {
     const toks = w.tok || readTokens(w.zh);
@@ -1755,10 +1746,9 @@ function prefetchChars() { const ws = currentVocab.map((v) => v.zh).filter(hasHa
 const wpSaveBtn = (w) => hasWord(w.zh)
   ? `<button class="btn saved" data-wpsave aria-label="${L('단어장에서 빼기')}: ${esc(w.zh)}">${ICON.starFill}<span>${L('저장됨')}</span></button>`
   : `<button class="btn" data-wpsave aria-label="${L('단어장에 저장')}: ${esc(w.zh)}">${ICON.star}<span>${L('단어장')}</span></button>`;
-// ---------- 설명 패널 ----------
-// 문장 속 단어를 누르면 아래에서 설명 패널이 올라온다(단어·문법·활용 탭). 원문과 선택한 문장은 계속 보이고, 패널 안은 자체 스크롤이다.
-let panel = null; // { tab, w, kind, si, k, el } — 열려 있는 동안만 값이 있다
-let panelSkip = false; // 패널을 닫으려고 history.back()을 부른 뒤 popstate를 한 번 무시한다
+// ---------- 단어·문법·활용 이어서 보기 ----------
+// 문장 카드 아래에 핵심 단어 → 문법 → 활용 문장이 이어서 나열되고, 항목을 누르면 그 자리에서 펼쳐진다(아코디언). 문장 속 단어를 누르면 그 문장 안에서 단어 설명이 펼쳐진다.
+let panel = null; // { w, kind, si, k, el, box } — 문장 속 단어 설명이 열려 있는 동안만 값이 있다
 function miniWord(kind, si, k) {
   const { s, words } = unitState(kind)[si]; const w = words[k];
   const v = currentVocab.find((x) => x.zh === w.zh);
@@ -1768,71 +1758,59 @@ const ctxOf = (w) => (w.ctx_zh && w.ctx_i != null ? { zh: w.ctx_zh, i: w.ctx_i }
 const pnSaveBtn = (zh) => hasWord(zh)
   ? `<button class="btn saved" data-msave aria-pressed="true" aria-label="${L('단어장에서 빼기')}: ${esc(zh)}">${ICON.bookmarkFill}<span>${L('저장됨')}</span></button>`
   : `<button class="btn" data-msave aria-pressed="false" aria-label="${L('단어장에 저장')}: ${esc(zh)}">${ICON.bookmark}<span>${L('단어 저장')}</span></button>`;
-function pnWordTab() {
-  const w = panel.w; const gloss = currentVocab.length ? `<h4>${L('핵심 단어')}</h4><div class="pn-chips">${currentVocab.map((v, i) => `<button class="pchip${w && w.zh === v.zh ? ' on' : ''}" data-pv="${i}"><b lang="${BCP()}">${esc(v.zh)}</b><span>${esc(v.ko)}</span></button>`).join('')}</div>` : '';
-  if (!w) return `<p class="hint" style="margin:0 0 12px">${L('문장 속 단어를 누르면 뜻과 발음이 나와요.')}</p>${gloss}`;
+function wordDetailHtml(w) {
   return `<div class="pn-main"><div class="pn-w"><div class="zhline pn" lang="${BCP()}">${w.tok ? cellsFrom(w.tok) : cells(w.zh)}</div>${playBtn(w.zh, '발음 듣기', false, true, '', ctxOf(w))}</div><div class="pn-save">${pnSaveBtn(w.zh)}</div></div>
     <div class="pn-ko ${w.ko ? '' : 'none'}">${w.ko ? esc(w.ko) : L('이 단어의 뜻 정보가 없어요. 발음은 들을 수 있어요.')}</div>
     ${w.check ? `<div class="chknote">${L('읽기를 한 번 더 확인해 보세요 · AI는 「{ai}」, 분석 도구는 「{tool}」로 읽었어요. 문맥에 따라 읽기가 달라지는 단어일 수 있어요.', { ai: esc(w.reading), tool: esc(w.kuro || '?') })}</div>` : ''}
-    ${hasHan(w.zh) ? `<section class="pn-sec chars" id="pn-chars">${charsHtml(w)}</section>` : ''}
+    ${hasHan(w.zh) ? `<section class="pn-sec chars" data-pnchars>${charsHtml(w)}</section>` : ''}
     ${w.ctx_zh ? `<section class="pn-sec"><h4>${L('이 문장에서')}</h4>${zhLine(w.ctx_zh, 'mid', w.zh)}<div class="ex-ko">${esc(w.ctx_ko)}</div><div class="actions">${playBtn(w.ctx_zh, '문장 듣기')}${sentSaveBtn('pctx', w.ctx_zh, true)}</div></section>` : ''}
-    ${w.ex_zh ? `<section class="pn-sec"><h4>${L('관련 예문')}</h4>${zhLine(w.ex_zh, 'mid')}<div class="ex-ko">${esc(w.ex_ko)}</div><div class="actions">${playBtn(w.ex_zh, '예문 듣기')}</div></section>` : ''}
-    ${gloss}`;
+    ${w.ex_zh ? `<section class="pn-sec"><h4>${L('관련 예문')}</h4>${zhLine(w.ex_zh, 'mid')}<div class="ex-ko">${esc(w.ex_ko)}</div><div class="actions">${playBtn(w.ex_zh, '예문 듣기')}</div></section>` : ''}`;
 }
-function pnListTab(kind) {
-  const items = kind === 'g' ? (currentResult.grammar || []) : (currentResult.extra_sentences || []);
-  if (!items.length) return `<p class="hint">${L(kind === 'g' ? '이 일기에는 문법 포인트가 없어요.' : '이 일기에는 활용 문장이 없어요.')}</p>`;
+function fillWordChars(box, w) { // 글자별 풀이: 저장해 둔 것이 있으면 바로, 없으면 서버에서 받아 온다
+  const slot = () => box.isConnected && box.querySelector('[data-pnchars]');
+  if (!hasHan(w.zh) || !slot() || charCache[chKey(w.zh)]) return;
+  loadChars([w.zh]).then(() => { const el = slot(); if (el) el.innerHTML = charsHtml(w, charCache[chKey(w.zh)] ? '' : L('이 단어는 풀이하지 못했어요.')); })
+    .catch((e) => { const el = slot(); if (el) el.innerHTML = charsHtml(w, e.message); });
+}
+const learnItems = (kind) => kind === 'g' ? (currentResult.grammar || []) : (currentResult.extra_sentences || []);
+function learnItemBody(kind, x, i) {
   const state = unitState(kind);
-  const line = (zh, i) => `<div class="zhline mid" lang="${BCP()}">${sentenceHtml(state[i].words, i, kind)}</div>`;
-  return items.map((x, i) => kind === 'g'
-    ? `<section class="pn-sec"><div class="pat" lang="${BCP()}">${esc(x.pattern)}</div><div>${esc(x.explanation_ko)}</div>${x.example_zh ? line(x.example_zh, i) : ''}${x.example_ko ? `<div class="ex-ko maskable">${esc(x.example_ko)}</div>` : ''}<div class="actions">${x.example_zh ? playBtn(x.example_zh) + sentSaveBtn('gram:' + i, x.example_zh, true) : ''}</div></section>`
-    : `<section class="pn-sec"><div class="ko">${esc(x.situation_ko)}</div>${line(x.zh, i)}${x.ko ? `<div class="ex-ko maskable">${esc(x.ko)}</div>` : ''}<div class="actions">${playBtn(x.zh)}${copyBtn(x.zh)}${sentSaveBtn('extra:' + i, x.zh, true)}</div></section>`).join('');
+  const line = () => `<div class="zhline mid" lang="${BCP()}">${sentenceHtml(state[i].words, i, kind)}</div>`;
+  return kind === 'g'
+    ? `<section class="pn-sec"><div>${esc(x.explanation_ko)}</div>${x.example_zh ? line() : ''}${x.example_ko ? `<div class="ex-ko maskable">${esc(x.example_ko)}</div>` : ''}<div class="actions">${x.example_zh ? playBtn(x.example_zh) + sentSaveBtn('gram:' + i, x.example_zh, true) : ''}</div></section>`
+    : `<section class="pn-sec">${line()}${x.ko ? `<div class="ex-ko maskable">${esc(x.ko)}</div>` : ''}<div class="actions">${playBtn(x.zh)}${copyBtn(x.zh)}${sentSaveBtn('extra:' + i, x.zh, true)}</div></section>`;
 }
-function renderPanel() {
+function learnHtml() {
+  const grp = (label, n, rows) => n ? `<section class="learn-grp"><h3 class="sub">${L(label)} <span class="cnt">${n}</span></h3>${rows}</section>` : '';
+  const vocab = currentVocab.map((v, i) => `<details class="acc" data-vi="${i}"><summary><b lang="${BCP()}">${esc(v.zh)}</b><span>${esc(v.ko)}</span></summary><div class="acc-body"></div></details>`).join('');
+  const rows = (kind) => learnItems(kind).map((x, i) => `<details class="acc"><summary>${kind === 'g' ? `<b lang="${BCP()}">${esc(x.pattern)}</b>` : `<span>${esc(x.situation_ko)}</span>`}</summary><div class="acc-body">${learnItemBody(kind, x, i)}</div></details>`).join('');
+  return grp('핵심 단어', currentVocab.length, vocab) + grp('문법 포인트', learnItems('g').length, rows('g')) + grp('활용 문장', learnItems('x').length, rows('x'));
+}
+document.addEventListener('toggle', (e) => { // 항목이 펼쳐질 때: 핵심 단어는 그때 내용을 채우고, 접힐 때는 안에 열린 단어 설명을 닫는다
+  const d = e.target; if (!d.matches || !d.matches('details.acc')) return;
+  if (!d.open) { if (panel && d.contains(panel.box)) hidePanel(true); return; }
+  if (d.dataset.vi == null) return;
+  const body = d.querySelector('.acc-body'); if (body.firstChild) return;
+  const v = currentVocab[Number(d.dataset.vi)]; const w = wordItem(v.zh, v.ko, { ex_zh: v.example_zh || '', ex_ko: v.example_ko || '' });
+  body.innerHTML = wordDetailHtml(w); fillWordChars(body, w);
+}, true);
+function hidePanel(silent) {
   if (!panel) return;
-  ['word', 'gram', 'extra'].forEach((t) => { const b = $('pn-t-' + t); b.setAttribute('aria-selected', String(t === panel.tab)); b.tabIndex = t === panel.tab ? 0 : -1; });
-  $('wpn-body').innerHTML = panel.tab === 'word' ? pnWordTab() : pnListTab(panel.tab === 'gram' ? 'g' : 'x');
-  $('wpn-body').scrollTop = 0;
-  if (panel.tab === 'word' && panel.w && hasHan(panel.w.zh)) fillPanelChars();
-  fitPanel(); setTimeout(() => { if (panel) fitPanel(); }, 450); // 올라오는 동안·풀이가 들어온 뒤의 높이로 한 번 더 맞춘다
+  const { el, box } = panel; el.classList.remove('sel'); box.remove(); panel = null; stopSpeak();
+  if (!silent && document.contains(el)) el.focus({ preventScroll: true });
 }
-function fillPanelChars() { // 글자별 풀이: 저장해 둔 것이 있으면 바로, 없으면 서버에서 받아 온다
-  const w = panel.w; if (!w || charCache[chKey(w.zh)]) return;
-  const same = () => panel && panel.w === w && $('pn-chars');
-  loadChars([w.zh]).then(() => { if (same()) $('pn-chars').innerHTML = charsHtml(w, charCache[chKey(w.zh)] ? '' : L('이 단어는 풀이하지 못했어요.')); })
-    .catch((e) => { if (same()) $('pn-chars').innerHTML = charsHtml(w, e.message); });
-}
-function fitPanel() { // 패널 높이만큼 본문 아래를 비우고, 선택한 문장(안 들어가면 선택한 단어)이 패널에 가리면 위로 밀어 올린다
-  const box = $('wpanel'); document.documentElement.style.setProperty('--pn-h', box.offsetHeight + 'px'); document.body.classList.add('pn-open');
-  const el = panel && panel.el; if (!el || !document.contains(el) || el.closest('#wpanel')) return;
-  const top = box.getBoundingClientRect().top, bar = ($('app-bar') || document.querySelector('header.top'))?.getBoundingClientRect().bottom || 0;
-  const card = el.closest('.cardx'); const cr = card && card.getBoundingClientRect();
-  const target = cr && cr.height <= top - bar - 24 ? cr : el.getBoundingClientRect();
-  const gap = target.bottom - top;
-  if (gap > -12) window.scrollBy({ top: gap + 16, behavior: 'smooth' });
-}
-if (typeof ResizeObserver !== 'undefined') new ResizeObserver(() => { if (panel) fitPanel(); }).observe($('wpanel'));
-function openPanel(init) { // init: { tab, w?, kind?, si?, k?, el? }
-  const wasOpen = !!panel;
-  panel?.el?.classList.remove('sel');
-  panel = { tab: 'word', w: null, kind: 's', si: 0, k: 0, el: null, ...init };
-  panel.el?.classList.add('sel');
-  $('wpanel').classList.remove('hidden');
-  if (!wasOpen) history.pushState({ pn: 1 }, '');
-  renderPanel();
-}
-function hidePanel(fromPop) {
-  if (!panel) return;
-  const el = panel.el; el?.classList.remove('sel'); panel = null; stopSpeak();
-  $('wpanel').classList.add('hidden'); document.body.classList.remove('pn-open');
-  if (!fromPop && history.state && history.state.pn) { panelSkip = true; history.back(); }
-  if (el && document.contains(el)) el.focus({ preventScroll: true });
-}
-function showMini(kind, si, k, el) { // 문장 속 단어 누르기 → 단어 탭
-  if (panel && panel.el === el && panel.tab === 'word') return hidePanel(); // 같은 단어를 다시 누르면 닫는다
-  stopSpeak();
-  openPanel({ tab: 'word', w: miniWord(kind, si, k), kind, si, k, el });
-  $('wpn-body').querySelector('.pn-w .play')?.click(); // 누르면 발음을 바로 들려 준다
+function showMini(kind, si, k, el) { // 문장 속 단어 누르기 → 그 문장 안에서 단어 설명이 펼쳐진다
+  if (panel && panel.el === el) return hidePanel(); // 같은 단어를 다시 누르면 접는다
+  stopSpeak(); hidePanel(true);
+  const host = el.closest('.cardx, .acc-body'); if (!host) return;
+  const w = miniWord(kind, si, k);
+  const box = document.createElement('div'); box.className = 'wdetail'; box.tabIndex = -1; box.setAttribute('role', 'region'); box.setAttribute('aria-label', L('단어 설명'));
+  box.innerHTML = `<div class="wd-head"><button class="btn icon" data-pclose aria-label="${L('닫기')}"><span data-i="close"></span></button></div>${wordDetailHtml(w)}`;
+  box.querySelectorAll('[data-i]').forEach((n) => { n.innerHTML = ICON[n.dataset.i] || ''; });
+  host.appendChild(box); el.classList.add('sel'); panel = { w, kind, si, k, el, box };
+  box.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+  fillWordChars(box, w);
+  box.querySelector('.pn-w .play')?.click(); // 누르면 발음을 바로 들려 준다
 }
 const hideMini = hidePanel;
 const vocabItems = () => currentVocab.map((v) => wordItem(v.zh, v.ko, { ex_zh: v.example_zh || '', ex_ko: v.example_ko || '' }));
@@ -1880,9 +1858,7 @@ function render(r, isMock) {
   const unit = (zh, ko) => (zh ? { s: { zh, ko: ko || '' }, words: wordsOf({ zh }, gloss) } : null);
   gramState = (r.grammar || []).map((g) => unit(g.example_zh, g.example_ko));
   extraState = (r.extra_sentences || []).map((x) => unit(x.zh, x.ko));
-  const nG = (r.grammar || []).length, nX = (r.extra_sentences || []).length;
-  $('tools').innerHTML = [['word', '핵심 단어', currentVocab.length], ['gram', '문법 포인트', nG], ['extra', '활용 문장', nX]].filter((t) => t[2])
-    .map(([t, label, n]) => `<button class="tchip" data-ptool="${t}">${L(label)} <b>${n}</b></button>`).join('');
+  $('tools').innerHTML = learnHtml();
   $('tools').classList.toggle('hidden', !$('tools').children.length);
 
   // 문장에 붙지 않은 확인 사항만 아래 목록에 둔다(붙은 것은 문장 옆 '확인 필요')
@@ -1902,13 +1878,13 @@ document.addEventListener('click', (e) => {
   const wd = e.target.closest('.wd'); if (wd) return showMini(wd.dataset.kind || 's', Number(wd.dataset.s), Number(wd.dataset.k), wd);
   if (e.target.closest('[data-charsretry]')) { const w = wp.list[wp.i]; if (w && $('wp-chars')) { $('wp-chars').innerHTML = charsHtml(w); fillChars(); } return; }
   if (e.target.closest('[data-pclose]')) return hidePanel();
-  const pt = e.target.closest('[data-ptab]'); if (pt && panel) { panel.tab = pt.dataset.ptab; return renderPanel(); }
-  const tool = e.target.closest('[data-ptool]'); if (tool) return openPanel({ tab: tool.dataset.ptool });
-  const pv = e.target.closest('[data-pv]');
-  if (pv && panel) { const v = currentVocab[Number(pv.dataset.pv)]; panel.el?.classList.remove('sel'); panel.el = null; panel.tab = 'word'; panel.w = wordItem(v.zh, v.ko, { ex_zh: v.example_zh || '', ex_ko: v.example_ko || '' }); renderPanel(); return; }
-  if (e.target.closest('[data-msave]') && panel && panel.w) {
-    const w = panel.w; addOrRemoveWord({ zh: w.zh, ko: w.ko || L('(뜻 미확인)'), ex_zh: w.ctx_zh || w.ex_zh, ex_ko: w.ctx_zh ? w.ctx_ko : w.ex_ko });
-    e.target.closest('[data-msave]').outerHTML = pnSaveBtn(w.zh); refreshSaveButtons(); return;
+  const ms = e.target.closest('[data-msave]');
+  if (ms) { // 단어 설명의 저장 단추: 문장 속 단어(panel) 또는 핵심 단어 항목
+    const acc = ms.closest('details[data-vi]'); const v = acc && currentVocab[Number(acc.dataset.vi)];
+    const w = acc && v ? wordItem(v.zh, v.ko, { ex_zh: v.example_zh || '', ex_ko: v.example_ko || '' }) : panel && panel.w;
+    if (!w) return;
+    addOrRemoveWord({ zh: w.zh, ko: w.ko || L('(뜻 미확인)'), ex_zh: w.ctx_zh || w.ex_zh, ex_ko: w.ctx_zh ? w.ctx_ko : w.ex_ko });
+    ms.outerHTML = pnSaveBtn(w.zh); refreshSaveButtons(); return;
   }
   const vw = e.target.closest('[data-vw]'); if (vw) return openWord(vocabItems(), Number(vw.dataset.vw), vw);
   const wo = e.target.closest('[data-wopen]'); if (wo) return openWord(wordbookItems(), Number(wo.dataset.wopen), wo);
@@ -2771,12 +2747,12 @@ function showResultPage() {
 }
 function showWritePage(fromPop) {
   if (!onResultPage()) return;
-  stopSpeak(); const hadPn = !!(panel && history.state && history.state.pn); hidePanel(true);
+  stopSpeak(); hidePanel(true);
   if (coach.active) { store.set(HINT_KEY, '1'); coachFinish(false); }
   appEl.classList.remove('show-result');
   const el = $('v-write'); el.classList.remove('pg-back'); void el.offsetWidth; el.classList.add('pg-back');
   window.scrollTo(0, 0); setTabs();
-  if (!fromPop && history.state && (history.state.rv || hadPn)) history.go(hadPn ? -2 : -1);
+  if (!fromPop && history.state && history.state.rv) history.go(-1);
 }
 function showResult() { showResultPage(); }
 $('hdr-back').addEventListener('click', () => { showWritePage(); $('diary').focus({ preventScroll: true }); });
