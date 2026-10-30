@@ -71,6 +71,7 @@
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
   @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition-duration: 0.01ms !important; } } /* 진행 막대·페이드 등 남은 전환도 끈다 */
   body { margin: 0; background: var(--desk); color: var(--ink); line-height: 1.7; font-family: var(--f-ui); font-size: var(--fs-m); }
   body.noscroll { overflow: hidden; }
   .hidden { display: none !important; }
@@ -1875,8 +1876,8 @@ function moreBlock(s) {
 }
 const normAmb = (r) => (r.ambiguities || []).map((a) => (typeof a === 'string' ? { n: 0, text: a } : { n: Number(a.n) || 0, text: String(a.text || '') })).filter((a) => a.text);
 const saveBtn = (i, zh, compact = false) => hasWord(zh)
-  ? `<button class="btn saved${compact ? ' icon' : ''}" data-save="${i}" aria-label="${L('단어장에서 빼기')}: ${esc(zh)}">${ICON.starFill}${compact ? '' : `<span>${L('저장됨')}</span>`}</button>`
-  : `<button class="btn${compact ? ' icon' : ''}" data-save="${i}" aria-label="${L('단어장에 저장')}: ${esc(zh)}">${ICON.star}${compact ? '' : `<span>${L('단어장')}</span>`}</button>`;
+  ? `<button class="btn saved${compact ? ' icon' : ''}" data-save="${i}" aria-pressed="true" aria-label="${L('단어장에서 빼기')}: ${esc(zh)}">${ICON.starFill}${compact ? '' : `<span>${L('저장됨')}</span>`}</button>`
+  : `<button class="btn${compact ? ' icon' : ''}" data-save="${i}" aria-pressed="false" aria-label="${L('단어장에 저장')}: ${esc(zh)}">${ICON.star}${compact ? '' : `<span>${L('단어장')}</span>`}</button>`;
 const pad2 = (n) => String(n).padStart(2, '0');
 
 function render(r, isMock) {
