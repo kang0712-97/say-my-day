@@ -19,7 +19,7 @@
 4. 코드는 필요한 부분만 `grep`으로 찾아 읽는다(`app/public/index.html` 약 3100줄, `app/server.js` 약 520줄 — 통째로 읽지 말 것)
 
 ## 현재 상태 (2026-10-30)
-- **그림일기 개편(T19~T28) 로컬 완료, 아직 배포 전.** 배포본(`04eecfe`)보다 로컬 커밋이 25개 앞선다. 배포는 사용자 승인 후에만(승인 요청서: `design/release-request.md`). `npm test` 7단계 전부 통과.
+- **그림일기 개편(T19~T28) 로컬 완료, 아직 배포 전.** 사용 피드백 후속 카드 T29~T34 대기(현황판 참고). 배포본(`04eecfe`)보다 로컬 커밋이 25개 앞선다. 배포는 사용자 승인 후에만(승인 요청서: `design/release-request.md`). `npm test` 7단계 전부 통과.
 - **배포 사이트:** https://chinese-diary.onrender.com (Render 무료 플랜, GitHub 비공개 저장소 `kang0712-97/chinese-diary`, main에 push하면 자동 배포). 공개 모드(`PUBLIC_MODE=1`): 일기는 서버에 저장하지 않고 각자 브라우저에만, 번역 1인 시간당 10회·하루 100회, 글자 풀이 시간당 60회, 음성 새로 만들기 시간당 800회.
 - **로컬:** `cd app && node server.js` → http://localhost:3000 (실제 사용자 데이터가 `data/userdata.json`에 저장됨)
 - 마지막 배포 = `04eecfe`(2026-10-28, 사용자 승인 후 push. M3 일본어 + T1~T10 + 휴대폰 확인 수정. 새 문구·`/healthz`·중국어 글자 풀이 응답 확인, Render 빌드 로그·메모리는 대시보드에서 못 봄).
