@@ -1,5 +1,5 @@
 # T25 일기장·설정·데이터
-상태: 대기
+상태: 진행 중
 근거: `design/redesign-plan.md`(읽고 시작), `/say-my-day-design` 스킬 절차, DESIGN.md '일기장·설정과 데이터', 보드 04(가운데·오른쪽), `design/tasks/T12`·`T14`
 
 ## 할 일
