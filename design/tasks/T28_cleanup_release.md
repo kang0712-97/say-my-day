@@ -1,5 +1,5 @@
 # T28 정리·배포 준비
-상태: 대기
+상태: 완료(승인 대기: 배포는 사용자 승인 후)
 근거: `design/redesign-plan.md`(읽고 시작), `/say-my-day-design` 스킬 절차, `CLAUDE.md` 배포 규칙, `design/ops.md`
 
 ## 할 일
@@ -19,4 +19,4 @@
 추가: `git diff origin/main | grep -E "sk-ant-|AIza"` 0건.
 
 ## 결과
-(끝나면 한 줄 요약+수치)
+죽은 CSS 21줄·함수 2개 제거(백업 v43), `npm test` 7단계 전부 통과, 키 노출 0건, CLAUDE.md 현재 상태 갱신, 배포 승인 요청서 `design/release-request.md` 작성. push 안 함. 스크린샷 보드 비교는 재실시 안 함(화면 변화 없음).
