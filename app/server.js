@@ -475,7 +475,7 @@ function makeSpeech(text, voice, rate, needTiming = false) {
 // 쓰기 전에 직전 파일을 userdata.json.bak 으로 남긴다. 키마다 마지막 수정 시각(at)을 같이 저장해 더 최근 것을 따른다.
 const DATA_DIR = process.env.CHINESE_DIARY_DATA_DIR || path.join(ROOT, '..', 'data');
 const DATA_FILE = path.join(DATA_DIR, 'userdata.json');
-const DATA_KEYS = new Set(['diary-history', 'wordbook', 'sentbook', 'activity', 'glossary']);
+const DATA_KEYS = new Set(['diary-history', 'wordbook', 'sentbook', 'activity', 'glossary', 'speak-log']);
 const DATA_LIMIT = 8 * 1024 * 1024;
 function readData() {
   try { const d = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8')); return d && d.keys ? d : { keys: {} }; } catch { return { keys: {} }; }
