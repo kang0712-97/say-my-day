@@ -479,8 +479,13 @@
   header.top .logo { margin-right: auto; min-height: var(--smd-hit-area); padding: 0; background: none; border: 0; color: var(--ink); font: 800 1.35rem/1 var(--f-ui); letter-spacing: -.02em; text-align: left; }
   .topnav { display: flex; align-items: center; gap: 2px; }
   header.top .logo, .tlink { white-space: nowrap; }
-  @media (max-width: 380px) { header.top .logo { font-size: 1.125rem; } .tlink { padding: 0 4px; } }
-  @media (max-width: 340px) { header.top { padding-left: 8px; } .app.show-result header.top { padding-left: 0; } header.top .logo { font-size: 1rem; } .tlink { padding: 0 2px; gap: 2px; } }
+  .wm { display: block; width: auto; }
+  .wm-eyebrow { height: 24px; margin: 0 0 12px; }
+  header.top .logo .wm { height: 25px; }
+  :root[data-theme="dark"] .wm { filter: invert(1); }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .wm { filter: invert(1); } }
+  @media (max-width: 380px) { header.top .logo .wm { height: 22px; } .tlink { padding: 4px 4px; } }
+  @media (max-width: 340px) { header.top { padding-left: 8px; } .app.show-result header.top { padding-left: 0; } header.top .logo .wm { height: 20px; } .tlink { padding: 4px 2px; min-width: 48px; } }
   .tlink { position: relative; display: inline-flex; flex-direction: column; justify-content: center; align-items: center; gap: 2px; min-width: 52px; min-height: var(--smd-hit-area); padding: 4px 6px; background: none; border: 0; border-radius: var(--smd-radius-control); color: var(--ink); font: 500 var(--fs-s) var(--f-ui); }
   .tlink[aria-expanded="true"], #menu-btn[aria-expanded="true"] { background: var(--smd-surface-muted); }
   .tlink .tl-ic svg { display: block; width: 22px; height: 22px; }
@@ -656,6 +661,19 @@
   .ln-ex .tl { display: flex; align-items: flex-start; gap: 12px; }
   .ln-ex .tl .zhline { flex: 1; min-width: 0; }
   .ln-skip { display: block; margin: 16px auto 0; min-height: 44px; background: none; border-color: transparent; color: var(--muted); text-decoration: underline; }
+  /* 인트로(T46): 새가 튀어나오고 글자가 쓰이고 깃털이 내려앉는다. 항상 흰 바탕·검은 글씨(브랜드 화면) */
+  .splash { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; background: #FFFFFF; color: #111111; transition: opacity .45s ease; }
+  .splash.hidden { display: none; }
+  .splash.out { opacity: 0; pointer-events: none; }
+  .sp-in { position: relative; display: flex; flex-direction: column; align-items: center; gap: 24px; padding: 24px; }
+  .sp-bird { width: min(52vw, 220px); height: auto; animation: spbird .9s cubic-bezier(.2, .9, .3, 1.2) .15s both; }
+  .sp-wm img { display: block; width: min(64vw, 280px); height: auto; clip-path: inset(0 100% 0 0); animation: spwrite 1s ease-in-out .8s forwards; }
+  .sp-feather { position: absolute; right: 6%; top: 8%; width: 36px; height: 36px; opacity: 0; color: #111111; animation: spfeather 1.7s ease-in-out .6s both; }
+  .sp-feather svg { display: block; width: 100%; height: 100%; }
+  @keyframes spbird { 0% { opacity: 0; transform: translateY(44px) scale(.85); } 60% { opacity: 1; transform: translateY(-14px) scale(1.04); } 100% { opacity: 1; transform: none; } }
+  @keyframes spwrite { to { clip-path: inset(0 0 0 0); } }
+  @keyframes spfeather { 0% { opacity: 0; transform: translate(30px, -40px) rotate(-30deg); } 25% { opacity: 1; } 60% { transform: translate(-6px, 140px) rotate(22deg); } 100% { opacity: 0; transform: translate(-34px, 200px) rotate(-12deg); } }
+  @media (prefers-reduced-motion: reduce) { .sp-bird, .sp-wm img { animation: none; clip-path: none; opacity: 1; } .sp-feather { display: none; } }
   /* 첫 화면(T40b): 새가 먼저, 아래에 일기 쓰기 버튼. 언어 표시는 위에 작게 */
   .app:not(.show-nest) #v-nest { display: none; }
   .app.show-nest #v-write, .app.show-nest #result { display: none; }
@@ -1107,7 +1125,7 @@
 <div class="app show-nest">
   <header class="top">
     <button class="hdr-back" id="hdr-back" aria-label="일기 쓰기 화면으로 돌아가기"><span data-i="back"></span></button>
-    <button class="logo" id="tab-write" aria-label="Say My Day">say my day</button>
+    <button class="logo" id="tab-write" aria-label="Say My Day"><img class="wm" src="/img/brand/wordmark.webp" width="128" height="25" alt=""></button>
     <nav class="topnav" aria-label="메뉴">
       <button class="tlink" id="tab-hist" aria-expanded="false" aria-controls="sheet"><span class="tl-ic" data-i="diary"></span><span class="tl-t">일기장</span><span class="dot hidden" id="n-hist">0</span></button>
       <button class="tlink" id="tab-word" aria-expanded="false" aria-controls="sheet"><span class="tl-ic" data-i="scrap"></span><span class="tl-t">보관함</span><span class="dot hidden" id="n-due"></span></button>
@@ -1324,7 +1342,7 @@
     <button class="intro-skip" id="intro-skip" data-t="intro.skip">건너뛰기</button>
     <div class="intro-slides" id="intro-slides">
       <section class="slide on" aria-label="1 / 3">
-        <p class="eyebrow">Say My Day</p>
+        <img class="wm wm-eyebrow" src="/img/brand/wordmark.webp" width="120" height="24" alt="Say My Day">
         <h2 id="intro-t0">어떤 말로 내 하루를 말해 볼까요?<br><em lang="zh-CN">用哪种语言说说你的一天？</em></h2>
         <h3 class="lp-h">일기를 쓰는 말 · <span lang="zh-CN">写日记的语言</span></h3><div class="lp-grid" id="lp-src" role="radiogroup" aria-label="일기를 쓰는 말 / 写日记的语言"></div>
         <h3 class="lp-h" id="lp-th"></h3><div class="lp-grid" id="lp-tgt" role="radiogroup" aria-label="배우고 싶은 말 / 想学的语言"></div>
@@ -1332,7 +1350,7 @@
       </section>
       <section class="slide" aria-label="2 / 3" aria-hidden="true">
         <div class="intro-bird"><img class="bird" data-bird="hello" width="200" height="200" alt="" decoding="async"></div>
-        <p class="eyebrow" data-t="intro.hello.eyebrow">Say My Day</p>
+        <img class="wm wm-eyebrow" src="/img/brand/wordmark.webp" width="120" height="24" alt="Say My Day">
         <h2 data-th="intro.hello.h">오늘 하루 어땠나요?<br><em>내 이야기를 외국어로 말해봐요.</em></h2>
         <p class="small" data-th="intro.hello.p">내 하루를 일기로 쓰면, 그게 오늘 배울 문장이 돼요.<br>새로운 언어를 내 일상으로 만들 때까지.</p>
       </section>
@@ -1426,6 +1444,13 @@
 
 <div id="share" class="overlay hidden" role="dialog" aria-modal="true" aria-label="공유 카드"></div>
 <div id="quiz" class="overlay hidden" role="dialog" aria-modal="true" aria-label="카드 퀴즈"></div>
+<div id="splash" class="splash hidden" role="img" aria-label="Say My Day">
+  <div class="sp-in">
+    <img class="sp-bird" src="/img/brand/bird.webp" width="220" height="203" alt="">
+    <div class="sp-wm"><img src="/img/brand/wordmark.webp" width="280" height="55" alt=""></div>
+    <span class="sp-feather" aria-hidden="true" data-i="feather"></span>
+  </div>
+</div>
 <div id="finish" class="overlay fin hidden" role="dialog" aria-modal="true" aria-label="공부 마무리"></div>
 <div id="learn" class="learn-ov hidden" role="dialog" aria-modal="true" aria-label="카드로 학습">
   <div class="ln-top">
@@ -4368,6 +4393,16 @@ document.addEventListener('keydown', (e) => {
 { let x0 = null; const el = $('intro');
   el.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
   el.addEventListener('touchend', (e) => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (intro.pickerOnly || Math.abs(dx) <= 50) return; const to = intro.i + (dx < 0 ? 1 : -1); if (!(intro.i === 0 && dx < 0)) introShow(to); }, { passive: true }); }
+// 앱을 열 때 브라우저 세션마다 한 번 인트로가 나온다. 탭하면 건너뛰고, 움직임 줄이기에서는 짧게. 시험·개발에서는 localStorage splash-off로 끈다.
+function playSplash() {
+  const el = $('splash'), app = document.querySelector('.app');
+  el.classList.remove('out', 'hidden'); app.inert = true;
+  const done = () => { if (el.classList.contains('out')) return; el.classList.add('out'); app.inert = false; setTimeout(() => el.classList.add('hidden'), 480); };
+  el.onclick = done; setTimeout(done, matchMedia('(prefers-reduced-motion: reduce)').matches ? 900 : 2600);
+}
+{ let seen = false;
+  try { seen = !!(sessionStorage.getItem('smd-splash') || localStorage.getItem('splash-off')); sessionStorage.setItem('smd-splash', '1'); } catch {}
+  if (!seen) playSplash(); }
 paintBirds();
 if (!store.get('intro-seen', '')) introOpen();
 setUI(LANG.src); zhStatic();
