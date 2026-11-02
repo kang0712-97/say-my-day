@@ -30,3 +30,23 @@ Use recorded application facts. Narrative examples and product interpretation ca
 ## Write boundary
 All new files stay inside submission/slides/. Old files and source images/videos remain untouched.
 
+## THESIS
+My own diary becomes language-learning material. The first audience must know the material, the learner's action, and the accumulated result before hearing implementation details.
+
+## OWN-WORLD
+Inherit the app's real bird and wordmark, quiet ruled diary paper, and clear ink typography. Authored sample diary sentences are visibly illustrative, never measurement data. Screenshots and video are actual product evidence.
+
+## STORY
+Slides 1–4: value, problem, whole journey, actual demonstration. Slides 5–8: priority, tradeoff, return hypothesis, balanced measurement. Slides 9–11: product AI prompt, development AI rules and skills, actual incidents. Slide 12: limitations and next validation. Slides 13–14: optional links and original evidence.
+
+## FIRST VIEWPORT
+A visitor can identify the product as a diary-based language learning app from the headline and two-line explanation. The real bird carries its notebook beside an authored diary page. The primary button leads to the usage loop; ordinary next-slide navigation still visits the problem.
+
+## FORM
+Code-led HTML document, 1600×900 desktop stage, 12 main pages plus 2 appendices. Mobile becomes readable vertical pages instead of a scaled miniature. Signature behaviors are journey selection, scene-linked video, before/after, prompt timeline and case details. Native video controls, keyboard navigation, reduced motion, notes and page-per-slide printing remain available.
+
+Actual concept-seed reference printed by the tool: seed:9d7e49ffc28d813b. Scope surface, mode persuade. The service was unreachable and no catalog challenger or catalog QUALITY BAR board was provided. This reference is provenance, not evidence of a user selection or full external roll. The user explicitly delegated visual/layout decisions and pinned the option to inherit the app concept; no new palette workshop was presented as approved. The document was built code-first from those instructions.
+
+## Quality calibration
+See QUALITY_BAR.md for the explicitly authored internal reference bar; it is not represented as a catalog challenger board.
+

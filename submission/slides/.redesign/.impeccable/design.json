@@ -1,0 +1,128 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-02T20:43:39.875Z",
+  "title": "Design System: Say My Day Presentation",
+  "extensions": {
+    "shadows": [
+      {
+        "name": "diary-sheet",
+        "value": "12px 18px 35px -25px #686b5b",
+        "purpose": "Cover's rotated material sheet only."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease",
+        "value": "cubic-bezier(.16,1,.3,1)",
+        "purpose": "Page entrance and chart fill."
+      },
+      {
+        "name": "page-in",
+        "value": ".38s",
+        "purpose": "Opacity .65 to 1 and translateY(10px) to zero."
+      },
+      {
+        "name": "bar-in",
+        "value": ".65s",
+        "purpose": "Metric fill from zero to the supplied fill."
+      },
+      {
+        "name": "primary-hover",
+        "value": ".18s",
+        "purpose": "Background and transform transition."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "mobile",
+        "value": "760px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink action used on paper.",
+      "html": "<button class=\"ds-primary\">어떤 앱인지 보기</button>",
+      "css": ".ds-primary{font-family:var(--font,Day,-apple-system,\"Apple SD Gothic Neo\",sans-serif);background:var(--ink,#171918);color:#fff;border:1px solid var(--ink,#171918);padding:17px 24px;border-radius:12px;font-size:24px;font-weight:650;min-height:62px;cursor:pointer;transition:background .18s,transform .18s}.ds-primary:hover{background:#3e4638;transform:translateY(-2px)}.ds-primary:disabled{opacity:.3;cursor:default}.ds-primary:focus-visible,.ds-text:focus-visible,.ds-tabs button:focus-visible,.ds-segment button:focus-visible,.ds-select:focus-visible,.ds-nav button:focus-visible{outline:3px solid #69785e;outline-offset:5px}"
+    },
+    {
+      "name": "Text Action",
+      "kind": "button",
+      "refersTo": "button-text",
+      "description": "Quiet underlined action.",
+      "html": "<button class=\"ds-text\">기록 원문 보기</button>",
+      "css": ".ds-text{font-family:var(--font,Day,-apple-system,\"Apple SD Gothic Neo\",sans-serif);background:transparent;color:var(--ink,#171918);border:0;border-bottom:1px solid currentColor;padding:12px 0;font-size:24px;font-weight:650;cursor:pointer}.ds-text:hover{opacity:.65}.ds-primary:focus-visible,.ds-text:focus-visible,.ds-tabs button:focus-visible,.ds-segment button:focus-visible,.ds-select:focus-visible,.ds-nav button:focus-visible{outline:3px solid #69785e;outline-offset:5px}"
+    },
+    {
+      "name": "Journey Tabs",
+      "kind": "nav",
+      "description": "Static visual excerpt of selected journey tabs; runtime supplies tab interaction.",
+      "html": "<div class=\"ds-tabs\"><button aria-selected=\"true\">쓰기</button><button aria-selected=\"false\">학습</button><button aria-selected=\"false\">쌓기</button></div>",
+      "css": ".ds-tabs{display:flex;border-bottom:1px solid var(--line,#d3d4cc);gap:0}.ds-tabs button{font-family:var(--font,Day,-apple-system,\"Apple SD Gothic Neo\",sans-serif);border:0;background:transparent;color:var(--muted,#62675f);font-size:25px;font-weight:650;padding:13px 24px 17px;position:relative;min-height:60px;cursor:pointer;transition:color .18s}.ds-tabs button:first-child{padding-left:0}.ds-tabs button[aria-selected=true]{color:var(--ink,#171918)}.ds-tabs button[aria-selected=true]:after{content:\"\";position:absolute;height:3px;background:var(--ink,#171918);left:20px;right:20px;bottom:-2px}.ds-tabs button:first-child[aria-selected=true]:after{left:0}.ds-tabs button:hover{color:#111}.ds-primary:focus-visible,.ds-text:focus-visible,.ds-tabs button:focus-visible,.ds-segment button:focus-visible,.ds-select:focus-visible,.ds-nav button:focus-visible{outline:3px solid #69785e;outline-offset:5px}"
+    },
+    {
+      "name": "Before and After Selector",
+      "kind": "button",
+      "refersTo": "segmented-active",
+      "description": "Static visual excerpt of an ink-selected comparison control.",
+      "html": "<div class=\"ds-segment\"><button aria-pressed=\"false\">이전</button><button aria-pressed=\"true\">현재</button></div>",
+      "css": ".ds-segment{display:inline-flex;gap:6px;background:var(--soft,#eeeee8);padding:6px;border-radius:12px}.ds-segment button{font-family:var(--font,Day,-apple-system,\"Apple SD Gothic Neo\",sans-serif);font-size:23px;font-weight:600;padding:12px 24px;border-radius:8px;color:var(--muted,#62675f);border:0;background:transparent;cursor:pointer}.ds-segment button[aria-pressed=true]{color:#fff;background:var(--ink,#171918)}.ds-primary:focus-visible,.ds-text:focus-visible,.ds-tabs button:focus-visible,.ds-segment button:focus-visible,.ds-select:focus-visible,.ds-nav button:focus-visible{outline:3px solid #69785e;outline-offset:5px}"
+    },
+    {
+      "name": "Record Select",
+      "kind": "input",
+      "refersTo": "record-select",
+      "description": "Native menu for choosing an evidence record.",
+      "html": "<select class=\"ds-select\" aria-label=\"기록 선택\"><option>프롬프트 기록</option><option>사건 기록</option></select>",
+      "css": ".ds-select{font-family:var(--font,Day,-apple-system,\"Apple SD Gothic Neo\",sans-serif);font-size:22px;border:1px solid var(--line,#d3d4cc);border-radius:8px;background:var(--warm,#f5f4ee);color:var(--ink,#171918);padding:10px 16px;max-width:100%;min-width:280px}.ds-primary:focus-visible,.ds-text:focus-visible,.ds-tabs button:focus-visible,.ds-segment button:focus-visible,.ds-select:focus-visible,.ds-nav button:focus-visible{outline:3px solid #69785e;outline-offset:5px}"
+    },
+    {
+      "name": "Presentation Navigation",
+      "kind": "nav",
+      "description": "Excerpt of the fixed navigation strip.",
+      "html": "<nav class=\"ds-nav\"><button disabled aria-label=\"이전\">이전</button><span>1 / 14</span><button>다음</button><button>목차</button><button>대본</button></nav>",
+      "css": ".ds-nav{font-family:var(--font,Day,-apple-system,\"Apple SD Gothic Neo\",sans-serif);display:flex;align-items:center;gap:16px;padding:0 28px;height:64px;background:#fff;color:var(--ink,#171918);border-top:1px solid var(--line,#d3d4cc)}.ds-nav button{font:inherit;font-size:16px;min-height:40px;padding:8px 14px;border-radius:8px;border:0;background:transparent;cursor:pointer}.ds-nav button:hover{background:var(--soft,#eeeee8)}.ds-nav button:disabled{opacity:.3;cursor:default}.ds-nav span{font-size:17px;font-variant-numeric:tabular-nums;min-width:76px;text-align:center}.ds-primary:focus-visible,.ds-text:focus-visible,.ds-tabs button:focus-visible,.ds-segment button:focus-visible,.ds-select:focus-visible,.ds-nav button:focus-visible{outline:3px solid #69785e;outline-offset:5px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Illustrated Diary",
+    "overview": "This is a presentation-scoped record of the built Say My Day HTML deck. Its warm paper, actual wordmark and notebook-carrying bird inherit the application's identity. These rules apply inside this presentation and do not establish or change the application's global system.\n\nLarge Korean statements, quiet source lines and actual product captures share a mostly flat paper surface. The demonstration and prompt narrative use dark surfaces. The illustrated diary supplies material warmth; controls remain compact and legible.",
+    "keyCharacteristics": [
+      "Warm paper and near-black ink.",
+      "Locally hosted Pretendard with large Korean headings.",
+      "Thin rules, selected-state ink and inspectable product evidence.",
+      "A fitted desktop stage that becomes a scrolling mobile page."
+    ],
+    "rules": [
+      {
+        "name": "The Surface Contrast Rule",
+        "body": "Preserve the implemented light text on dark narrative surfaces and ink text on paper; dark sections are whole surfaces, not colored text accents.",
+        "section": "colors"
+      },
+      {
+        "name": "The Korean Word Rule",
+        "body": "At the mobile breakpoint, Korean headings and prose keep words intact. Table cells, code and source lines may wrap anywhere; Chinese language spans use normal word breaking with overflow wrapping.",
+        "section": "typography"
+      },
+      {
+        "name": "The Reading Flow Rule",
+        "body": "Mobile is an active slide with vertical reading flow, never a miniature desktop canvas.",
+        "section": "layout"
+      }
+    ],
+    "dos": [
+      "Do retain the actual wordmark, bird and original product captures.",
+      "Do preserve selected, disabled and visible keyboard-focus states.",
+      "Do use normal mobile reading flow and keep Korean words intact.",
+      "Do keep these rules scoped to this presentation."
+    ],
+    "donts": [
+      "Don't stretch portrait product evidence to fill a desktop column.",
+      "Don't apply the diary sheet's rotation and shadow to ordinary controls or evidence tables.",
+      "Don't treat a sampled contextual type size as a mandatory size for every paragraph."
+    ]
+  }
+}
