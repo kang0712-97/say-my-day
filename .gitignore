@@ -8,3 +8,6 @@ prompts/user_glossary.md
 node_modules/
 # 디자인 제작 자료 묶음(이미지·압축 파일·카탈로그, 수백 MB): 배포 저장소에 올리지 않는다
 design-*/
+# 사용자 원본 캡처·영상(개인 이름 포함, 용량 큼): 저장소에 올리지 않는다
+old/
+*.mp4
