@@ -16,8 +16,8 @@
 
 ## 이미지·영상 쓰는 법
 - 이미지는 `submission/images/` 아래 파일만 씁니다. HTML이 `submission/slides/`에 있으므로 경로는 `../images/파일명`(하위 폴더는 `../images/old/…`, `../images/design/…`)입니다.
-- **쓰면 안 되는 것**: 저장소 루트의 `old/` 폴더(이름이 든 원본 캡처), `submission/images/old/user_personal/`, 루트의 `*.mp4` 파일. 옛 화면은 `submission/images/old/v1-0919-result.png`, `v2-0919-B-result.png`, `v3-1029-pre-result.png`, `v4-1030-picturediary-result.png`만 씁니다.
-- 4장(시연)에는 `<video controls src="demo.mp4">`를 넣고, 영상이 없을 때를 위해 "시연 영상: 제출물 참고"라는 대체 문구를 함께 두세요(영상 파일은 제가 `submission/slides/demo.mp4`로 따로 넣습니다).
+- **쓰면 안 되는 것**: 저장소 루트의 `old/` 폴더(이름이 든 원본 캡처), `submission/images/old/user_personal/`, 루트의 `*.mp4` 파일(`submission/slides/`의 영상 2개는 예외로 사용). 옛 화면은 `submission/images/old/v1-0919-result.png`, `v2-0919-B-result.png`, `v3-1029-pre-result.png`, `v4-1030-picturediary-result.png`만 씁니다.
+- 영상은 `submission/slides/`에 이미 복사돼 있습니다: `demo1.mp4`(앱 사용 영상 1), `demo2.mp4`(앱 사용 영상 2, PDF 다운로드 부분 추가본). 4장(시연)에 두 영상을 모두 `<video controls preload="metadata" src="demo1.mp4">`, `<video controls preload="metadata" src="demo2.mp4">`로 넣고(탭으로 전환하거나 나란히), 영상 설명은 "앱 사용 영상 1", "앱 사용 영상 2(PDF 저장 포함)"로만 쓰세요. 영상 내용은 보지 못하므로 내용을 지어내지 마세요. 영상이 열리지 않을 때를 위해 "시연 영상: 제출물 참고"라는 문구도 함께 두세요. 영상 파일은 수정·삭제하지 마세요.
 - 이미지 안의 글자를 가리거나 자르지 말고, 휴대폰 캡처는 한 장 폭을 화면의 30~40%로 나란히 배치하세요.
 
 ## 만드는 규칙

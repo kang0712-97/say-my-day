@@ -117,7 +117,7 @@ for (const cs of CASES) for (const theme of ['light', 'dark']) for (const width 
   for (const screen of ['쓰기', '결과', '학습']) {
     const w = await frame(cs, width, theme); frames++;
     if (screen === '결과') { w.eval('render')(cs.data.result, false); w.eval('showResult')(); await sleep(500); }
-    if (screen === '학습') { w.eval('render')(cs.data.result, false); w.eval('showResult')(); w.eval('learnOpen')(false); await sleep(300); w.eval('lnMove')(1); await sleep(300); }
+    if (screen === '학습') { w.eval('render')(cs.data.result, false); w.eval('showResult')(); w.eval('learnOpen')(false); await sleep(300); w.eval('lnMove')(1); await sleep(600); } // 넘기는 움직임(0.26초)이 끝난 뒤에 잰다(글자 200%로 키우면 다시 그려져 더 걸릴 수 있음)
     const tagw = `${screen} ${width}px`; contrast(w, cs, tagw, theme); overflow200(w, cs, tagw + ' ' + theme);
     const d = w.document, W = d.documentElement.clientWidth; if (d.documentElement.scrollWidth > W + 2) problems.push(`[${cs.name}/${theme}] ${tagw}: 글자 100%에서 문서가 가로로 스크롤됨 (${d.documentElement.scrollWidth}>${W})`);
   }
