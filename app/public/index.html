@@ -626,8 +626,9 @@
   @keyframes lnl { from { opacity: 0; transform: translateX(-32px); } }
   @media (prefers-reduced-motion: reduce) { .ln-card.in-r, .ln-card.in-l { animation: none; } }
   /* 아래 이동 막대: 주 버튼(다음)은 검은 채움, 보조 버튼(이전)은 같은 높이·같은 글자의 굵은 테두리 — 위계는 있되 둘 다 분명히 눌리는 버튼 */
-  .ln-nav { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--paper); }
-  .ln-nav .btn, .ln-nav .primary { min-height: 48px; margin: 0; padding: 6px 12px; justify-content: center; gap: 8px; font: 700 1rem/1.3 var(--f-ui); text-align: center; }
+  .ln-nav { padding: 12px 16px calc(16px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--paper); }
+  .ln-navi { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; width: max-content; max-width: 100%; margin: 0 auto; } /* 두 버튼은 같은 폭, 폭은 글자에 맞춰 줄임 */
+  .ln-nav .btn, .ln-nav .primary { min-height: 48px; margin: 0; padding: 6px 20px; justify-content: center; gap: 8px; font: 700 1rem/1.3 var(--f-ui); text-align: center; }
   .ln-nav .btn, .ln-nav .primary { min-width: 0; word-break: keep-all; overflow-wrap: anywhere; } /* 띄어쓰기에서 먼저 줄바꿈, 글자를 아주 크게 하면 칸 안에서 어디서든 줄바꿈 */
   .ln-nav .btn { background: var(--paper); color: var(--ink); border: 2px solid var(--ink); }
   .ln-nav .primary { border: 2px solid var(--ink); }
@@ -1460,7 +1461,7 @@
   </div>
   <div class="ln-tabs" id="ln-tabs"></div>
   <div class="ln-card" id="ln-card" tabindex="-1"></div>
-  <div class="ln-nav"><button class="btn" id="ln-prev" type="button"><span data-i="back"></span><span id="ln-prev-l">이전</span></button><button class="primary" id="ln-next" type="button"><span id="ln-next-l"></span><span class="arrow" data-i="arrow"></span></button></div>
+  <div class="ln-nav"><div class="ln-navi"><button class="btn" id="ln-prev" type="button"><span data-i="back"></span><span id="ln-prev-l">이전</span></button><button class="primary" id="ln-next" type="button"><span id="ln-next-l"></span><span class="arrow" data-i="arrow"></span></button></div></div>
   <div class="vh" id="ln-live" aria-live="polite"></div>
 </div>
 <div id="dim" aria-hidden="true"></div>
@@ -4051,7 +4052,7 @@ $('hist').addEventListener('click', (e) => {
     hmore = null; saveScoped(HIST_KEY, list.filter((x) => String(x.id) !== del.dataset.del)); renderHist(); renderCal();
   }
 });
-document.addEventListener('click', (e) => { if (hmore && !e.target.closest('#hist .vmenu, [data-hmore]')) { hmore = null; renderHist(); } });
+document.addEventListener('click', (e) => { if (hmore && e.target.isConnected && !e.target.closest('#hist .vmenu, [data-hmore]')) { hmore = null; renderHist(); } }); // 메뉴 안 단추를 눌러 목록이 다시 그려지면 눌린 단추는 화면에서 떨어져 있으므로 "바깥 클릭"으로 보지 않는다(삭제 확인이 바로 닫히던 오류)
 $('hist').addEventListener('click', (e) => { if (e.target.closest('#day-new')) { closeSheet(); showWritePage(); openNewDiary(); } });
 $('hist-new').addEventListener('click', () => {
   const v = $('diary').value.trim();
