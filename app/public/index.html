@@ -1357,9 +1357,9 @@ customPinyin(PINYIN_FIX);
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // 작은 새 그림(장식). 상태 안내는 이 그림이 아니라 옆의 글자·아이콘이 맡는다(alt=""). 사용: bird('hello', 200)
-// 복장 새(T40): 현재 성장 단계 + 동작 → 그림. 알(1·2단계)은 동작 없이 한 장. think·oops·giggle·surprised 그림이 들어오면 COS_EXTRA에 이름을 추가.
+// 복장 새(T40): 현재 성장 단계 + 동작 → 그림. 알(1·2단계)은 동작 없이 한 장. think·oops·giggle·surprised는 G03~G10에만 있다(알은 한 장).
 const COS_CORE = ['write', 'listen', 'read', 'review', 'complete', 'sticker', 'rest', 'welcome'];
-const COS_EXTRA = [];
+const COS_EXTRA = ['think', 'oops', 'giggle', 'surprised'];
 const BIRD_POSE = { hello: 'welcome', writing: 'write', thinking: 'think', discovery: 'read', 'read-aloud': 'read', listening: 'listen', saved: 'complete', review: 'review', 'first-entry': 'complete', retry: 'oops', 'retry-help': 'oops', walking: 'welcome', rest: 'rest' };
 const POSE_FALLBACK = { think: 'review', oops: 'welcome', giggle: 'complete', surprised: 'welcome' };
 function birdArt(name, n) {
@@ -1373,6 +1373,7 @@ function birdArt(name, n) {
 const bird = (name, size = 96) => BIRD_POSE[name] ? `<img class="bird" data-bird="${name}" src="${birdArt(name)}" width="${size}" height="${size}" alt="" decoding="async" loading="lazy">` : '';
 const paintBirds = (root = document) => root.querySelectorAll('img[data-bird]').forEach((im) => { im.src = birdArt(im.dataset.bird); });
 // 서버(chinese-diary/data 폴더)에도 저장하는 항목. 설정·테마 같은 기기별 값은 브라우저에만 둔다.
+const goodDay = (x) => !!x && /^\d{4}-\d{2}-\d{2}$/.test(String(x.d)); // 시험용 가짜 학습일(d가 날짜가 아닌 것)이 섞이면 새 단계가 잘못 올라가므로 걸러 낸다
 const SYNCED = ['diary-history', 'wordbook', 'sentbook', 'activity', 'glossary', 'speak-log', 'study-days'];
 let storageWarned = 0;
 function storageFull() {
@@ -3500,8 +3501,8 @@ function applyImport(obj, mode) {
     const inc = Array.isArray(obj.keys[k]) ? obj.keys[k] : [];
     if (mode === 'replace') { store.set(k, inc); continue; }
     if (k === 'speak-log') { store.set(k, SpeakCheck.merge(store.get(k, []), inc)); continue; }
-    const cur = store.get(k, []); const seen = new Set(cur.map(idOf[k]));
-    const merged = [...cur, ...inc.filter((x) => !seen.has(idOf[k](x)))];
+    const cur = store.get(k, []).filter((x) => k !== 'study-days' || goodDay(x)); const seen = new Set(cur.map(idOf[k]));
+    const merged = [...cur, ...inc.filter((x) => !seen.has(idOf[k](x)) && (k !== 'study-days' || goodDay(x)))];
     if (k === 'diary-history') { merged.sort((a, b) => String(b.at).localeCompare(String(a.at))); merged.length = Math.min(merged.length, 300); }
     store.set(k, merged);
   }
@@ -3688,7 +3689,7 @@ $('nest-bird').addEventListener('click', () => {
   nestRapid = now - nestAt < 900 ? nestRapid + 1 : 1; nestAt = now; nestN++;
   const egg = st.n <= 2, tickle = nestRapid >= 5;
   nestSay(egg ? NEST_EGG[nestN % NEST_EGG.length] && L(NEST_EGG[nestN % NEST_EGG.length]) : tickle ? L('간지러워요짹! 하하') : L(NEST_TAP[nestN % NEST_TAP.length]));
-  img.src = birdArt(egg ? 'welcome' : tickle ? 'complete' : NEST_POSES[nestN % NEST_POSES.length]);
+  img.src = birdArt(egg ? 'welcome' : tickle ? 'giggle' : nestRapid === 1 && nestN % 3 === 1 ? 'surprised' : NEST_POSES[nestN % NEST_POSES.length]);
   img.classList.remove('pop', 'wob'); void img.offsetWidth; img.classList.add(egg ? 'wob' : 'pop');
   clearTimeout(nestBack); nestBack = setTimeout(() => { img.src = birdArt('welcome'); nestSay(birdName() ? weekSay() : L('안녕짹! 내 이름을 지어 줄래짹?')); }, 3000);
 });
@@ -4030,6 +4031,7 @@ $('gl-used').addEventListener('click', (e) => {
 $('status').addEventListener('click', (e) => { if (e.target.id === 'cancel' && controller) controller.abort('user'); if (e.target.closest('#retry')) $('go').click(); });
 $('clear').addEventListener('click', () => { const d = $('diary'); if (d.readOnly) return; d.value = ''; editingId = null; d.dispatchEvent(new Event('input')); setStatus(''); d.focus(); });
 document.querySelectorAll('[data-i]').forEach((el) => { if (!el.innerHTML) el.innerHTML = ICON[el.dataset.i] || ''; });
+{ const sd = store.get('study-days', []), ok = sd.filter(goodDay); if (ok.length !== sd.length) store.set('study-days', ok); }
 applyLangUI(); for (const w of store.get('wordbook', [])) if (w && w.lang === 'ja') { jaLearn(w.zh, w.reading); jaFixLearn(w.zh, w.reading, w.check); } tagLegacy(); renderHist(); renderWords(); renderCal(); renderGlossary(); updateSyncUI(); pullFromServer();
 window.addEventListener('focus', () => { if (sync.pulled) pullFromServer(); });
 
