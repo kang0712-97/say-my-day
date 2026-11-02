@@ -8,3 +8,5 @@ backup/
 prompts/user_glossary.md
 prompts/system_prompt_v*.md
 node_modules/
+# 디자인 제작 자료 묶음(이미지·압축 파일·카탈로그, 수백 MB): 배포 저장소에 올리지 않는다
+design-*/
