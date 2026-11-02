@@ -1,0 +1,3 @@
+const sl = (ms) => new Promise((r) => setTimeout(r, ms));
+const mock = async () => { const m = await (await fetch('/mock.json')).json(); render(m.result || m, false); showResult(); await sl(500); };
+const f0 = window.fetch; window.fetch = (u, o) => String(u).includes('/api/translate') ? Promise.resolve(new Response(JSON.stringify({ error: '번역 서버가 잠시 응답하지 않아요.' }), { status: 502 })) : f0(u, o); document.getElementById('nest-go').click(); await sl(400); const d = document.getElementById('diary'); d.value = '오늘은 아침에 비가 와서 우산을 챙겼다. 점심에는 친구와 우동을 먹었다. 저녁에는 중국어 공부를 했다.'; d.dispatchEvent(new Event('input')); document.getElementById('go').click(); await sl(1800); document.getElementById('status').scrollIntoView({ block: 'center' }); await sl(300); return 'api';

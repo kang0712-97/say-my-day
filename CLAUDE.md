@@ -14,7 +14,7 @@
 
 ## 먼저 읽을 것 (순서대로, 필요한 만큼만)
 1. 이 파일
-2. `README.md` — 개편 이력 전체(진행 상황 목록). 새 일을 하면 여기에 한 줄 이상 추가한다
+2. `design/PROGRESS.md` — 개편 이력 전체(진행 상황 목록, 예전 README). 새 일을 하면 여기에 한 줄 이상 추가한다
 3. `design/multilingual-design.md` — 다국어 설계와 단계(M0~M5), 아직 모르는 것
 4. 코드는 필요한 부분만 `grep`으로 찾아 읽는다(`app/public/index.html` 약 3100줄, `app/server.js` 약 520줄 — 통째로 읽지 말 것)
 

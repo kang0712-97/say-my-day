@@ -2,11 +2,9 @@
 .env
 data/
 .DS_Store
-# 배포에 올리지 않는 개인 자료(실제 일기 응답, 개인 용어집, 이전 버전)
-tests/
+# 배포에 올리지 않는 개인 자료(개인 용어집, 이전 화면 백업). 시험 코드와 프롬프트 이전 버전은 공개(별명은 일반 이름으로 바꾼 상태)
 backup/
 prompts/user_glossary.md
-prompts/system_prompt_v*.md
 node_modules/
 # 디자인 제작 자료 묶음(이미지·압축 파일·카탈로그, 수백 MB): 배포 저장소에 올리지 않는다
 design-*/

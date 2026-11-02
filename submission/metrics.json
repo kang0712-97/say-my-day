@@ -1,0 +1,245 @@
+{
+ "_note": "사람 없이 스크립트로 잰 값(2026-11-03). 사용자 테스트는 하지 않았음. 입력 4건 = 예시 결과 1(mock.json) + 실제 AI 응답 3(tests/real_0N.json, 이름은 일반 이름으로 바꿈). 뷰포트 360x780. 측정 코드는 submission/measure.js, 같은 코드를 이전 빌드(카드 학습 도입 직전 커밋)와 새 빌드에서 실행.",
+ "compare": {
+  "before_build": "카드 학습 도입 직전 빌드(긴 스크롤 결과 화면)",
+  "after_build": "현재 배포본(카드 학습 세션)",
+  "visibleChoices": {
+   "desc": "한 화면(뷰포트)에 동시에 보이는 눌리는 요소 수의 평균(화면을 한 화면씩 내려 가며 평균, 새 방식은 카드마다)",
+   "before_avg_of_4": 25.9,
+   "after_avg_of_4": 13.2,
+   "per_input": {
+    "before": [
+     27.3,
+     25.5,
+     25.2,
+     25.5
+    ],
+    "after": [
+     12.6,
+     13.4,
+     13.2,
+     13.4
+    ]
+   }
+  },
+  "wordCoverage": {
+   "desc": "문장에 나온 내용 단어 중 학습 단어 목록에 들어간 비율(단어 분해 정보가 있는 입력만)",
+   "before": {
+    "mock.json": 0.38,
+    "real_03": 0.21
+   },
+   "after": {
+    "mock.json": 1,
+    "real_03": 1.02
+   },
+   "words_in_list": {
+    "before": [
+     9,
+     10
+    ],
+    "after": [
+     24,
+     48
+    ]
+   },
+   "na": "real_01·real_02는 옛 프롬프트(v0.4) 응답이라 단어 분해가 없어 계산하지 않음"
+  },
+  "stepsToFinish": {
+   "desc": "끝까지 보는 데 필요한 조작 횟수(이전: 화면 스와이프, 이후: 카드 넘기기 탭)",
+   "before_swipes": [
+    7,
+    10,
+    10,
+    10
+   ],
+   "after_taps": [
+    10,
+    14,
+    14,
+    14
+   ],
+   "reading": "조작 횟수는 줄지 않았고 비슷하거나 늘었다 — 몰입(한 번에 하나)과 맞바꾼 비용"
+  },
+  "longestUnit": {
+   "desc": "끊김 없이 이어서 스크롤해야 하는 가장 긴 단위(화면 수)",
+   "before_whole_page": [
+    7.6,
+    11,
+    10.7,
+    10.4
+   ],
+   "after_tallest_card": [
+    3.2,
+    1.7,
+    1.7,
+    6.2
+   ],
+   "after_cards_needing_scroll": [
+    3,
+    5,
+    4,
+    4
+   ],
+   "reading": "전체 길이 7.6~11화면 → 가장 긴 카드 1.7~6.2화면. 단어 리스트 카드가 가장 길다(단어가 많을수록) — 남은 개선점"
+  }
+ },
+ "raw": {
+  "before": [
+   {
+    "fixture": "mock.json",
+    "sentences": 4,
+    "hasWordSplit": true,
+    "contentWords": 24,
+    "coreVocab": 9,
+    "build": "before",
+    "wordsInList": 9,
+    "wordCoverage": 0.38,
+    "pageHeightPx": 5899,
+    "screens": 7.6,
+    "swipesToEnd": 7,
+    "visibleChoicesAvg": 27.3,
+    "visibleChoicesMax": 31
+   },
+   {
+    "fixture": "_fx_real_01.json",
+    "sentences": 8,
+    "hasWordSplit": false,
+    "contentWords": null,
+    "coreVocab": 10,
+    "build": "before",
+    "wordsInList": 10,
+    "wordCoverage": null,
+    "pageHeightPx": 8572,
+    "screens": 11,
+    "swipesToEnd": 10,
+    "visibleChoicesAvg": 25.5,
+    "visibleChoicesMax": 29
+   },
+   {
+    "fixture": "_fx_real_02.json",
+    "sentences": 8,
+    "hasWordSplit": false,
+    "contentWords": null,
+    "coreVocab": 10,
+    "build": "before",
+    "wordsInList": 10,
+    "wordCoverage": null,
+    "pageHeightPx": 8353,
+    "screens": 10.7,
+    "swipesToEnd": 10,
+    "visibleChoicesAvg": 25.2,
+    "visibleChoicesMax": 28
+   },
+   {
+    "fixture": "_fx_real_03.json",
+    "sentences": 8,
+    "hasWordSplit": true,
+    "contentWords": 47,
+    "coreVocab": 10,
+    "build": "before",
+    "wordsInList": 10,
+    "wordCoverage": 0.21,
+    "pageHeightPx": 8090,
+    "screens": 10.4,
+    "swipesToEnd": 10,
+    "visibleChoicesAvg": 25.5,
+    "visibleChoicesMax": 29
+   }
+  ],
+  "after": [
+   {
+    "fixture": "mock.json",
+    "sentences": 4,
+    "hasWordSplit": true,
+    "contentWords": 24,
+    "coreVocab": 9,
+    "build": "after",
+    "cards": 11,
+    "taps": 10,
+    "wordsInList": 24,
+    "wordCoverage": 1,
+    "tallestCardPx": 2492,
+    "tallestCardScreens": 3.2,
+    "cardsNeedingScroll": 3,
+    "visibleChoicesAvg": 12.6,
+    "visibleChoicesMax": 27
+   },
+   {
+    "fixture": "_fx_real_01.json",
+    "sentences": 8,
+    "hasWordSplit": false,
+    "contentWords": null,
+    "coreVocab": 10,
+    "build": "after",
+    "cards": 15,
+    "taps": 14,
+    "wordsInList": 10,
+    "wordCoverage": null,
+    "tallestCardPx": 1339,
+    "tallestCardScreens": 1.7,
+    "cardsNeedingScroll": 5,
+    "visibleChoicesAvg": 13.4,
+    "visibleChoicesMax": 27
+   },
+   {
+    "fixture": "_fx_real_02.json",
+    "sentences": 8,
+    "hasWordSplit": false,
+    "contentWords": null,
+    "coreVocab": 10,
+    "build": "after",
+    "cards": 15,
+    "taps": 14,
+    "wordsInList": 10,
+    "wordCoverage": null,
+    "tallestCardPx": 1288,
+    "tallestCardScreens": 1.7,
+    "cardsNeedingScroll": 4,
+    "visibleChoicesAvg": 13.2,
+    "visibleChoicesMax": 26
+   },
+   {
+    "fixture": "_fx_real_03.json",
+    "sentences": 8,
+    "hasWordSplit": true,
+    "contentWords": 47,
+    "coreVocab": 10,
+    "build": "after",
+    "cards": 15,
+    "taps": 14,
+    "wordsInList": 48,
+    "wordCoverage": 1.02,
+    "tallestCardPx": 4874,
+    "tallestCardScreens": 6.2,
+    "cardsNeedingScroll": 4,
+    "visibleChoicesAvg": 13.4,
+    "visibleChoicesMax": 28
+   }
+  ]
+ },
+ "automated_tests": {
+  "command": "npm test",
+  "steps": 8,
+  "last_run": "2026-11-03 전부 통과",
+  "detail": [
+   "병음 교정",
+   "병음 문맥(了·得·不·一)",
+   "문장 나누기",
+   "화면 문구 사전 키·자리표",
+   "따라 말하기 비교·기록",
+   "일본어 읽기 누락 검사",
+   "화면 스모크(3개 언어 조합)",
+   "접근성 검사(3조합 × 라이트/다크 × 폭 5종 × 화면 3종 = 90화면, 글자 200%·색 대비·이름 없는 버튼)"
+  ],
+  "api_calls_in_tests": 0
+ },
+ "project": {
+  "first_commit": "2026-10-19",
+  "last_commit": "2026-11-03",
+  "commits": 130,
+  "task_cards": 66,
+  "index_html_lines": 4506,
+  "server_js_lines": 683,
+  "prompt_versions": 5
+ }
+}
