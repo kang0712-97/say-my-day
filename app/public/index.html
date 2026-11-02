@@ -508,6 +508,28 @@
   .home-more .cont { width: 100%; padding: var(--smd-space-16); background: var(--smd-surface-muted); border-radius: var(--smd-radius-surface); }
   .home-more:not(:has(> :not(.hidden))) { display: none; }
   .write { padding: var(--smd-space-16) 20px 0; }
+  /* 홈 = 펼친 일기장 한 쪽: 언어·날짜·새·쓰기 칸이 한 장 종이 안에 있다 */
+  .diary-page { margin: var(--smd-space-12) 16px 0; padding-bottom: 20px; background: var(--paper); border: 1px solid var(--line); border-left: 8px solid var(--ink); border-radius: 6px 16px 16px 6px; }
+  .diary-page .write-top { padding: 12px 16px 0; }
+  .diary-page .wt-main { gap: 0; }
+  .diary-page .langchip { min-height: 44px; margin-left: -4px; padding: 0 4px; background: none; border: 0; color: var(--muted); font: 500 .8125rem var(--f-ui); }
+  .diary-page .say { width: calc(100% - 32px); margin: var(--smd-space-12) 16px 0; }
+  .diary-page .home-acts { padding: var(--smd-space-16) 16px 0; }
+  .diary-page .write { padding: var(--smd-space-12) 16px 0; }
+  .diary-page .field { background: none; border: 0; border-radius: 0; padding: 0; }
+  .diary-page .field-foot { padding: 0; }
+  .diary-page .write .chips { display: flex; flex-wrap: wrap; align-items: center; gap: 0 12px; margin-top: var(--smd-space-8); }
+  .diary-page .write .chips span { grid-column: auto; margin-right: 4px; color: var(--muted); font-weight: 500; }
+  .diary-page .write .chips .chip { min-height: 44px; padding: 0 2px; background: none; border: 0; border-bottom: 1px dotted var(--muted); border-radius: 0; font-size: var(--fs-s); }
+  .say { position: relative; border-radius: 16px; }
+  .say::before { content: ""; position: absolute; top: -7px; right: 44px; width: 12px; height: 12px; background: var(--paper); border-left: 1px solid var(--ink); border-top: 1px solid var(--ink); transform: rotate(45deg); }
+  .fth { display: inline-flex; vertical-align: -3px; margin-right: 6px; }
+  .fth svg { width: 18px; height: 18px; }
+  .home-more .cont { padding: 0; background: none; }
+  .home-more .primary { width: auto; min-height: 48px; margin-top: var(--smd-space-12); padding: 0 12px 0 20px; font-size: 1rem; gap: 12px; }
+  .home-more .quick-row .bird { width: 48px; height: 48px; }
+  .bk-bird span { position: relative; }
+  .bk-bird span::before { content: ""; position: absolute; top: 50%; left: -7px; width: 12px; height: 12px; margin-top: -6px; background: var(--paper); border-left: 1px solid var(--ink); border-bottom: 1px solid var(--ink); transform: rotate(45deg); }
   .write label.lbl { display: block; margin-bottom: var(--smd-space-8); font: 650 var(--fs-m)/1.5 var(--f-ui); color: var(--ink); }
   .field { background: var(--paper); border: 1px solid var(--line); border-left: 8px solid var(--ink); border-radius: 6px 16px 16px 6px; padding: var(--smd-space-16) var(--smd-space-16) var(--smd-space-4); }
   .field textarea { display: block; width: 100%; min-height: clamp(160px, 28dvh, 320px); padding: 0; border: 0; border-radius: 0; background: none; resize: none; font-size: 18px; line-height: 30px; background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 29px, color-mix(in srgb, var(--line) 70%, transparent) 29px, color-mix(in srgb, var(--line) 70%, transparent) 30px); background-attachment: local; }
@@ -832,10 +854,11 @@
   </header>
 
   <div id="v-write">
+  <div class="diary-page">
   <section class="write-top">
     <div class="wt-main">
-      <p class="today-row"><span data-i="calendar"></span><span id="today"></span></p>
       <button class="langchip" id="lang-chip" aria-label="언어 선택"></button>
+      <p class="today-row"><span data-i="calendar"></span><span id="today"></span></p>
     </div>
     <img class="bird wt-bird" src="/img/bird/02-writing.webp" width="96" height="96" alt="" decoding="async">
   </section>
@@ -851,7 +874,7 @@
   </section>
 
   <section class="write">
-    <label for="diary" class="lbl">오늘의 이야기</label>
+    <label for="diary" class="lbl vh">오늘의 이야기</label>
     <div class="field">
       <textarea id="diary" lang="ko" placeholder="예) 오늘은 아침에 빗소리를 들으며 깼다. 기분 좋은 시작이다." maxlength="1000"></textarea>
       <div class="field-foot">
@@ -870,6 +893,7 @@
     <div id="wake-msg" class="hint wake hidden" role="status" aria-live="polite"></div>
     <div id="status" class="banner hidden" role="status" aria-live="polite"></div>
   </section>
+  </div><!-- /diary-page -->
 
   <section class="home-more">
     <div id="quick-card" class="cont quick hidden">
@@ -879,7 +903,6 @@
       </div>
       <button class="primary" id="quick-go"><span>3분 복습</span><span class="arrow" data-i="arrow"></span></button>
     </div>
-    <div class="duelink"><button id="book-link"><span>내 일기책</span><span data-i="chev"></span></button></div>
     <div id="due-card" class="duelink hidden"><button id="due-start"><span id="due-text"></span><span data-i="chev"></span></button></div>
   </section>
 
@@ -1404,6 +1427,7 @@ async function pullFromServer() {
 // ---------- 아이콘 (선 굵기·크기를 통일한 SVG) ----------
 const svg = (body, cls = '') => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${body}</svg>`;
 const ICON = {
+  feather: svg('<path d="M12.67 19a2 2 0 001.416-.588l6.154-6.172a6 6 0 00-8.49-8.49L5.586 9.914A2 2 0 005 11.328V18a1 1 0 001 1z"/><path d="M16 8L2 22"/><path d="M17.5 15H9"/>'),
   speaker: svg('<path d="M4 9v6h4l5 4V5L8 9H4z"/><path d="M16.5 8.5a5 5 0 010 7M19 6a8.5 8.5 0 010 12"/>'),
   stop: svg('<rect x="6" y="6" width="12" height="12" rx="1.5"/>', 'fill'),
   copy: svg('<rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 012-2h9"/>'),
@@ -2158,7 +2182,7 @@ function renderQuick(words) {
   const card = $('quick-card'); card.classList.toggle('hidden', !words.length);
   if (!words.length) return;
   const n = Math.min(QUICK_N, words.length); const nDue = words.filter((x) => x.due <= Date.now()).length;
-  $('quick-say').textContent = L(BIRD_SAY.ready[sayReady], { n });
+  $('quick-say').innerHTML = `<span class="fth" aria-hidden="true">${ICON.feather}</span>${esc(L(BIRD_SAY.ready[sayReady], { n }))}`;
   $('quick-p').textContent = nDue ? L('오늘 복습할 단어 {n}개', { n: nDue }) : L('저장한 단어를 가볍게 훑어봐요. 복습할 차례인 단어는 아직 없어요.');
 }
 function quickEntries() {
@@ -2283,7 +2307,7 @@ function renderBook() {
     const date = `${d.toLocaleDateString(LANGS[UI].bcp, { year: 'numeric', month: 'long', day: 'numeric' })}<small>${esc(weekdayOf(d))}${pg.parts > 1 ? ` · ${pg.part + 1}/${pg.parts}` : ''}</small>`;
     const bn = Math.max(0, ...sents.map((st) => (log.find((x) => x.id === SpeakCheck.idOf(LANG.tgt, 's', st.zh)) || {}).n || 0));
     const says = bn >= 3 ? L('이 문장 벌써 {n}번째네짹', { n: bn }) : (BOOK_SAY[(book.i + 1) % 3 === 0 ? (book.i / 3 | 0) % BOOK_SAY.length : -1] || '');
-    const birdLine = store.get('bird-talk', true) && says ? `<div class="bk-bird"><img src="/img/bird/${BIRDS.saved}.webp" width="48" height="48" alt=""><span>${esc(says.length && BOOK_SAY.includes(says) ? L(says) : says)}</span></div>` : '';
+    const birdLine = store.get('bird-talk', true) && says ? `<div class="bk-bird"><img src="/img/bird/${BIRDS.saved}.webp" width="48" height="48" alt=""><span><i class="fth" aria-hidden="true">${ICON.feather}</i>${esc(says.length && BOOK_SAY.includes(says) ? L(says) : says)}</span></div>` : '';
     body = `<h3 class="bk-date"><i class="bk-ribbon" aria-hidden="true"></i>${date}</h3>` + sents.map((st, k) => {
       const key = `${h.id}:${pg.from + k}`, hidden = book.hide && !book.shown.has(key);
       const n = (log.find((x) => x.id === SpeakCheck.idOf(LANG.tgt, 's', st.zh)) || {}).n || 0;
@@ -2319,7 +2343,6 @@ $('p-book').addEventListener('keydown', (e) => { const sp = e.target.closest && 
 }
 document.addEventListener('keydown', (e) => { if (openName === 'book' && !e.target.closest('input,textarea') && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) bookGo(book.i + (e.key === 'ArrowRight' ? 1 : -1), e.key === 'ArrowRight' ? 'next' : 'prev'); });
 $('hist-book').addEventListener('click', bookOpen);
-$('book-link').addEventListener('click', bookOpen);
 function addOrRemoveWord(item) {
   let list = loadWords();
   if (list.some((w) => w.zh === item.zh)) list = list.filter((w) => w.zh !== item.zh);
@@ -3170,7 +3193,7 @@ function weekSay() {
   return L('안녕짹! 오늘 하루 얘기 들려주짹');
 }
 function syncHome() {
-  $('week-say').textContent = weekSay();
+  $('week-say').innerHTML = `<span class="fth" aria-hidden="true">${ICON.feather}</span>${esc(weekSay())}`;
   const t = todayEntry();
   $('cont-card').classList.toggle('hidden', !t);
   if (t) { const f = t.diary.replace(/\s+/g, ' ').trim(); $('cont-prev').textContent = f.slice(0, 40) + (f.length > 40 ? '…' : ''); }
