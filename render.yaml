@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: chinese-diary
+    name: say-my-day
     runtime: node
     plan: free
     # 신경망 음성(edge-tts)을 파이썬 가상환경에 설치한다. 실패해도 앱은 브라우저 음성으로 동작한다.
