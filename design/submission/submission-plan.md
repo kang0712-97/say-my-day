@@ -1,6 +1,6 @@
 # 제출 자료 준비 계획 (바이브 코딩 프로젝트 · Say My Day, PO 직군)
 작성: 2026-11-03 · 상태: 계획(실행 전). 마감 시각은 아직 모름 → 아래 "3단계 범위"로 짜 둠.
-GitHub: https://github.com/kang0712-97/chinese-diary · 배포: https://chinese-diary.onrender.com (2026-11-03 배포 중/확인은 아래 §0)
+GitHub: https://github.com/kang0712-97/say-my-day · 배포: https://chinese-diary.onrender.com (2026-11-03 배포 중/확인은 아래 §0)
 
 ## 0. 먼저 확인할 것
 - 배포 반영 확인(Render가 새 커밋 `741fa96`을 올렸는지), 배포 주소에서 번역이 되는지(API 크레딧). **크레딧이 없으면 시연·평가가 모두 막히므로 가장 먼저.**

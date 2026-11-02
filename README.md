@@ -7,7 +7,7 @@
 
 ## 빠르게 실행하기 (API 키 없이)
 ```bash
-git clone https://github.com/kang0712-97/chinese-diary.git && cd chinese-diary
+git clone https://github.com/kang0712-97/say-my-day.git && cd say-my-day
 npm install            # 일본어 읽기용 kuromoji 한 개만 설치됩니다
 npm start              # http://localhost:3000
 ```
