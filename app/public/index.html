@@ -4,6 +4,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Say My Day</title>
+<link rel="manifest" href="/manifest.webmanifest">
+<meta name="theme-color" content="#FFFFFF">
+<link rel="icon" type="image/png" href="/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Say My Day">
 <!-- 저장된 테마를 첫 화면 그리기 전에 적용해서 깜빡임을 막는다 -->
 <script>try { var t = JSON.parse(localStorage.getItem('theme') || 'null'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}</script>
 <!-- 폰트: UI Pretendard(없으면 Noto Sans KR), 중국어 Noto Sans SC, 일본어 Noto Sans JP. 오프라인이면 시스템 폰트로 대체된다. -->
@@ -3457,6 +3464,8 @@ function maybeHints() { if (!store.get(HINT_KEY, '') && !tour) setTimeout(() => 
   addEventListener('scroll', req, { passive: true }); addEventListener('resize', req);
   if (window.ResizeObserver) new ResizeObserver(req).observe(document.body);
   upd(); }
+// 홈 화면 설치·오프라인 최소 동작: 서비스 워커는 화면 껍데기만 보관하고 /api 는 건드리지 않는다. 실패해도 앱은 그대로 동작.
+if ('serviceWorker' in navigator) addEventListener('load', () => { try { navigator.serviceWorker.register('/sw.js').catch(() => {}); } catch (e) {} });
 </script>
 </body>
 </html>
