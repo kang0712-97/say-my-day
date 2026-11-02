@@ -1,0 +1,46 @@
+{
+  "file": "/Users/gimgang/Library/CloudStorage/GoogleDrive-gimgang439@gmail.com/내 드라이브/00. Projects/06. 교육/260930 AI 네이티브 커리어 캠프(2기)/05. 진행/00. AI활용 교육_영희쌤/01.program/say-my-day/submission/slides/발표_리디자인.html",
+  "mainSlides": 12,
+  "appendixSlides": 2,
+  "images": [
+    "03-write.png",
+    "04-learn-sentence.png",
+    "08-stats.png",
+    "09-hist.png",
+    "10-book-cover.png",
+    "11-err-empty.png",
+    "12-err-long.png",
+    "13-err-lang.png",
+    "14-err-api.png",
+    "15-empty-hist.png",
+    "17-resume.png",
+    "20-before-first.png",
+    "bird.webp",
+    "wordmark.webp"
+  ],
+  "video": "demo-edited.mp4",
+  "sources": [
+    "README.md",
+    "submission/프롬프트.md",
+    "submission/metrics.json",
+    "submission/stability.md",
+    "design/tasks/T38_journey_redesign_plan.md",
+    "design/tasks/T44_learning_flow_proposal.md"
+  ],
+  "structure": [
+    "내 하루가 나만의 외국어 교재로.",
+    "번역은 끝났는데, 내 말은 되지 않았다.",
+    "쓰고, 배우고, 쌓는 하나의 흐름.",
+    "직접 보면, 더 간단합니다.",
+    "기능보다, 끝낼 수 있는 학습을 먼저.",
+    "모두 보여 줄까, 하나씩 안내할까.",
+    "매일의 기록이, 다시 돌아올 이유가 되도록.",
+    "선택지는 줄었고, 넘기는 횟수는 늘었습니다.",
+    "앱 속 AI도, 학습을 위해 답하도록.",
+    "AI가 만들고, 사람이 결정했다.",
+    "실수는, 다음 작업의 규칙이 됐다.",
+    "내일의 한 줄이, 오늘보다 쉬워지도록.",
+    "발표의 근거와 제출물.",
+    "원기록을 확인합니다."
+  ]
+}

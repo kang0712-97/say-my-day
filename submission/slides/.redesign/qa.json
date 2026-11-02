@@ -1,0 +1,930 @@
+{
+  "errors": [],
+  "states": [
+    {
+      "name": "slide-1",
+      "title": "내 하루가 나만의 외국어 교재로.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-2",
+      "title": "번역은 끝났는데, 내 말은 되지 않았다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-2-[data-question]-0",
+      "title": "번역은 끝났는데, 내 말은 되지 않았다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-3",
+      "title": "쓰고, 배우고, 쌓는 하나의 흐름.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-3-tab-0",
+      "title": "쓰고, 배우고, 쌓는 하나의 흐름.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-3-tab-1",
+      "title": "쓰고, 배우고, 쌓는 하나의 흐름.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-3-tab-2",
+      "title": "쓰고, 배우고, 쌓는 하나의 흐름.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-4",
+      "title": "직접 보면, 더 간단합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-5",
+      "title": "기능보다, 끝낼 수 있는 학습을 먼저.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-5-tab-0",
+      "title": "기능보다, 끝낼 수 있는 학습을 먼저.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-5-tab-1",
+      "title": "기능보다, 끝낼 수 있는 학습을 먼저.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-6",
+      "title": "모두 보여 줄까, 하나씩 안내할까.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-6-[data-focus]-0",
+      "title": "모두 보여 줄까, 하나씩 안내할까.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-6-[data-focus]-1",
+      "title": "모두 보여 줄까, 하나씩 안내할까.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-7",
+      "title": "매일의 기록이, 다시 돌아올 이유가 되도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-7-[data-return] button-0",
+      "title": "매일의 기록이, 다시 돌아올 이유가 되도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-7-[data-return] button-1",
+      "title": "매일의 기록이, 다시 돌아올 이유가 되도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-8",
+      "title": "선택지는 줄었고, 넘기는 횟수는 늘었습니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-9",
+      "title": "앱 속 AI도, 학습을 위해 답하도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-9-[data-prompt-step]-0",
+      "title": "앱 속 AI도, 학습을 위해 답하도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-9-[data-prompt-step]-1",
+      "title": "앱 속 AI도, 학습을 위해 답하도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-9-[data-prompt-step]-2",
+      "title": "앱 속 AI도, 학습을 위해 답하도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-9-[data-prompt-step]-3",
+      "title": "앱 속 AI도, 학습을 위해 답하도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-9-[data-prompt-step]-4",
+      "title": "앱 속 AI도, 학습을 위해 답하도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-10",
+      "title": "AI가 만들고, 사람이 결정했다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-10-tab-0",
+      "title": "AI가 만들고, 사람이 결정했다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-10-tab-1",
+      "title": "AI가 만들고, 사람이 결정했다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-10-tab-2",
+      "title": "AI가 만들고, 사람이 결정했다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-11",
+      "title": "실수는, 다음 작업의 규칙이 됐다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-11-[data-case]-0",
+      "title": "실수는, 다음 작업의 규칙이 됐다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-11-[data-case]-1",
+      "title": "실수는, 다음 작업의 규칙이 됐다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-11-[data-case]-2",
+      "title": "실수는, 다음 작업의 규칙이 됐다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-11-[data-case]-3",
+      "title": "실수는, 다음 작업의 규칙이 됐다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-11-[data-case]-4",
+      "title": "실수는, 다음 작업의 규칙이 됐다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-11-[data-case]-5",
+      "title": "실수는, 다음 작업의 규칙이 됐다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-12",
+      "title": "내일의 한 줄이, 오늘보다 쉬워지도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-13",
+      "title": "발표의 근거와 제출물.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-14",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-14-tab-0",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-0-0",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-0-1",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-0-2",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-0-3",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-0-4",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-14-tab-1",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-1-0",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-1-1",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-1-2",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-1-3",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-1-4",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-1-5",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-14-tab-2",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-2-0",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-2-1",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-2-2",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-2-3",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-2-4",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "record-2-5",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "slide-14-tab-3",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    }
+  ],
+  "responsive": [
+    {
+      "name": "1280-1",
+      "title": "내 하루가 나만의 외국어 교재로.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777776270737011,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "1280-2",
+      "title": "번역은 끝났는데, 내 말은 되지 않았다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "1280-3",
+      "title": "쓰고, 배우고, 쌓는 하나의 흐름.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "1280-4",
+      "title": "직접 보면, 더 간단합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777776270737011,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "1280-5",
+      "title": "기능보다, 끝낼 수 있는 학습을 먼저.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.77777792848188,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "1280-6",
+      "title": "모두 보여 줄까, 하나씩 안내할까.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "1280-7",
+      "title": "매일의 기록이, 다시 돌아올 이유가 되도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "1280-8",
+      "title": "선택지는 줄었고, 넘기는 횟수는 늘었습니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777776270737011,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "1280-9",
+      "title": "앱 속 AI도, 학습을 위해 답하도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "1280-10",
+      "title": "AI가 만들고, 사람이 결정했다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "1280-11",
+      "title": "실수는, 다음 작업의 규칙이 됐다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "1280-12",
+      "title": "내일의 한 줄이, 오늘보다 쉬워지도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777776270737011,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "1280-13",
+      "title": "발표의 근거와 제출물.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "1280-14",
+      "title": "원기록을 확인합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 1.7777777777777777,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-1",
+      "title": "내 하루가 나만의 외국어 교재로.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.4503464203233256,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-2",
+      "title": "번역은 끝났는데, 내 말은 되지 않았다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.49744897959183676,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-3",
+      "title": "쓰고, 배우고, 쌓는 하나의 흐름.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.3272712968911849,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-4",
+      "title": "직접 보면, 더 간단합니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.3190714203535864,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-5",
+      "title": "기능보다, 끝낼 수 있는 학습을 먼저.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.42380507683164953,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-6",
+      "title": "모두 보여 줄까, 하나씩 안내할까.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.29942777624491657,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-7",
+      "title": "매일의 기록이, 다시 돌아올 이유가 되도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.35324587101430815,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-8",
+      "title": "선택지는 줄었고, 넘기는 횟수는 늘었습니다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.33781314710300864,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-9",
+      "title": "앱 속 AI도, 학습을 위해 답하도록.",
+      "overflow": [
+        {
+          "tag": "BUTTON",
+          "cls": "",
+          "text": "연결v0.5"
+        }
+      ],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.4355716878402904,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-10",
+      "title": "AI가 만들고, 사람이 결정했다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.49744897959183676,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-11",
+      "title": "실수는, 다음 작업의 규칙이 됐다.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.331232167739367,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-12",
+      "title": "내일의 한 줄이, 오늘보다 쉬워지도록.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.4339058479938808,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-13",
+      "title": "발표의 근거와 제출물.",
+      "overflow": [],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.34420464731434874,
+      "documentFits": true,
+      "navFits": true
+    },
+    {
+      "name": "390-14",
+      "title": "원기록을 확인합니다.",
+      "overflow": [
+        {
+          "tag": "BUTTON",
+          "cls": "",
+          "text": "화면 지표"
+        }
+      ],
+      "clipped": [],
+      "overlapSource": [],
+      "ratio": 0.4834679528153873,
+      "documentFits": true,
+      "navFits": true
+    }
+  ],
+  "video": [
+    {
+      "time": 6.741365,
+      "ready": 4,
+      "error": null,
+      "playing": true
+    },
+    {
+      "time": 23.201067,
+      "ready": 4,
+      "error": null,
+      "playing": true
+    },
+    {
+      "time": 83.65618,
+      "ready": 4,
+      "error": null,
+      "playing": true
+    },
+    {
+      "time": 134.891543,
+      "ready": 4,
+      "error": null,
+      "playing": true
+    }
+  ],
+  "navigation": {
+    "home": "1 / 14",
+    "right": "2 / 14",
+    "end": "14 / 14",
+    "evidence": "13 / 14",
+    "record": "14 / 14"
+  },
+  "videoDialog": true,
+  "notes": {
+    "open": true,
+    "paragraphs": 3
+  },
+  "zoom": true,
+  "broken": [],
+  "external": []
+}
