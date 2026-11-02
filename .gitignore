@@ -11,3 +11,12 @@ design-*/
 # 사용자 원본 캡처·영상(개인 이름 포함, 용량 큼): 저장소에 올리지 않는다
 old/
 *.mp4
+
+# 다른 도구가 만든 발표 시안(로컬 보관)
+submission/slides/.qa/
+submission/slides/.redesign/
+submission/slides/assets/
+submission/slides/제작보고.md
+submission/slides/발표_리디자인*
+submission/slides/*_발표자료.html
+제출파일/
