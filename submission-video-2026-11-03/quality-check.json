@@ -1,0 +1,18 @@
+{
+  "durationSeconds": 150.62,
+  "withinOneToThreeMinutes": true,
+  "width": 1080,
+  "height": 2400,
+  "fps": 30,
+  "video": "H.264 / yuv420p",
+  "audio": "AAC / stereo / 48kHz",
+  "fullDecodeExitCode": 0,
+  "blackIntervals": [],
+  "audioLevels": [
+    "[Parsed_volumedetect_0 @ 0x60000320ce70] mean_volume: -26.9 dB",
+    "[Parsed_volumedetect_0 @ 0x60000320ce70] max_volume: -2.8 dB"
+  ],
+  "bytes": 20481617,
+  "sha256": "a81a5a3c4dc2f1ca47fd1ad420f4bf1be7bc59b90e5f4c42d6df981fcb3a8a8f",
+  "plannedDurationSeconds": 150.60000000000002
+}
