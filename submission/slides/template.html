@@ -98,7 +98,11 @@ p,li{font:500 32px/1.6 var(--f)}
 .acc-item.open .acc-body{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
 .acc-body b{display:block;font:700 24px var(--f);color:var(--muted);margin-bottom:6px}
 /* ---------- 영상 ---------- */
-.video{width:100%;max-height:640px;border-radius:24px;background:#000;border:4px solid var(--ink)}
+.video{height:640px;width:auto;max-width:100%;border-radius:24px;background:#000;border:4px solid var(--ink)}
+.vwrap{display:flex;gap:48px;align-items:flex-start}
+.chap{display:flex;flex-direction:column;gap:14px}
+.chap button{text-align:left;padding:14px 28px;border:3px solid var(--ink);border-radius:999px;background:var(--paper);font:700 28px/1.2 var(--f);transition:background .2s,color .2s}
+.chap button:hover,.chap button.on{background:var(--ink);color:#fff}
 /* ---------- 이동 막대 ---------- */
 .chrome{position:fixed;left:0;right:0;bottom:0;height:64px;display:flex;align-items:center;gap:14px;padding:0 24px;background:rgba(255,255,255,.9);backdrop-filter:blur(10px);border-top:1px solid var(--line);z-index:20}
 .chrome .nbtn{width:44px;height:44px;border-radius:50%;border:2px solid var(--ink);background:var(--paper);display:grid;place-items:center;font:700 20px var(--f)}
@@ -252,9 +256,16 @@ aside.notes{display:none}
   <div class="kicker"><i></i>시연</div>
   <h2 class="title">어떻게 쓰나요?</h2>
   <p class="answer">일기 한 편이 학습으로 끝나기까지.</p>
-  <div class="body" data-tabs data-media>
-    <div class="tabs" role="tablist"><button role="tab" aria-selected="true" data-tab="m1">앱 사용 영상 1</button><button role="tab" aria-selected="false" data-tab="m2">앱 사용 영상 2 (PDF 저장 포함)</button></div>
-    <div class="panels"><div class="panel on" data-panel="m1"><video class="video" controls preload="metadata" src="demo1.mp4"></video></div><div class="panel" data-panel="m2"><video class="video" controls preload="metadata" src="demo2.mp4"></video></div></div>
+  <div class="body vwrap">
+    <video class="video" id="demoVid" controls preload="metadata" poster="demo-preview.jpg" src="demo.mp4"></video>
+    <div class="chap" data-chapters>
+      <button data-seek="0">00:00 서비스 소개</button>
+      <button data-seek="15">00:15 번역·단어·문법·듣기</button>
+      <button data-seek="83">01:23 깃털 보상과 성장</button>
+      <button data-seek="92">01:32 지난 일기 복습</button>
+      <button data-seek="125">02:05 불확실한 번역 안내</button>
+      <button data-seek="134">02:14 PDF 저장</button>
+    </div>
   </div>
   <aside class="notes">영상을 재생하며 설명합니다. 안 열리면 제출물의 영상 파일을 사용합니다.</aside>
 </section>
@@ -343,6 +354,7 @@ aside.notes{display:none}
   $$('.compare').forEach((c) => { const r = $('input', c), set = () => c.style.setProperty('--p', r.value + '%'); r.addEventListener('input', set); set(); });
   const h = parseInt(location.hash.slice(1), 10); show(Number.isFinite(h) && h > 0 ? h - 1 : 0, 1);
 })();
+document.addEventListener('click',function(e){var b=e.target.closest&&e.target.closest('[data-seek]');if(!b)return;var v=document.getElementById('demoVid');if(!v)return;v.currentTime=+b.dataset.seek;v.play();b.parentNode.querySelectorAll('button').forEach(function(x){x.classList.toggle('on',x===b)})});
 </script>
 </body>
 </html>
