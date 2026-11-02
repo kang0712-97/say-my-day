@@ -209,6 +209,30 @@ aside.notes{display:none}
 .row .rl{font:800 32px/1.3 var(--f)}
 .row p{margin:0;font:500 29px/1.5 var(--f)}
 .row.warn{background:var(--ink);color:#fff}
+.res{display:block;margin-top:26px;max-width:900px}
+.slide.sp .answer.res-a{max-width:900px}
+.slide.sp>.body.res{max-width:940px}
+.res .bar-row{grid-template-columns:300px 1fr;gap:18px}
+.res .bar-row .name{font-size:26px;word-break:keep-all}.res .bar-row .name small{font-size:21px}
+.ab{position:absolute;right:120px;top:40px;display:flex;gap:28px}
+.ab figure{margin:0;text-align:center}
+.ab .phone{--ph:700px;width:max-content}
+.ab .scr{position:relative;width:323px;height:700px;overflow:hidden;background:#fff}
+.ab .scr img{display:block;width:100%;height:auto}
+.ab figcaption{margin-top:12px;font:600 26px/1.3 var(--f)}.ab figcaption b{font-weight:800}
+.anim-scroll img{animation:scrl 16s linear infinite;animation-play-state:paused}
+@keyframes scrl{0%,4%{transform:translateY(0)}96%,100%{transform:translateY(calc(-100% + 700px))}}
+.ab .cf{position:absolute;inset:0;height:100%;object-fit:cover;transform:translateX(105%);animation:cseq 15s ease-in-out infinite;animation-play-state:paused}
+@keyframes cseq{0%{transform:translateX(105%)}3%,18%{transform:translateX(0)}21%,100%{transform:translateX(-105%)}}
+.on-slide .ab .cf,.on-slide .anim-scroll img{animation-play-state:running}
+/* 휴대폰 화면 확대 */
+.phone:not(.noz){cursor:zoom-in}
+.phone:not(.noz)::after{content:"눌러서 확대";position:absolute;right:12px;bottom:12px;padding:6px 14px;border-radius:999px;background:rgba(17,17,17,.78);color:#fff;font:700 20px var(--f);pointer-events:none}
+.zoom{position:fixed;inset:0;z-index:50;background:rgba(0,0,0,.82);display:none;place-items:center;cursor:zoom-out}
+.zoom.on{display:grid}
+.zoom .zbox{border:8px solid #111;border-radius:54px;overflow:hidden;background:#111}
+.zoom img,.zoom video{display:block;height:min(92vh,1100px);width:auto;background:#fff}
+.zoom .zh{position:fixed;top:18px;left:0;right:0;text-align:center;color:#fff;font:600 18px var(--f)}
 </style>
 </head>
 <body>
@@ -437,10 +461,10 @@ aside.notes{display:none}
 </section>
 
 <!-- 12 결과 -->
-<section class="slide" data-title="결과" data-section="평가">
+<section class="slide sp" data-title="결과" data-section="평가">
   <div class="kicker"><i></i>평가 결과</div>
   <h2 class="title">결과는 어땠나요?</h2>
-  <p class="answer">누를 것은 <mark>절반</mark>으로 줄고 단어는 <mark>빠짐없이</mark> 들어갔습니다. 대신 넘기는 횟수는 늘었습니다.</p>
+  <p class="answer res-a">누를 것은 <mark>절반</mark>으로 줄고 단어는 <mark>빠짐없이</mark> 들어갔습니다. 대신 넘기는 횟수는 늘었습니다.</p>
   <div class="body res">
     <div class="bars">
       <div class="bar-row"><div class="name">한 화면에 눌러야 할 것의 수<small>4개 결과의 평균</small></div>
@@ -452,10 +476,13 @@ aside.notes{display:none}
       <div class="bar-row"><div class="name">스크롤해야 하는 가장 긴 길이<small>화면 몇 개 분량인지, 4개 결과의 평균</small></div>
         <div class="track"><div class="b before" style="--w:100%"><i></i><span>예전 9.9개</span></div><div class="b after" style="--w:32%"><i></i><span>지금 3.2개</span></div></div></div>
     </div>
-    <div><div class="compare" id="cmp"><img src="../images/20-before-first.png" alt="예전"><div class="after"><img src="../images/04-learn-sentence.png" alt="지금"></div><div class="bar"></div><span class="lab l">예전</span><span class="lab r">지금</span><input type="range" min="0" max="100" value="50" aria-label="예전과 지금 비교"></div><div class="cap ask2">← 좌우로 끌어 비교 →</div></div>
+    <div class="ab">
+      <figure><div class="phone noz"><div class="scr anim-scroll"><img src="../images/30-old-scroll-full.png" alt="예전: 길게 이어진 한 페이지"></div></div><figcaption><b>예전</b> 쭉 이어진 스크롤</figcaption></figure>
+      <figure><div class="phone noz"><div class="scr"><img class="cf" style="animation-delay:0s" src="../images/04-learn-sentence.png" alt=""><img class="cf" style="animation-delay:3s" src="../images/05-learn-words.png" alt=""><img class="cf" style="animation-delay:6s" src="../images/06-learn-grammar.png" alt=""><img class="cf" style="animation-delay:9s" src="../images/07-fullread.png" alt=""><img class="cf" style="animation-delay:12s" src="../images/08-stats.png" alt=""></div></div><figcaption><b>지금</b> 카드를 한 장씩 넘김</figcaption></figure>
+    </div>
   </div>
   <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 넘기는 횟수가 늘어도 괜찮은지는 사용자에게 다시 물어본다</span><span><b>다음</b> 좋아지지 않은 것과 그 이유를 말씀드립니다.</span></div>
-  <aside class="notes">막대는 장이 열릴 때 늘어납니다. 눌러야 할 것과 단어 비율은 좋아졌고, 넘기는 횟수는 늘었다는 점을 같은 무게로 말씀드립니다. 오른쪽 화면은 좌우로 끌어 예전과 지금을 비교할 수 있습니다.</aside>
+  <aside class="notes">오른쪽 화면은 예전에는 한 페이지가 길게 이어졌고, 지금은 카드를 한 장씩 넘긴다는 것을 보여 줍니다. 막대는 장이 열릴 때 늘어납니다. 눌러야 할 것과 단어 비율은 좋아졌고, 넘기는 횟수는 늘었다는 점을 같은 무게로 말씀드립니다.</aside>
 </section>
 
 <!-- 13 아쉬운 점 -->
@@ -603,6 +630,7 @@ aside.notes{display:none}
   <button class="nbtn" id="next" aria-label="다음">→</button>
 </nav>
 <div class="overview" id="overview" role="dialog" aria-label="목차"><h2>목차</h2><div class="ov-grid" id="ovgrid"></div></div>
+<div class="zoom" id="zoom" aria-label="확대 보기"><div class="zh">아무 곳이나 누르거나 Esc로 닫기</div><div class="zbox" id="zbox"></div></div>
 <div class="notes-panel" id="notes" aria-live="polite"></div>
 
 <script>
@@ -680,6 +708,16 @@ aside.notes{display:none}
   dv&&dv.addEventListener('timeupdate',()=>{ if(end&&dv.currentTime>=end){ dv.pause(); end=0; } });
   document.addEventListener('click',e=>{const b=e.target.closest&&e.target.closest('.tabs>button,.acc-item>button,.flip,.clips button'); if(b) b.classList.add('seen');});
   document.querySelectorAll('.tabs>button[aria-selected="true"],.acc-item.open>button').forEach(b=>b.classList.add('seen'));
+  const zm=document.getElementById('zoom'), zb=document.getElementById('zbox');
+  document.addEventListener('click',e=>{
+    if(zm.classList.contains('on')){ zm.classList.remove('on'); zb.innerHTML=''; return; }
+    const ph=e.target.closest&&e.target.closest('.phone:not(.noz)'); if(!ph||e.target.closest('video[controls]')) return;
+    const v=ph.querySelector('video'), im=ph.querySelector('img');
+    if(v){ const c=document.createElement('video'); c.src=v.currentSrc||v.src; c.muted=true; c.loop=true; c.playsInline=true; c.addEventListener('loadedmetadata',()=>{c.currentTime=v.currentTime; c.play().catch(()=>{});}); zb.appendChild(c); }
+    else if(im){ const c=document.createElement('img'); c.src=im.src; c.alt=im.alt; zb.appendChild(c); } else return;
+    zm.classList.add('on'); e.stopPropagation();
+  },true);
+  addEventListener('keydown',e=>{ if(e.key==='Escape'&&zm.classList.contains('on')){ zm.classList.remove('on'); zb.innerHTML=''; e.stopImmediatePropagation(); } },true);
 })();
 </script>
 <!--
