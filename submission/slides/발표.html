@@ -234,10 +234,22 @@ aside.notes{display:none}
 .zoom .zbox{border:8px solid #111;border-radius:54px;overflow:hidden;background:#111}
 .zoom img,.zoom video{display:block;height:min(92vh,1100px);width:auto;background:#fff}
 .zoom .zh{position:fixed;top:18px;left:0;right:0;text-align:center;color:#fff;font:600 18px var(--f)}
+.chrome .tool,.chrome .cnt,.chrome .sec{white-space:nowrap}
+.dots{min-width:0;overflow:hidden;flex-wrap:nowrap}
+@media (max-width:900px){
+  .dots,.chrome .sec,.help{display:none}
+  .chrome{justify-content:space-between;gap:8px;padding:0 12px}
+  .chrome .tool{padding:0 12px;font-size:14px;height:40px}
+  .chrome .cnt{font-size:16px;min-width:0}
+  .chrome .nbtn{width:40px;height:40px}
+}
+.rot{display:none}
+@media (max-width:900px) and (orientation:portrait){.rot{display:block;position:fixed;top:14px;left:0;right:0;text-align:center;font:700 18px var(--f);color:#111;z-index:40}}
 </style>
 </head>
 <body>
 <div class="progress" id="progress"></div>
+<div class="rot">휴대폰을 가로로 돌리면 더 크게 보입니다</div>
 <div class="help">← → 이동 · 클릭/Space 다음 · G 목차 · N 대본 · F 전체화면</div>
 <div class="viewport"><div class="stage" id="stage">
 <!-- 1 표지 -->
