@@ -536,7 +536,8 @@
   .fin-stats > div { flex: 1; padding: 16px 8px; border: 1px solid var(--ink); border-radius: var(--smd-radius-surface); }
   .fin-stats b { display: block; font: 800 2.4rem/1.1 var(--f-ui); }
   .fin-stats span { color: var(--muted); font: 600 var(--fs-m) var(--f-ui); }
-  .bird-stage { display: flex; flex-direction: column; gap: 4px; margin: 8px 16px 0; font: var(--fs-s)/1.4 var(--f-ui); color: var(--muted); }
+  .bird-stage { display: grid; grid-template-columns: 64px 1fr; align-items: center; column-gap: 12px; row-gap: 4px; margin: 8px 16px 0; font: var(--fs-s)/1.4 var(--f-ui); color: var(--muted); }
+  .bird-stage img.bs-img { grid-row: 1 / 4; width: 64px; height: 64px; }
   .bird-stage .bs-t { color: var(--ink); font-weight: 600; }
   .bird-stage .bs-bar { display: block; height: 8px; border: 1px solid var(--ink); border-radius: 999px; overflow: hidden; background: var(--paper); }
   .bird-stage .bs-bar i { display: block; height: 100%; background: var(--ink); }
@@ -2552,10 +2553,25 @@ $('p-book').addEventListener('click', (e) => {
   if (sp && !e.target.closest('button')) { const sec = sp.closest('.bk-s'), b = sec.querySelector('[data-spk]') || sec.querySelector('[data-say]'); if (b) b.click(); }
 });
 $('p-book').addEventListener('keydown', (e) => { const sp = e.target.closest && e.target.closest('[data-bkspeak]'); if (sp && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); sp.click(); } });
-{ let x0 = null, y0 = 0; // 좌우로 밀면 쪽 넘기기
-  $('p-book').addEventListener('touchstart', (e) => { const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; }, { passive: true });
-  $('p-book').addEventListener('touchend', (e) => { if (x0 === null) return; const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0; x0 = null;
-    if (Math.abs(dx) > 60 && Math.abs(dy) < 40) bookGo(book.i + (dx < 0 ? 1 : -1), dx < 0 ? 'next' : 'prev'); }, { passive: true });
+{ // 손가락을 따라 쪽이 움직이고, 충분히 밀고 놓으면 넘어가고 아니면 제자리로 돌아온다(움직임 줄이기: 따라 움직이지 않고 거리만 본다)
+  let x0 = null, y0 = 0, drag = false, st = null;
+  const reduce = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const edge = (dx) => (dx < 0 ? book.i >= book.pages.length : book.i <= 0); // 첫/끝 쪽에서 더 밀면 살짝만 따라온다
+  $('p-book').addEventListener('touchstart', (e) => { if (e.touches.length !== 1) { x0 = null; return; } const t = e.touches[0]; x0 = t.clientX; y0 = t.clientY; drag = false; st = $('bk-stage'); if (st) st.style.transition = 'none'; }, { passive: true });
+  $('p-book').addEventListener('touchmove', (e) => {
+    if (x0 === null || !st) return; const t = e.touches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+    if (!drag && Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy) * 1.5) drag = true;
+    if (!drag || reduce()) return;
+    const k = edge(dx) ? 0.25 : 1; st.style.transform = `translateX(${dx * k}px) rotate(${(dx * k) / 40}deg)`; st.style.opacity = String(1 - Math.min(Math.abs(dx), 240) / 480);
+  }, { passive: true });
+  $('p-book').addEventListener('touchend', (e) => {
+    if (x0 === null) return; const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0; x0 = null;
+    const go = Math.abs(dx) > 70 && Math.abs(dy) < 60 && !edge(dx);
+    if (go) { st = null; return bookGo(book.i + (dx < 0 ? 1 : -1), dx < 0 ? 'next' : 'prev'); } // 새 쪽은 기존 들어오는 움직임으로 나타난다
+    if (st && drag) { st.style.transition = 'transform .18s ease-out, opacity .18s ease-out'; st.style.transform = ''; st.style.opacity = ''; }
+    st = null;
+  }, { passive: true });
+  $('p-book').addEventListener('touchcancel', () => { if (st) { st.style.transition = ''; st.style.transform = ''; st.style.opacity = ''; } x0 = null; st = null; }, { passive: true });
 }
 document.addEventListener('keydown', (e) => { if (openName === 'book' && !e.target.closest('input,textarea') && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) bookGo(book.i + (e.key === 'ArrowRight' ? 1 : -1), e.key === 'ArrowRight' ? 'next' : 'prev'); });
 $('hist-book').addEventListener('click', bookOpen);
@@ -2913,7 +2929,7 @@ function birdStage(days = studyDaysCount()) {
 }
 function stageHtml(st) { // 단계 이름·진행 막대·다음 단계까지 남은 날
   const t = L('새 단계 {n}/{t} · {name}', { n: st.n, t: st.total, name: L(st.name) });
-  return `<span class="bs-t">${esc(t)}</span><span class="bs-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${st.pct}" aria-label="${esc(t)}"><i style="width:${st.pct}%"></i></span><span class="bs-n">${st.last ? L('가장 높은 단계예요') : L('다음 단계까지 {d}일', { d: st.left })}</span>`;
+  return `<img class="bird bs-img" src="/img/growth/G${String(st.n).padStart(2, '0')}.webp" width="64" height="64" alt="" decoding="async"><span class="bs-t">${esc(t)}</span><span class="bs-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${st.pct}" aria-label="${esc(t)}"><i style="width:${st.pct}%"></i></span><span class="bs-n">${st.last ? L('가장 높은 단계예요') : L('다음 단계까지 {d}일', { d: st.left })}</span>`;
 }
 function markStudyDay() {
   const list = store.get('study-days', []), id = `${bookPair()}:${dayKey()}`;
