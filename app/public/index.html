@@ -2968,7 +2968,7 @@ function openRead(from) {
     <div id="rp-done" class="cell hidden" style="text-align:center;margin-top:20px"><div class="empty" style="padding:0">${DOODLE}</div><b style="font-family:var(--f-ui);font-size:var(--fs-l)">${L('오늘 일기를 끝까지 읽었어요.')}</b>
       <div class="actions" style="justify-content:center"><button class="btn solid" id="rp-finish">${L('공부 마치기')}</button><button class="btn" id="rp-quiz">${L('저장한 것으로 퀴즈')}</button><button class="btn" id="rp-again">${L('처음부터 다시')}</button></div></div>`;
   $('rp-title').textContent = L('따라 읽기'); 
-  $('rp-ko').checked = store.get('rp-ko', false); $('rp-py').checked = $('opt-py').checked; applyRpKo();
+  $('rp-ko').checked = store.get('rp-ko', true); $('rp-py').checked = $('opt-py').checked; applyRpKo();
   rp.from = from || null;
   if (!rp.open) {
     rp.open = true; history.pushState({ rp: 1 }, '');
