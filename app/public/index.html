@@ -2660,12 +2660,13 @@ document.querySelectorAll('[data-wb]').forEach((b) => b.addEventListener('click'
 // PDF에 쓰는 그림은 여기 세 줄만 바꾸면 된다(나중에 흑백 전용 그림으로 교체): 표지 / 쪽 머리 / 마지막 쪽
 const PDF_ART = { get cover() { return birdArt('hello'); }, get head() { return birdArt('writing'); }, get end() { return birdArt('rest'); } };
 const pdfCover = (title, tag, lines, compact) => `<section class="ps-cover${compact ? ' compact' : ''}"><img src="${PDF_ART.cover}" width="220" height="220" alt=""><h1>${esc(title)}</h1><p class="ps-tag">${esc(tag)}</p>${lines.map((l) => `<p>${esc(l)}</p>`).join('')}</section>`;
+const BASE_TITLE = document.title;
 function runPrint(docTitle, html) {
+  // 인쇄 내용은 화면에서는 숨겨져 있으므로 남겨 둔다. 휴대폰 크롬은 "PDF로 저장"을 누른 뒤에 쪽을 다시 그리는데, 인쇄 이벤트가 끝났다고 내용을 바로 지우면 빈 흰 쪽이 저장됐다.
   $('print-sheet').innerHTML = html;
   toast(L("인쇄 창에서 'PDF로 저장'을 고르세요."));
-  const prev = document.title; document.title = docTitle;
-  const done = () => { document.title = prev; $('print-sheet').innerHTML = ''; window.removeEventListener('afterprint', done); };
-  window.addEventListener('afterprint', done);
+  document.title = docTitle; // PDF 파일 이름으로 쓰인다. 인쇄 창을 닫은 뒤 한참 있다가 원래 제목으로 되돌린다.
+  clearTimeout(runPrint.t); runPrint.t = setTimeout(() => { document.title = BASE_TITLE; }, 120000);
   Promise.all([...$('print-sheet').querySelectorAll('img')].map((im) => (im.decode ? im.decode().catch(() => {}) : 0))).then(() => setTimeout(() => window.print(), 50));
 }
 const pdfDate = (d, o) => d.toLocaleDateString(LANGS[UI].bcp, o || { year: 'numeric', month: 'long', day: 'numeric' });
