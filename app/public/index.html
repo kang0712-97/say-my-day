@@ -630,11 +630,11 @@
   .wsheet.open .ws-more { display: block; }
   .wsheet .ws-more > .pn-sec:first-child { border-top: 0; margin-top: 0; padding-top: 12px; }
   .wsheet .ws-foot { padding: 8px 20px calc(12px + env(safe-area-inset-bottom)); }
-  .wsheet .ws-foot .btn { width: 100%; justify-content: center; margin-top: 0; }
+  .wsheet .ws-foot { display: flex; gap: 8px; }
+  .wsheet .ws-foot .btn { flex: 1; min-width: 0; justify-content: center; margin-top: 0; }
   .wsheet .pn-main { flex-wrap: nowrap; align-items: center; }
   .wsheet .zhline.pn { font-size: 1.75rem; }
-  .wsheet .pn-save .btn { min-width: var(--smd-hit-area); padding-inline: 0; justify-content: center; }
-  .wsheet .pn-save .btn span { display: none; }
+  .wsheet .wd-head .btn { border: 0; background: transparent; box-shadow: none; }
   .wsheet .wd-head { position: absolute; top: 8px; right: 10px; padding: 0; }
   .wsheet .ws-sum { padding: 12px 64px 8px 20px; }
   .lc-more { margin-top: 8px; min-height: 40px; }
@@ -2043,10 +2043,10 @@ function miniWord(kind, si, k) {
 }
 const ctxOf = () => null; // 단어 소리는 문장 소리를 자르지 않고 그 단어만 따로 합성한다(문장에서 자르면 앞뒤 단어가 섞이거나 끊겨 들렸다)
 const pnSaveBtn = (zh) => hasWord(zh)
-  ? `<button class="btn saved" data-msave aria-pressed="true" aria-label="${L('단어장에서 빼기')}: ${esc(zh)}">${ICON.bookmarkFill}<span>${L('저장됨')}</span></button>`
-  : `<button class="btn" data-msave aria-pressed="false" aria-label="${L('단어장에 저장')}: ${esc(zh)}">${ICON.bookmark}<span>${L('단어 저장')}</span></button>`;
-function wordSummaryHtml(w) { // 1단: 단어·발음·뜻·저장
-  return `<div class="pn-main"><div class="pn-w"><div class="zhline pn" lang="${BCP()}">${w.tok ? cellsFrom(w.tok) : cells(w.zh)}</div>${playBtn(w.zh, '발음 듣기', false, true, '', ctxOf(w))}${spkBtn(w.zh, 'w')}</div><div class="pn-save">${pnSaveBtn(w.zh)}</div></div>
+  ? `<button class="btn saved" data-msave aria-pressed="true" aria-label="${L('단어장에서 빼기')}: ${esc(zh)}">${ICON.starFill}<span>${L('저장됨')}</span></button>`
+  : `<button class="btn" data-msave aria-pressed="false" aria-label="${L('단어장에 저장')}: ${esc(zh)}">${ICON.star}<span>${L('단어장에 저장')}</span></button>`;
+function wordSummaryHtml(w, noSave = false) { // 1단: 단어·발음·뜻·저장
+  return `<div class="pn-main"><div class="pn-w"><div class="zhline pn" lang="${BCP()}">${w.tok ? cellsFrom(w.tok) : cells(w.zh)}</div>${playBtn(w.zh, '발음 듣기', false, true, '', ctxOf(w))}${spkBtn(w.zh, 'w')}</div>${noSave ? '' : `<div class="pn-save">${pnSaveBtn(w.zh)}</div>`}</div>
     <div class="pn-ko ${w.ko ? '' : 'none'}">${w.ko ? esc(w.ko) : L('이 단어의 뜻 정보가 없어요. 발음은 들을 수 있어요.')}</div>`;
 }
 function wordMoreHtml(w) { // 2단 자세히: 읽기 확인·글자 풀이·이 문장에서·관련 예문
@@ -2103,9 +2103,9 @@ function showMini(kind, si, k, el) { // 문장 속 단어 누르기 → 화면 �
   const w = miniWord(kind, si, k);
   const box = document.createElement('div'); box.className = 'wsheet'; box.tabIndex = -1; box.setAttribute('role', 'region'); box.setAttribute('aria-label', L('단어 설명'));
   box.innerHTML = `<div class="wd-head"><button class="btn icon" data-pclose aria-label="${L('닫기')}"><span data-i="close"></span></button></div>
-    <div class="ws-sum">${wordSummaryHtml(w)}</div>
+    <div class="ws-sum">${wordSummaryHtml(w, true)}</div>
     <div class="ws-more" id="ws-more" role="region" aria-label="${L('자세히 보기')}">${wordMoreHtml(w)}</div>
-    <div class="ws-foot"><button class="btn" data-wsmore aria-expanded="false" aria-controls="ws-more">${L('자세히 보기')}</button></div>`;
+    <div class="ws-foot">${pnSaveBtn(w.zh)}<button class="btn" data-wsmore aria-expanded="false" aria-controls="ws-more">${L('자세히 보기')}</button></div>`;
   box.querySelectorAll('[data-i]').forEach((n) => { n.innerHTML = ICON[n.dataset.i] || ''; });
   document.body.appendChild(box); el.classList.add('sel'); panel = { w, kind, si, k, el, box };
   document.querySelectorAll('.wsheet-pad').forEach((p) => p.classList.add('on')); // 시트에 가려지지 않게 아래 여백을 만든다
