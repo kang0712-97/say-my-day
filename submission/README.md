@@ -2,7 +2,7 @@
 | 파일 | 용도 | 제출 위치 |
 |---|---|---|
 | `프롬프트.md` | AI 활용 과정(프롬프트 v0.1~v0.5 변경 기록, 독립 감수, CLAUDE.md·스킬, AI 실수 8건) | 드라이브 본인 폴더에 파일로 |
-| `slides-outline.md` + `metrics.json` + `images/` + `gpt-prompt.md` | 발표 자료(HTML) 제작 입력 | GPT로 만든 HTML을 `images/`와 함께 업로드 |
+| `gpt-input.md`(복사해 붙여 넣기용) + `images/` | 발표 자료(HTML) 제작 입력(`gpt-prompt.md`·`slides-outline.md`·`metrics.json`을 합친 것) | GPT로 만든 HTML을 `images/`와 함께 업로드 |
 | `demo-script.md` | 시연 영상 대본 | 영상은 드라이브에 파일로(너무 크면 링크를 「00_제출 주소」에) |
 | `stability.md` + `images/11~17` + `scenes/` | 안정성 시연 근거 | 발표 8장·영상 |
 | `measure.js` + `metrics.json` | 전후 지표 측정 코드·결과 | 발표 9~10장 |
