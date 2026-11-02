@@ -1008,7 +1008,7 @@
     <div class="sh-wx" role="group" aria-labelledby="wx-l"><span class="sh-cap" id="wx-l"></span><div class="wx-row" id="wx-row"></div></div>
   </section>
   <section class="dpg-pic">
-    <img class="bird wt-bird" src="/img/bird/02-writing.webp" width="120" height="120" alt="" decoding="async">
+    <img class="bird wt-bird" data-bird="writing" width="120" height="120" alt="" decoding="async">
     <div class="sp-side">
       <button class="say" id="week-link" type="button"><span id="week-say"></span></button>
       <div class="bird-stage" id="bird-stage"></div>
@@ -1053,7 +1053,7 @@
     </div>
     <div id="quick-card" class="cont quick hidden">
       <div class="quick-row">
-        <img class="bird" src="/img/bird/08-review.webp" width="56" height="56" alt="" decoding="async" loading="lazy">
+        <img class="bird" data-bird="review" width="56" height="56" alt="" decoding="async" loading="lazy">
         <div class="quick-main"><p class="cont-t" id="quick-say"></p><p class="cont-p" id="quick-p"></p></div>
       </div>
       <button class="primary" id="quick-go"><span>3분 복습</span><span class="arrow" data-i="arrow"></span></button>
@@ -1066,7 +1066,7 @@
   <div id="result" class="hidden">
     <div id="mock" class="banner warn hidden" style="margin:0 20px 14px"></div>
     <div class="pad">
-      <div id="saved-row" class="saved-row hidden" role="status"><img class="bird" src="/img/bird/07-saved.webp" width="96" height="96" alt="" decoding="async"><div><b><span data-i="bookmarkFill"></span>일기장에 저장했어요.</b><span>일기장에서 다시 볼 수 있어요.</span></div></div>
+      <div id="saved-row" class="saved-row hidden" role="status"><img class="bird" data-bird="saved" width="96" height="96" alt="" decoding="async"><div><b><span data-i="bookmarkFill"></span>일기장에 저장했어요.</b><span>일기장에서 다시 볼 수 있어요.</span></div></div>
       <div id="voice-warn" class="banner error hidden" role="alert"></div>
       <h2 class="vh" id="sec-sentences">번역</h2>
       <nav class="steps" id="steps" aria-label="학습 단계">
@@ -1104,7 +1104,7 @@
       <div id="p-hist" class="hidden">
         <div class="vhead">
           <div class="vhead-t"><h2>일기장</h2><p>쓴 일기를 다시 보고 관리해요.</p></div>
-          <img class="bird" src="/img/bird/09-first-entry.webp" width="96" height="96" alt="" decoding="async">
+          <img class="bird" data-bird="first-entry" width="96" height="96" alt="" decoding="async">
         </div>
         <div id="backup-nudge"></div>
         <div id="cal" class="cal"></div>
@@ -1117,7 +1117,7 @@
       <div id="p-word" class="hidden">
         <div class="vhead">
           <div class="vhead-t"><h2>보관함·복습</h2><p>저장한 단어와 문장을 복습해요.</p><p id="spk-total" class="hidden"></p></div>
-          <img class="bird" id="vh-bird" src="/img/bird/08-review.webp" width="96" height="96" alt="" decoding="async">
+          <img class="bird" id="vh-bird" data-bird="review" width="96" height="96" alt="" decoding="async">
         </div>
         <div class="seg vseg" role="tablist" aria-label="보관함 종류">
           <button role="tab" data-wb="word" aria-selected="true">단어 <span id="wb-n-word">0</span></button>
@@ -1131,7 +1131,7 @@
       </div>
       <div id="p-week" class="hidden">
         <div class="vhead"><div class="vhead-t"><h2>주간 돌아보기</h2><p id="wk-range"></p></div>
-          <img class="bird" src="/img/bird/07-saved.webp" width="96" height="96" alt="" decoding="async"></div>
+          <img class="bird" data-bird="saved" width="96" height="96" alt="" decoding="async"></div>
         <section class="wk" id="wk-body" aria-live="polite"></section>
       </div>
       <div id="p-set" class="hidden">
@@ -1195,7 +1195,7 @@
         <p class="small" id="lp-note" style="margin-top:12px"></p>
       </section>
       <section class="slide" aria-label="2 / 3" aria-hidden="true">
-        <div class="intro-bird"><img class="bird" src="/img/bird/01-hello.webp" width="200" height="200" alt="" decoding="async"></div>
+        <div class="intro-bird"><img class="bird" data-bird="hello" width="200" height="200" alt="" decoding="async"></div>
         <p class="eyebrow" data-t="intro.hello.eyebrow">Say My Day</p>
         <h2 data-th="intro.hello.h">오늘 하루 어땠나요?<br><em>내 이야기를 외국어로 말해봐요.</em></h2>
         <p class="small" data-th="intro.hello.p">내 하루를 일기로 쓰면, 그게 오늘 배울 문장이 돼요.<br>새로운 언어를 내 일상으로 만들 때까지.</p>
@@ -1216,7 +1216,7 @@
 
 <div id="writing" class="writing hidden" role="status" aria-live="polite">
   <div class="w-in">
-    <img class="bird w-bird" src="/img/bird/03-thinking-translation.webp" width="96" height="96" alt="" decoding="async">
+    <img class="bird w-bird" data-bird="thinking" width="96" height="96" alt="" decoding="async">
     <div class="w-ko" id="w-ko"></div>
     <svg class="w-svg" id="w-svg" viewBox="70 20 270 310" aria-hidden="true">
       <g class="w-line">
@@ -1305,8 +1305,21 @@ customPinyin(PINYIN_FIX);
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 // 작은 새 그림(장식). 상태 안내는 이 그림이 아니라 옆의 글자·아이콘이 맡는다(alt=""). 사용: bird('hello', 200)
-const BIRDS = { hello: '01-hello', writing: '02-writing', thinking: '03-thinking-translation', discovery: '04-word-discovery', 'read-aloud': '05-read-aloud', listening: '06-listening', saved: '07-saved', review: '08-review', 'first-entry': '09-first-entry', retry: '10-retry-help', walking: '11-walking', rest: '12-rest-no-review' };
-const bird = (name, size = 96) => BIRDS[name] ? `<img class="bird" src="/img/bird/${BIRDS[name]}.webp" width="${size}" height="${size}" alt="" decoding="async" loading="lazy">` : '';
+// 복장 새(T40): 현재 성장 단계 + 동작 → 그림. 알(1·2단계)은 동작 없이 한 장. think·oops·giggle·surprised 그림이 들어오면 COS_EXTRA에 이름을 추가.
+const COS_CORE = ['write', 'listen', 'read', 'review', 'complete', 'sticker', 'rest', 'welcome'];
+const COS_EXTRA = [];
+const BIRD_POSE = { hello: 'welcome', writing: 'write', thinking: 'think', discovery: 'read', 'read-aloud': 'read', listening: 'listen', saved: 'complete', review: 'review', 'first-entry': 'complete', retry: 'oops', 'retry-help': 'oops', walking: 'welcome', rest: 'rest' };
+const POSE_FALLBACK = { think: 'review', oops: 'welcome', giggle: 'complete', surprised: 'welcome' };
+function birdArt(name, n) {
+  n = n || birdStage().n;
+  const g = String(n).padStart(2, '0');
+  if (n <= 2) return `/img/cos/G${g}.webp`;
+  let p = BIRD_POSE[name] || name;
+  if (!COS_CORE.includes(p) && !COS_EXTRA.includes(p)) p = POSE_FALLBACK[p] || 'welcome';
+  return `/img/cos/G${g}/${p}.webp`;
+}
+const bird = (name, size = 96) => BIRD_POSE[name] ? `<img class="bird" data-bird="${name}" src="${birdArt(name)}" width="${size}" height="${size}" alt="" decoding="async" loading="lazy">` : '';
+const paintBirds = (root = document) => root.querySelectorAll('img[data-bird]').forEach((im) => { im.src = birdArt(im.dataset.bird); });
 // 서버(chinese-diary/data 폴더)에도 저장하는 항목. 설정·테마 같은 기기별 값은 브라우저에만 둔다.
 const SYNCED = ['diary-history', 'wordbook', 'sentbook', 'activity', 'glossary', 'speak-log', 'study-days'];
 let storageWarned = 0;
@@ -2418,7 +2431,7 @@ function renderWords() {
   const nDue = list.filter(dueNow).length;
   // 머리 그림이 상태를 알린다(새는 한 마리만): 복습할 것 있음=복습, 없음=쉬는 새, 저장 없음=첫 기록
   const btn = $('quiz-start');
-  $('vh-bird').src = `/img/bird/${BIRDS[nDue ? 'review' : list.length ? 'rest' : 'first-entry']}.webp`;
+  $('vh-bird').dataset.bird = nDue ? 'review' : list.length ? 'rest' : 'first-entry'; paintBirds($('p-hist'));
   $('vdue').classList.toggle('hidden', !list.length);
   if (nDue) { $('vdue-text').textContent = L(isWord ? '오늘 복습할 단어 {n}개' : '오늘 복습할 문장 {n}개', { n: nDue }); btn.innerHTML = L('복습 시작') + ICON.arrow; btn.className = 'btn solid'; btn.disabled = false; }
   else if (list.length) { $('vdue-text').textContent = L(isWord ? '오늘 복습할 단어가 없어요.' : '오늘 복습할 문장이 없어요.') + ' ' + L('저장 {m}개', { m: list.length }); btn.textContent = L('전체 복습하기'); btn.className = 'btn'; btn.disabled = false; }
@@ -2445,7 +2458,7 @@ function renderWords() {
 document.querySelectorAll('[data-wb]').forEach((b) => b.addEventListener('click', () => { wbTab = b.dataset.wb; renderWords(); }));
 // PDF(단어장·일기책): 인쇄 전용 영역을 채워 브라우저 인쇄("PDF로 저장")를 연다. 흑백 인쇄 기준(그림은 회색조, 색 글자 없음).
 // PDF에 쓰는 그림은 여기 세 줄만 바꾸면 된다(나중에 흑백 전용 그림으로 교체): 표지 / 쪽 머리 / 마지막 쪽
-const PDF_ART = { cover: `/img/bird/${BIRDS.hello}.webp`, head: `/img/bird/${BIRDS.writing}.webp`, end: `/img/bird/${BIRDS.rest}.webp` };
+const PDF_ART = { get cover() { return birdArt('hello'); }, get head() { return birdArt('writing'); }, get end() { return birdArt('rest'); } };
 const pdfCover = (title, tag, lines, compact) => `<section class="ps-cover${compact ? ' compact' : ''}"><img src="${PDF_ART.cover}" width="220" height="220" alt=""><h1>${esc(title)}</h1><p class="ps-tag">${esc(tag)}</p>${lines.map((l) => `<p>${esc(l)}</p>`).join('')}</section>`;
 function runPrint(docTitle, html) {
   $('print-sheet').innerHTML = html;
@@ -2526,13 +2539,13 @@ function bookGo(i, dir) { book.i = Math.max(0, Math.min(book.pages.length, i)); 
 function renderBook() {
   hidePanel(true);
   const root = $('p-book'), pages = book.pages, N = pages.length;
-  if (!N) { root.innerHTML = `<div class="bk"><div class="bk-cover"><img class="bird" src="/img/bird/09-first-entry.webp" width="96" height="96" alt=""><h2>${L('아직 일기가 없어요.')}</h2><p>${L('일기를 쓰면 여기에 책으로 쌓여요.')}</p><button class="btn solid" id="book-new">${L('새 일기')}</button></div></div>`; return; }
+  if (!N) { root.innerHTML = `<div class="bk"><div class="bk-cover"><img class="bird" data-bird="first-entry" src="${birdArt('first-entry')}" width="96" height="96" alt=""><h2>${L('아직 일기가 없어요.')}</h2><p>${L('일기를 쓰면 여기에 책으로 쌓여요.')}</p><button class="btn solid" id="book-new">${L('새 일기')}</button></div></div>`; return; }
   let body;
   if (book.i === 0) {
     const days = new Set(pages.map((pg) => dayKey(new Date(pg.h.at)))).size, seen = new Set();
     const sents = pages.reduce((a, pg) => (seen.has(pg.h.id) ? a : (seen.add(pg.h.id), a + ((pg.h.result && pg.h.result.sentences) || []).length)), 0);
     const first = new Date(pages[0].h.at).toLocaleDateString(LANGS[UI].bcp, { year: 'numeric', month: 'long', day: 'numeric' });
-    body = `<div class="bk-cover"><span class="plate"><img src="/img/bird/${BIRDS.hello}.webp" width="144" height="144" alt=""></span><h2>${L('나의 이야기')}</h2><p class="tag">${L('작은 새와 함께 쓰는 내 하루')}</p><p>${esc(L(LANGS[LANG.src].name))} → ${esc(L(LANGS[LANG.tgt].name))}</p><p>${L('쓴 날 {n}일 · 문장 {s}개 · 단어 {w}개', { n: days, s: sents, w: loadWords().length })}</p><p>${L('처음 쓴 날 {d}', { d: first })}</p><p>${pages.length} ${L('쪽')}</p><button class="btn solid" data-bkgo="1">${L('펼치기')}</button><button class="btn" id="bk-pdf" type="button">${L('일기책 PDF로 저장')}</button></div>${bookToc(pages)}`;
+    body = `<div class="bk-cover"><span class="plate"><img src="${birdArt('hello')}" width="144" height="144" alt=""></span><h2>${L('나의 이야기')}</h2><p class="tag">${L('작은 새와 함께 쓰는 내 하루')}</p><p>${esc(L(LANGS[LANG.src].name))} → ${esc(L(LANGS[LANG.tgt].name))}</p><p>${L('쓴 날 {n}일 · 문장 {s}개 · 단어 {w}개', { n: days, s: sents, w: loadWords().length })}</p><p>${L('처음 쓴 날 {d}', { d: first })}</p><p>${pages.length} ${L('쪽')}</p><button class="btn solid" data-bkgo="1">${L('펼치기')}</button><button class="btn" id="bk-pdf" type="button">${L('일기책 PDF로 저장')}</button></div>${bookToc(pages)}`;
   } else {
     const pg = pages[book.i - 1], h = pg.h, d = new Date(h.at), sents = ((h.result && h.result.sentences) || []).slice(pg.from, pg.to);
     learnReadings(h.result);
@@ -2959,7 +2972,7 @@ function birdStage(days = studyDaysCount()) {
 }
 function stageHtml(st) { // 단계 이름·진행 막대·다음 단계까지 남은 날
   const t = L('새 단계 {n}/{t} · {name}', { n: st.n, t: st.total, name: L(st.name) });
-  return `<img class="bird bs-img" src="/img/growth/G${String(st.n).padStart(2, '0')}.webp" width="64" height="64" alt="" decoding="async"><span class="bs-t">${esc(t)}</span><span class="bs-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${st.pct}" aria-label="${esc(t)}"><i style="width:${st.pct}%"></i></span><span class="bs-n">${st.last ? L('가장 높은 단계예요') : L('다음 단계까지 {d}일', { d: st.left })}</span>`;
+  return `<img class="bird bs-img" src="/img/cos/G${String(st.n).padStart(2, '0')}.webp" width="64" height="64" alt="" decoding="async"><span class="bs-t">${esc(t)}</span><span class="bs-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${st.pct}" aria-label="${esc(t)}"><i style="width:${st.pct}%"></i></span><span class="bs-n">${st.last ? L('가장 높은 단계예요') : L('다음 단계까지 {d}일', { d: st.left })}</span>`;
 }
 function markStudyDay() {
   const list = store.get('study-days', []), id = `${bookPair()}:${dayKey()}`;
@@ -2967,7 +2980,7 @@ function markStudyDay() {
   return list.filter((x) => x.p === bookPair()).length;
 }
 function openFinish() {
-  const w = currentVocab.length, s = sentState.length, before = birdStage(), days = markStudyDay(), now = birdStage(), grew = now.i > before.i;
+  const w = currentVocab.length, s = sentState.length, before = birdStage(), days = markStudyDay(), now = birdStage(), grew = now.i > before.i; paintBirds();
   const fth = `<span class="fth" aria-hidden="true">${ICON.feather}</span>`;
   $('finish').innerHTML = `<div class="fin-box">
     ${bird('saved', 160)}
@@ -3312,7 +3325,7 @@ async function drawShare(cv, item) {
   const paper = shrCss('--paper') || '#fff', ink = shrCss('--ink') || '#111', muted = shrCss('--muted') || '#666', ui = shrCss('--f-ui') || 'sans-serif', zh = shrCss('--f-zh') || 'serif';
   try { await Promise.all([document.fonts.load(`700 64px ${zh}`, item.zh), document.fonts.load(`500 40px ${ui}`)]); } catch {}
   c.fillStyle = paper; c.fillRect(0, 0, W, H); c.textBaseline = 'alphabetic';
-  const img = await new Promise((r) => { const im = new Image(); im.onload = () => r(im); im.onerror = () => r(null); im.src = '/img/bird/02-writing.webp'; });
+  const img = await new Promise((r) => { const im = new Image(); im.onload = () => r(im); im.onerror = () => r(null); im.src = birdArt('writing'); });
   if (img) c.drawImage(img, W - pad - 200, pad - 20, 200, 200);
   c.fillStyle = muted; c.font = `500 36px ${ui}`; c.fillText(L('{y}년 {m}월 {d}일', { y: new Date().getFullYear(), m: new Date().getMonth() + 1, d: new Date().getDate() }), pad, pad + 40);
   let y = 400; c.fillStyle = ink; c.font = `700 72px ${zh}`;
@@ -3579,7 +3592,7 @@ function renderDayPage() {
 }
 function syncHome() {
   renderDayPage();
-  $('bird-stage').innerHTML = stageHtml(birdStage());
+  $('bird-stage').innerHTML = stageHtml(birdStage()); paintBirds();
   $('week-say').innerHTML = `<span class="fth" aria-hidden="true">${ICON.feather}</span>${esc(weekSay())}`;
   const t = todayEntry();
   $('cont-card').classList.toggle('hidden', !t);
@@ -3635,7 +3648,7 @@ function renderBookObj(list) { // 일기장 위의 책: 두께는 일기 수에 
   const b = $('hist-book'); b.style.setProperty('--th', th);
   b.style.boxShadow = Array.from({ length: th }, (_, i) => `${(i + 1) * 2}px ${(i + 1) * 2}px 0 0 var(--paper), ${(i + 1) * 2}px ${(i + 1) * 2}px 0 1px var(--ink)`).join(',');
   b.setAttribute('aria-label', `${L('내 일기책')}: ${L('일기 {n}편 · 문장 {s}개', { n: list.length, s: sents })}`);
-  b.innerHTML = `<span class="plate"><img src="/img/bird/${BIRDS.hello}.webp" alt=""></span><span class="bo-t"><b>${L('내 일기장')}</b><small>${L('일기 {n}편 · 문장 {s}개', { n: list.length, s: sents })}</small></span><span class="bo-go" aria-hidden="true">${ICON.arrow}</span>`;
+  b.innerHTML = `<span class="plate"><img src="${birdArt('hello')}" alt=""></span><span class="bo-t"><b>${L('내 일기장')}</b><small>${L('일기 {n}편 · 문장 {s}개', { n: list.length, s: sents })}</small></span><span class="bo-go" aria-hidden="true">${ICON.arrow}</span>`;
 }
 $('hist').addEventListener('click', (e) => {
   const hm = e.target.closest('[data-hmore]'); const hask = e.target.closest('[data-hask]');
@@ -3974,6 +3987,7 @@ document.addEventListener('keydown', (e) => {
 { let x0 = null; const el = $('intro');
   el.addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
   el.addEventListener('touchend', (e) => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; x0 = null; if (intro.pickerOnly || Math.abs(dx) <= 50) return; const to = intro.i + (dx < 0 ? 1 : -1); if (!(intro.i === 0 && dx < 0)) introShow(to); }, { passive: true }); }
+paintBirds();
 if (!store.get('intro-seen', '')) introOpen();
 setUI(LANG.src); zhStatic();
 
