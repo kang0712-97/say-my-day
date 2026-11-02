@@ -765,6 +765,10 @@
     #print-sheet .ps-cover h1 { font-size: 26pt; margin: 10mm 0 2mm; font-weight: 700; }
     #print-sheet .ps-cover .ps-tag { font-size: 12pt; font-weight: 700; margin: 0 0 8mm; padding-bottom: 4mm; border-bottom: 1.5pt solid #000; }
     #print-sheet .ps-cover p { margin: 1mm 0; font-size: 11pt; }
+    #print-sheet .ps-cover.compact { height: auto; break-after: auto; margin-bottom: 6mm; }
+    #print-sheet .ps-cover.compact img { width: 34mm; height: 34mm; padding: 2mm; }
+    #print-sheet .ps-cover.compact h1 { font-size: 20pt; margin: 5mm 0 1mm; }
+    #print-sheet .ps-cover.compact .ps-tag { margin-bottom: 3mm; padding-bottom: 2mm; }
     /* 쪽 머리: 날짜(일기 한 편 = 새 쪽) */
     #print-sheet .ps-day { break-before: page; }
     #print-sheet .ps-day:first-of-type { break-before: auto; }
@@ -778,7 +782,6 @@
     #print-sheet .ps-pairs li { border-top: 0; border-left: 1pt solid #000; padding: 1.2mm 0 1.2mm 3mm; margin-bottom: 1.6mm; line-height: 1.4; }
     #print-sheet .ps-pairs .ps-r { display: block; margin: 0; font-size: 9.5pt; }
     #print-sheet .ps-pairs .ps-m { font-size: 10.5pt; }
-    #print-sheet .ps-list li:first-child { border-top: 0; }
     #print-sheet .ps-end { break-before: avoid; text-align: center; margin-top: 12mm; break-inside: avoid; }
     #print-sheet .ps-end img { width: 28mm; height: 28mm; object-fit: contain; }
     #print-sheet .ps-end p { font-size: 10pt; margin: 2mm 0 0; }
@@ -2410,7 +2413,7 @@ document.querySelectorAll('[data-wb]').forEach((b) => b.addEventListener('click'
 // PDF(단어장·일기책): 인쇄 전용 영역을 채워 브라우저 인쇄("PDF로 저장")를 연다. 흑백 인쇄 기준(그림은 회색조, 색 글자 없음).
 // PDF에 쓰는 그림은 여기 세 줄만 바꾸면 된다(나중에 흑백 전용 그림으로 교체): 표지 / 쪽 머리 / 마지막 쪽
 const PDF_ART = { cover: `/img/bird/${BIRDS.hello}.webp`, head: `/img/bird/${BIRDS.writing}.webp`, end: `/img/bird/${BIRDS.rest}.webp` };
-const pdfCover = (title, tag, lines) => `<section class="ps-cover"><img src="${PDF_ART.cover}" width="220" height="220" alt=""><h1>${esc(title)}</h1><p class="ps-tag">${esc(tag)}</p>${lines.map((l) => `<p>${esc(l)}</p>`).join('')}</section>`;
+const pdfCover = (title, tag, lines, compact) => `<section class="ps-cover${compact ? ' compact' : ''}"><img src="${PDF_ART.cover}" width="220" height="220" alt=""><h1>${esc(title)}</h1><p class="ps-tag">${esc(tag)}</p>${lines.map((l) => `<p>${esc(l)}</p>`).join('')}</section>`;
 function runPrint(docTitle, html) {
   $('print-sheet').innerHTML = html;
   toast(L("인쇄 창에서 'PDF로 저장'을 고르세요."));
@@ -2426,9 +2429,8 @@ function printList() { // 지금 조합·지금 탭만
   if (!list.length) return toast(L('저장한 항목이 없어요.'));
   const date = pdfDate(new Date());
   const title = L(isWord ? '저장한 단어 목록' : '저장한 문장 목록');
-  const items = list.map((x) => `<li><span class="ps-t" lang="${BCP()}">${esc(x.zh)}</span><span class="ps-r" lang="${BCP()}">${esc(plainPinyin(x.zh))}</span><span class="ps-m">${esc(x.ko)}</span>${isWord && x.ex_zh ? `<span class="ps-e"><span lang="${BCP()}">${esc(x.ex_zh)}</span> ${esc(x.ex_ko || '')}</span>` : ''}</li>`).join('');
-  runPrint(`${title} ${LANG.src}-${LANG.tgt}`, pdfCover(title, L('작은 새와 함께 쓰는 내 하루'), [pdfPair(), L('{n}개', { n: list.length }), date])
-    + `<section class="ps-list"><header class="ps-dh"><img src="${PDF_ART.head}" width="40" height="40" alt=""><b>${esc(title)}</b><span>${esc(date)}</span></header><ol>${items}</ol></section>`);
+  const items = list.map((x) => `<li><span class="ps-t" lang="${BCP()}">${esc(x.zh)}</span><span class="ps-r" lang="${BCP()}">${esc(plainPinyin(x.zh))}</span><span class="ps-m">${esc(x.ko)}</span></li>`).join(''); // 예문은 넣지 않는다(단어·읽기·뜻만)
+  runPrint(`${title} ${LANG.src}-${LANG.tgt}`, pdfCover(title, L('작은 새와 함께 쓰는 내 하루'), [`${pdfPair()} · ${L('{n}개', { n: list.length })} · ${date}`], true) + `<section class="ps-list"><ol>${items}</ol></section>`); // 표지 바로 아래에서 목록이 시작
 }
 // 일기책 PDF: 표지 → 일기 한 편마다 새 쪽(쪽 머리에 날짜, 내가 쓴 일기, 문장 쌍) → 마지막 쪽
 function printBook() {
