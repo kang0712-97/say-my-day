@@ -1157,6 +1157,9 @@ const T = {
     'set.privacy': '<b>내 일기는 이 기기에 보관돼요.</b> 일기는 이 기기의 브라우저에만 저장돼요. 번역할 때만 일기 문장이 AI(Claude)에 전달되고, 음성을 만들 때는 번역된 {tgt} 문장이 음성 서비스에 전달돼요.',
     'writing.t': '내 이야기를 {tgt}로 옮겨 쓰고 있어요',
     'err.keep': '입력한 일기는 그대로 남아 있어요.',
+    'err.credit': '지금은 번역 서비스를 쓸 수 없어요. 곧 다시 열릴 거예요.',
+    'err.key': '번역 서비스 설정에 문제가 있어요. 잠시 후 다시 시도해 주세요.',
+    'err.service': '번역 서비스에서 문제가 생겼어요. 잠시 후 다시 시도해 주세요.',
     'err.limit_day': '오늘 쓸 수 있는 번역 횟수를 모두 사용했어요. 내일 다시 이용해 주세요.',
     'err.busy': '지금 번역 요청이 몰려 있어요. 잠시 후 다시 시도해 주세요.',
     'err.limit_ip': '1시간에 {n}번까지 번역할 수 있어요. 잠시 후 다시 시도해 주세요.',
@@ -1182,6 +1185,9 @@ const T = {
     'set.privacy': '<b>你的日记保存在这台设备上。</b>日记只保存在这台设备的浏览器里。只有翻译时，日记句子才会发送给 AI（Claude）；生成语音时，翻译好的{tgt}句子会发送给语音服务。',
     'writing.t': '正在把我的故事写成{tgt}',
     'err.keep': '你输入的日记还在。',
+    'err.credit': '翻译服务暂时无法使用，很快会恢复。',
+    'err.key': '翻译服务设置有问题，请稍后再试。',
+    'err.service': '翻译服务出了点问题，请稍后再试。',
     'err.limit_day': '今天可用的翻译次数已用完，请明天再来。',
     'err.busy': '现在翻译请求太多，请稍后再试。',
     'err.limit_ip': '每小时最多可以翻译{n}次，请稍后再试。',
@@ -1851,7 +1857,7 @@ function loadChars(words) {
   const lang = LANG.tgt, K = chKey; const need = uniq.filter((w) => !charCache[K(w)] && !charPending.has(K(w))).slice(0, 12);
   if (need.length) {
     const p = fetch('/api/chars', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ words: need, lang, src: LANG.src }) })
-      .then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error ? L(d.error) : L('글자 풀이를 불러오지 못했어요.')); for (const [k, v] of Object.entries(d.words || {})) charCache[chPre() + k] = v; saveCharCache(); })
+      .then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.code && T.ko['err.' + d.code] ? tr('err.' + d.code) : d.error ? L(d.error) : L('글자 풀이를 불러오지 못했어요.')); for (const [k, v] of Object.entries(d.words || {})) charCache[chPre() + k] = v; saveCharCache(); })
       .finally(() => need.forEach((w) => charPending.delete(K(w))));
     need.forEach((w) => charPending.set(K(w), p));
   }

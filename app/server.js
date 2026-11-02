@@ -239,7 +239,7 @@ async function callModel(userText, glossary = [], file) {
     }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(`API 오류 ${res.status}: ${data?.error?.message || '알 수 없음'}`);
+  if (!res.ok) throw upstreamError(res.status, data);
   const text = (data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
   if (!text) throw new Error(`Claude가 빈 응답을 보냈습니다. (stop_reason: ${data.stop_reason})`);
   if (data.stop_reason === 'max_tokens') throw new Error('응답이 길이 제한에서 잘렸습니다. 일기를 줄여 다시 시도해 주세요.');
@@ -296,6 +296,18 @@ function charsLimited(req) {
   return false;
 }
 
+// 번역·풀이 API가 실패했을 때 사용자에게 보일 종류를 가른다(원문 메시지는 화면에 내지 않는다). credit = API 크레딧 부족(운영자가 충전해야 함)
+const UPSTREAM_MSG = { credit: '지금은 번역 서비스를 쓸 수 없어요. 곧 다시 열릴 거예요.', key: '번역 서비스 설정에 문제가 있어요. 잠시 후 다시 시도해 주세요.', busy: '지금 요청이 몰려 있어요. 잠시 후 다시 시도해 주세요.', service: '번역 서비스에서 문제가 생겼어요. 잠시 후 다시 시도해 주세요.' };
+let creditWarnAt = 0;
+function upstreamError(status, data) {
+  const msg = String(data?.error?.message || '');
+  const e = new Error(`API 오류 ${status}`);
+  if (/credit balance/i.test(msg)) { e.code = 'credit'; e.http = 503; if (Date.now() - creditWarnAt > 60000) { creditWarnAt = Date.now(); console.error('[경고] API 크레딧이 부족해요. Plans & Billing에서 충전해 주세요.'); } }
+  else if (status === 401 || status === 403) { e.code = 'key'; e.http = 503; }
+  else if (status === 429 || status === 529 || /overloaded/i.test(msg)) { e.code = 'busy'; e.http = 503; }
+  else { e.code = 'service'; e.http = 502; }
+  return e;
+}
 async function callJsonModel(system, userText, maxTokens) {
   if (process.env.GEMINI_API_KEY) {
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
@@ -303,7 +315,7 @@ async function callJsonModel(system, userText, maxTokens) {
       body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: userText }] }], generationConfig: { responseMimeType: 'application/json', maxOutputTokens: maxTokens } }),
     });
     const data = await res.json();
-    if (!res.ok) throw new Error(`Gemini 오류 ${res.status}`);
+    if (!res.ok) throw upstreamError(res.status, data);
     return extractJson((data.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join(''));
   }
   const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -311,7 +323,7 @@ async function callJsonModel(system, userText, maxTokens) {
     body: JSON.stringify({ model: CHARS_MODEL, max_tokens: maxTokens, thinking: { type: 'between_tools' }, output_config: { effort: 'low' }, system, messages: [{ role: 'user', content: userText }] }),
   });
   const data = await res.json();
-  if (!res.ok) throw new Error(`API 오류 ${res.status}`);
+  if (!res.ok) throw upstreamError(res.status, data);
   return extractJson((data.content || []).filter((b) => b.type === 'text').map((b) => b.text).join(''));
 }
 
@@ -648,7 +660,8 @@ const server = http.createServer(async (req, res) => {
     }
     res.writeHead(405); res.end();
   } catch (err) {
-    req.logInfo.err = err && err.name; // 메시지에는 입력 일부가 섞일 수 있어 기록하지 않는다
+    req.logInfo.err = (err && err.code) || (err && err.name); // 메시지에는 입력 일부가 섞일 수 있어 기록하지 않는다
+    if (err && err.code && UPSTREAM_MSG[err.code]) return sendJson(res, err.http || 502, { error: UPSTREAM_MSG[err.code], code: err.code });
     sendJson(res, 500, { error: err.message });
   }
 });
