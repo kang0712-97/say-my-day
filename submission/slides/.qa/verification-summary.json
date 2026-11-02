@@ -1,0 +1,99 @@
+{
+  "htmlSha256": "9906c3054b29f5c67a3c1862aefd99ebec3b43cc96f1eee8b3c794f83326207f",
+  "mainSlides": 16,
+  "appendixSlides": 1,
+  "reviewedStates": 90,
+  "interactiveStates": 73,
+  "printPages": 17,
+  "sourceTablesVerbatim": true,
+  "outlineTitlesAndOrder": true,
+  "brokenImages": 0,
+  "javascriptErrors": 0,
+  "overflowStates": 0,
+  "originalVideos": [
+    {
+      "file": "demo1.mp4",
+      "presentAtFinalCheck": false,
+      "actionByThisTask": "none"
+    },
+    {
+      "file": "demo2.mp4",
+      "presentAtFinalCheck": false,
+      "actionByThisTask": "none"
+    }
+  ],
+  "playback": {
+    "errors": [],
+    "responsive": [
+      {
+        "size": {
+          "width": 1920,
+          "height": 1080
+        },
+        "stageWithinViewport": true,
+        "navFits": true,
+        "documentFits": true
+      },
+      {
+        "size": {
+          "width": 1280,
+          "height": 800
+        },
+        "stageWithinViewport": true,
+        "navFits": true,
+        "documentFits": true
+      },
+      {
+        "size": {
+          "width": 390,
+          "height": 844
+        },
+        "stageWithinViewport": true,
+        "navFits": true,
+        "documentFits": true
+      }
+    ],
+    "fullVideo": {
+      "ready": 4,
+      "error": null,
+      "advanced": true
+    },
+    "pdfVideo": {
+      "ready": 4,
+      "error": null,
+      "advanced": true,
+      "range": [
+        134.5,
+        147.8
+      ]
+    },
+    "pdfStopsAtEnd": true,
+    "backgroundClick": "2 / 17"
+  },
+  "images": [
+    "01-splash.png",
+    "03-write.png",
+    "04-learn-sentence.png",
+    "05-learn-words.png",
+    "06-learn-grammar.png",
+    "07-fullread.png",
+    "08-stats.png",
+    "11-err-empty.png",
+    "12-err-long.png",
+    "13-err-lang.png",
+    "14-err-api.png",
+    "15-empty-hist.png",
+    "17-resume.png",
+    "20-before-first.png",
+    "21-before-after.png",
+    "23-architecture.png",
+    "old/v1-0919-result.png",
+    "old/v2-0919-B-result.png",
+    "old/v3-1029-pre-result.png",
+    "old/v4-1030-picturediary-result.png",
+    "wordmark.webp"
+  ],
+  "missing": [
+    "발표자 이름"
+  ]
+}
