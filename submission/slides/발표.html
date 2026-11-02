@@ -128,7 +128,8 @@ aside.notes{display:none}
 @media print{
   html,body{overflow:visible;height:auto;background:#fff}
   .viewport{position:static;display:block}.chrome,.progress,.overview,.notes-panel,.help{display:none!important}
-  .stage{width:1920px;height:auto;zoom:.6667;box-shadow:none;border-radius:0;overflow:visible;transform:none!important}
+  .stage{width:1920px;height:auto;zoom:.6667;box-shadow:none;border-radius:0;overflow:visible;transform:none!important;margin:0!important}
+  .phone::after,.zoom{display:none!important}.viewport{inset:auto!important;display:block!important;place-items:initial!important}
   .slide{position:relative;inset:auto;width:1920px;height:1080px;opacity:1;visibility:visible;transform:none;break-after:page;page-break-after:always}
   .frag{opacity:1;transform:none}.panel{display:block!important}.panel+.panel{display:none!important}
   .b i{width:var(--w)!important}
