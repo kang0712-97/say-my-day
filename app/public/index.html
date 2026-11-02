@@ -598,6 +598,7 @@
   .ln-tabs { min-height: 40px; padding: 8px 16px 0; }
   .ln-pill { display: inline-block; padding: 2px 12px; border-radius: 999px; background: var(--ink); color: var(--paper); font: 700 var(--fs-s) var(--f-ui); }
   .ln-card { flex: 1; overflow: auto; padding: 8px 16px 16px; outline: none; }
+  .ln-card.ws-on { padding-bottom: 50vh; }
   .ln-card.in-r { animation: lnr .26s ease-out; }
   .ln-card.in-l { animation: lnl .26s ease-out; }
   @keyframes lnr { from { opacity: 0; transform: translateX(32px); } }
@@ -605,7 +606,7 @@
   @media (prefers-reduced-motion: reduce) { .ln-card.in-r, .ln-card.in-l { animation: none; } }
   .ln-nav { display: grid; grid-template-columns: 1fr 2fr; gap: 8px; padding: 8px 16px calc(16px + env(safe-area-inset-bottom)); border-top: 1px solid var(--line); background: var(--paper); }
   .ln-nav .btn, .ln-nav .primary { height: 56px; min-height: 56px; padding-top: 0; padding-bottom: 0; justify-content: center; }
-  .ln-nav .primary { justify-content: space-between; }
+  .ln-nav .primary { justify-content: space-between; margin: 0; }
   .ln-nav .btn.hidden ~ .primary { grid-column: 1 / -1; }
   .ln-intro { display: flex; flex-direction: column; align-items: center; gap: 8px; padding-top: 24px; text-align: center; }
   .ln-intro .bird { width: 160px; height: 160px; }
@@ -2269,7 +2270,7 @@ document.addEventListener('toggle', (e) => { // 항목이 펼쳐질 때: 핵심 
 function hidePanel(silent) {
   if (!panel) return;
   const { el, box } = panel; el.classList.remove('sel'); box.remove(); panel = null; stopSpeak();
-  document.querySelectorAll('.wsheet-pad').forEach((p) => p.classList.remove('on'));
+  document.querySelectorAll('.wsheet-pad').forEach((p) => p.classList.remove('on')); $('ln-card').classList.remove('ws-on');
   if (!silent && document.contains(el)) el.focus({ preventScroll: true });
 }
 function showMini(kind, si, k, el) { // 문장 속 단어 누르기 → 화면 아래에 단어 시트(요약)가 올라오고, "자세히 보기"로 예문·풀이를 펼친다
@@ -2285,7 +2286,9 @@ function showMini(kind, si, k, el) { // 문장 속 단어 누르기 → 화면 �
   box.querySelectorAll('[data-i]').forEach((n) => { n.innerHTML = ICON[n.dataset.i] || ''; });
   document.body.appendChild(box); el.classList.add('sel'); panel = { w, kind, si, k, el, box };
   document.querySelectorAll('.wsheet-pad').forEach((p) => p.classList.add('on')); // 시트에 가려지지 않게 아래 여백을 만든다
-  requestAnimationFrame(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }));
+  const lcard = el.closest('.ln-card'); // 학습 카드 안: 뒤쪽 화면은 움직이지 않고, 단어가 시트에 가려질 때만 카드를 조금 올린다
+  if (lcard) { lcard.classList.add('ws-on'); requestAnimationFrame(() => { const top = box.getBoundingClientRect().top, b = el.getBoundingClientRect().bottom; if (b > top - 8) lcard.scrollBy({ top: b - top + 16, behavior: 'smooth' }); }); }
+  else requestAnimationFrame(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }));
   fillWordChars(box, w);
   box.querySelector('.pn-w .play')?.click(); // 누르면 발음을 바로 들려 준다
 }
@@ -3137,20 +3140,20 @@ function learnOpen(resume) {
   lnS.cards = lnBuild(); lnS.key = lnKey();
   const pos = store.get('learn-pos', null);
   lnS.i = resume && pos && pos.k === lnS.key && pos.i > 0 && pos.i < lnS.cards.length ? pos.i : 0;
-  lnS.open = true; document.body.classList.add('learning'); $('learn').classList.remove('hidden');
+  lnS.open = true; document.body.classList.add('learning'); document.querySelector('.app').inert = true; $('learn').classList.remove('hidden');
   history.pushState({ ln: 1 }, ''); syncScrollLock(); lnRender(0);
 }
 function learnHide() { // 화면만 닫는다(기록 상태는 learnClose가 되돌린다)
   if (!lnS.open) return;
-  lnS.open = false; document.body.classList.remove('learning'); $('learn').classList.add('hidden');
-  hidePanel(true); stopSpeak(); syncScrollLock();
+  lnS.open = false; document.body.classList.remove('learning'); document.querySelector('.app').inert = false; $('learn').classList.add('hidden');
+  hidePanel(true); stopSpeak(); syncScrollLock(); if (!$('result').classList.contains('hidden')) $('learn-open').focus({ preventScroll: true });
 }
 function learnClose(after) { // 닫으면 번역 결과 목록(전체 보기)이 그대로 보인다
   if (history.state && history.state.ln) history.back(); else learnHide();
   if (after) setTimeout(after, 90);
 }
 $('learn-open').addEventListener('click', () => learnOpen(true));
-$('ln-x').addEventListener('click', () => { learnClose(); $('learn-open').focus({ preventScroll: true }); });
+$('ln-x').addEventListener('click', () => learnClose());
 $('ln-prev').addEventListener('click', () => lnMove(-1));
 $('ln-next').addEventListener('click', () => lnMove(1));
 $('learn').addEventListener('click', (e) => {
