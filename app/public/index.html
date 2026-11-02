@@ -765,10 +765,11 @@
     #print-sheet .ps-cover h1 { font-size: 26pt; margin: 10mm 0 2mm; font-weight: 700; }
     #print-sheet .ps-cover .ps-tag { font-size: 12pt; font-weight: 700; margin: 0 0 8mm; padding-bottom: 4mm; border-bottom: 1.5pt solid #000; }
     #print-sheet .ps-cover p { margin: 1mm 0; font-size: 11pt; }
-    #print-sheet .ps-cover.compact { height: auto; break-after: auto; margin-bottom: 6mm; }
-    #print-sheet .ps-cover.compact img { width: 34mm; height: 34mm; padding: 2mm; }
-    #print-sheet .ps-cover.compact h1 { font-size: 20pt; margin: 5mm 0 1mm; }
-    #print-sheet .ps-cover.compact .ps-tag { margin-bottom: 3mm; padding-bottom: 2mm; }
+    #print-sheet .ps-cover.compact { height: auto; display: grid; grid-template-columns: 18mm 1fr; column-gap: 4mm; align-items: center; text-align: left; break-after: auto; margin-bottom: 3mm; }
+    #print-sheet .ps-cover.compact img { grid-row: 1 / 4; align-self: center; box-sizing: border-box; width: 18mm; height: 18mm; padding: 1.5mm; border-width: 1pt; }
+    #print-sheet .ps-cover.compact h1 { font-size: 16pt; margin: 0; }
+    #print-sheet .ps-cover.compact .ps-tag { font-size: 9.5pt; margin: 0; padding: 0; border: 0; }
+    #print-sheet .ps-cover.compact p { margin: 0; font-size: 9.5pt; }
     /* 쪽 머리: 날짜(일기 한 편 = 새 쪽) */
     #print-sheet .ps-day { break-before: page; }
     #print-sheet .ps-day:first-of-type { break-before: auto; }
