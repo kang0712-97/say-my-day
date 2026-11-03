@@ -250,209 +250,400 @@ aside.notes{display:none}
 .gc img{display:block;height:170px;width:auto;margin:0 auto 6px}
 .gc b{display:block;font:800 28px/1.3 var(--f)}
 .gc span{display:block;font:600 24px/1.4 var(--f);color:var(--muted)}
+
+/* ---------- 재구성(2차) ---------- */
+.answer,.title,.w3 p,.two>div,.card p,.row p,.q,.rules>div,.clipdesc,.gro-text p,.decide li{word-break:keep-all;overflow-wrap:break-word}
+.bridge{flex-direction:row;align-items:center;font-size:27px;padding-top:16px;bottom:38px}
+.bridge .po{font-weight:600;color:var(--ink)}
+.help{font-size:14px}
+.slide.sp>.answer{max-width:1080px}
+.sp2>.kicker,.sp2>.title,.sp2>.answer,.sp2>.body,.sp2>.chips{max-width:840px}
+.chips .chip.solid{background:var(--ink);color:#fff;border-color:var(--ink)}
+.why3{display:grid;gap:16px;margin-top:30px}
+.w3{background:var(--gray);border-radius:var(--r);padding:20px 34px}
+.w3 b{display:block;font:800 36px/1.3 var(--f);margin-bottom:6px}
+.w3 p{margin:0;font:500 29px/1.5 var(--f)}
+.w3.dark{background:var(--ink);color:#fff}
+.why3 .chips{margin-top:2px}
+.stp3{display:grid;gap:14px;margin-top:30px}
+.stp3.s3{margin-top:28px}
+.stp3 .w3{padding:18px 30px}.stp3 .w3 b{font-size:32px}.stp3 .w3 p{font-size:28px}
+/* 모션 1: 일기 → 번역 */
+.conv{position:absolute;right:110px;top:140px;width:780px;display:grid;gap:12px}
+.cv-card{position:relative;background:var(--gray);border-radius:var(--r);padding:22px 34px}
+.cv-card small,.cv-words small{display:block;font:700 24px var(--f);color:var(--muted);margin-bottom:8px}
+.cv-card p{margin:0;font:600 36px/1.5 var(--f)}
+.cv-play{position:absolute;right:26px;top:18px;font-size:23px!important;padding:8px 18px!important}
+.cv-out{background:var(--paper);border:4px solid var(--ink)}
+.cv-out p.zh{font:700 56px/2.5 var(--f);margin:0}
+.cv-out ruby{ruby-position:over;margin-right:6px}
+.cv-out rt{font:600 24px var(--f);color:#555;opacity:0;transition:opacity .6s ease .45s}
+.cv-out.on rt{opacity:1}
+.cv-out.on ruby:nth-of-type(2) rt{transition-delay:.6s}.cv-out.on ruby:nth-of-type(3) rt{transition-delay:.75s}.cv-out.on ruby:nth-of-type(4) rt{transition-delay:.9s}.cv-out.on ruby:nth-of-type(5) rt{transition-delay:1.05s}.cv-out.on ruby:nth-of-type(6) rt{transition-delay:1.2s}
+.cv-arrow{justify-self:center;font:800 30px var(--f);color:var(--muted);padding:2px 0}
+.cv-words{background:var(--ink);color:#fff;border-radius:var(--r);padding:20px 34px}
+.cv-words small{color:#bbb}
+.cv-words div{display:flex;gap:12px;flex-wrap:wrap}
+.cv-words span{padding:9px 18px;border-radius:999px;background:#fff;color:var(--ink);font:700 26px/1.2 var(--f);opacity:0;transform:scale(.9);transition:opacity .35s ease,transform .35s ease}
+.cv-words.on span{opacity:1;transform:none}
+.cv-words.on span:nth-child(2){transition-delay:.15s}.cv-words.on span:nth-child(3){transition-delay:.3s}
+/* 모션 3: 새 성장 */
+.gro{margin-top:22px}
+.gro-main{display:grid;grid-template-columns:480px 1fr;gap:70px;align-items:center}
+.gro-big{position:relative;width:480px;height:420px;background:var(--gray);border-radius:var(--r)}
+.gro-big img{position:absolute;inset:20px;width:calc(100% - 40px);height:calc(100% - 40px);object-fit:contain;opacity:0;transform:scale(.94);transition:opacity .5s ease,transform .5s ease}
+.gro-big img.on{opacity:1;transform:none}
+.gro-day{display:flex;align-items:baseline;gap:14px;font-weight:800}
+.gro-day span{font:800 120px/1 var(--f);letter-spacing:-.03em}
+.gro-day small{font:700 40px var(--f);color:var(--muted)}
+.gro-name{margin:6px 0 14px;font:800 52px/1.2 var(--f)}
+.gro-text p{max-width:900px;margin:0 0 22px;font:500 31px/1.55 var(--f)}
+.gro-strip{display:grid;grid-template-columns:repeat(10,1fr);gap:12px;margin-top:20px}
+.gro-strip span{text-align:center;opacity:.28;transition:opacity .4s,transform .4s}
+.gro-strip span.on{opacity:1}.gro-strip span.cur{transform:translateY(-6px)}
+.gro-strip img{display:block;height:100px;width:auto;margin:0 auto 4px}
+.gro-strip b{display:block;font:700 21px/1.25 var(--f)}
+/* 두 AI 나눠 쓰기 */
+.lane{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.lane>b{min-width:150px;font:800 30px var(--f)}
+.lane span{padding:12px 24px;border:3px solid var(--ink);border-radius:999px;font:700 27px/1.25 var(--f)}
+.lane span.me{background:var(--accent)}
+.lane i{font:700 30px var(--f);font-style:normal}
+/* 회고 */
+.refl .quotes{margin-top:52px;display:grid;gap:44px;max-width:1500px}
+.refl .q{margin:0;font:800 56px/1.4 var(--f);letter-spacing:-.02em}
+.refl .q small{display:block;margin-top:12px;font:500 31px/1.5 var(--f);color:var(--muted);letter-spacing:0}
+.refl .q mark{background:linear-gradient(transparent 62%,var(--accent) 62%);color:inherit}
+.nlist{display:grid;gap:14px}
+.nlist .card{display:grid;grid-template-columns:56px 1fr;gap:20px;align-items:start;padding:22px 32px}
+.nlist .card i{display:inline-grid;place-items:center;width:48px;height:48px;border-radius:50%;background:var(--accent);color:#111;font:800 28px/1 var(--f);font-style:normal}
+.nlist .card p{font-size:27px;line-height:1.45;margin:0}.nlist .card p b{display:block;font-size:30px;margin-bottom:2px}
+.decide{margin:0;padding-left:34px}.decide li{font:500 27px/1.5 var(--f);margin-bottom:8px}.decide li b{font-weight:800}
+n.cu{font-style:normal}
+/* 이동 막대: 묶음 */
+.secs{flex:1;display:flex;gap:10px;justify-content:center;min-width:0}
+.secs button{padding:8px 16px;border:2px solid var(--ink);border-radius:999px;background:var(--paper);font:700 15px var(--f);white-space:nowrap}
+.secs button.on{background:var(--ink);color:#fff}
+.chrome .sec{display:none}
+.ov-sec{grid-column:1/-1;margin:14px 0 0;font:800 20px var(--f);color:var(--muted)}
+@media (max-width:900px){.secs{display:none}}
+.clips button{padding:20px 28px;font-size:30px}.clips button small{font-size:23px}
+.clipdesc{min-height:170px;font-size:34px;line-height:1.55;margin-top:30px}
+.slide[data-title="일부러 뺀 것"] .flip.s{height:232px}
+@media print{.rot,.help{display:none!important}.flip{height:auto!important}.flip .in{transform:none!important;height:auto;transform-style:flat}.flip .f,.flip .bk{position:relative!important;inset:auto!important;transform:none!important;backface-visibility:visible!important;height:auto}.flip .f p,.flip .f .hint,.flip .bk .hint,.flip .bk h3{display:none}.flip .f{border-radius:var(--r) var(--r) 0 0;padding-bottom:6px}.flip .bk{border-radius:0 0 var(--r) var(--r);padding-top:14px}.flip .bk p{font-size:25px}}
+@media print{.refl .q{opacity:1}.gro-big img{opacity:0}.gro-big img.on{opacity:1;transform:none}.cv-out rt,.cv-words span{opacity:1;transform:none}}
 </style>
 </head>
 <body>
 <div class="progress" id="progress"></div>
 <div class="rot">휴대폰을 가로로 돌리면 더 크게 보입니다</div>
-<div class="help">← → 이동 · 클릭/Space 다음 · G 목차 · N 대본 · F 전체화면</div>
+<div class="help">← → 이동 · 클릭/Space 다음 · G 목차 · F 전체화면</div>
 <div class="viewport"><div class="stage" id="stage">
 <!-- 1 표지 -->
 <section class="slide" data-title="표지" data-section="시작">
-  <div class="kicker"><i></i>PO 직군 · 바이브 코딩 프로젝트</div>
+  <div class="kicker"><i></i>PO 직군 · 바이브 코딩 프로젝트 · 2026.10.29 – 11.03</div>
   <div class="cover">
     <div>
       <img src="../images/wordmark.webp" alt="say my day" style="height:130px">
-      <h1 class="title" style="font-size:88px;margin-top:44px">내 하루 일기로<br>배우는 외국어</h1>
-      <p class="answer muted" style="margin-top:28px">한국어로 일기를 쓰면, 그 일기로<br>중국어·일본어를 듣고 말하며 배우는 앱입니다.</p>
+      <h1 class="title" style="font-size:96px;margin-top:44px">나의 일상이<br>새로운 언어로<br>확장된다</h1>
+      <p class="answer muted" style="margin-top:30px">일기를 쓰면, 그 일기로 외국어를 듣고 말하며 배우는 앱</p>
       <div class="frag" data-step="1" style="margin-top:44px"><button class="btn solid" data-next>시작하기 →</button></div>
     </div>
-    <div class="phone" style="--ph:700px"><img src="../images/01-splash.png" alt="Say My Day 첫 화면"></div>
+    <div class="phone" style="--ph:730px"><img src="../images/02-nest.png" alt="Say My Day 첫 화면"></div>
   </div>
-  <aside class="notes">안녕하세요. 제가 만든 Say My Day를 소개합니다. 한국어로 일기를 쓰면 그 일기로 중국어나 일본어를 배울 수 있는 앱입니다. 오늘은 기능 자랑보다, 제가 무엇을 만들기로 하고 무엇을 뺐는지를 중심으로 말씀드리겠습니다.</aside>
 </section>
 
 <!-- 2 문제 정의 -->
 <section class="slide sp" data-title="왜 만들었나" data-section="문제 정의">
   <div class="kicker"><i></i>문제 정의</div>
-  <h2 class="title">왜 만들었나요?</h2>
-  <p class="answer">외국어를 공부해도, <mark>내가 겪은 일</mark>을 그 말로 해 볼 기회는 거의 없습니다.</p>
-  <div class="body why">
-    <div class="grid g2">
-      <div class="card frag" data-step="1"><span class="chip solid">누구를 위한 앱인가</span><p style="margin-top:14px">외국어를 배우고 있고, 오늘 있었던 일을 그 말로 해 보고 싶은 사람</p></div>
-      <div class="card frag" data-step="2"><span class="chip solid">무엇이 불편한가</span><p style="margin-top:14px">번역기는 번역만 해 주고 끝납니다. 단어 앱의 예문은 남의 이야기라서 기억에 잘 남지 않습니다.</p></div>
-      <div class="card frag" data-step="3"><span class="chip solid">그래서</span><p style="margin-top:14px">내가 쓴 일기가 그대로 교재가 되면, 내 이야기라서 더 오래 기억에 남을 것이라고 생각했습니다.</p></div>
-      <div class="card frag" data-step="4"><span class="chip">이렇게 생각한 근거</span><p style="margin-top:14px">제가 직접 써 보며 불편했던 점 12가지를 모아 정리했습니다. 다른 사람에게 써 보게 하는 테스트는 하지 못했습니다.</p></div>
-    </div>
+  <h2 class="title">왜 만들었나</h2>
+  <p class="answer">외국어는 오래 배웠는데, <mark>내 하루</mark>는 그 말로 못 한다.</p>
+  <div class="body why3" style="max-width:1230px">
+    <div class="w3 frag" data-step="1"><b>말이 안 나온다</b><p>영어를 오래 배웠지만 말해 본 적은 거의 없다. 듣기·읽기는 되는데 말하기만 막혀서 답답했다.</p></div>
+    <div class="w3 frag" data-step="2"><b>남의 이야기라 안 남는다</b><p>듀오링고로 중국어를 1년 넘게 했다. 예문은 어색하고, 정작 내 상황에서는 단어가 안 떠올랐다.</p></div>
+    <div class="w3 dark frag" data-step="3"><b>그래서 내 일기로</b><p>일기는 이미 쌓이고 있는 내 하루다. 그 문장을 그대로 외국어로 말해 보면, 그게 내 언어가 된다고 생각했다.</p></div>
+    <div class="chips frag" data-step="4"><span class="chip">첫 사용자 · 나와 내 주변 사람</span><span class="chip">자기 전 5분, 방 안에서</span></div>
   </div>
-  <div class="sidephone"><div class="phone" style="--ph:640px"><img src="../images/03-write.png" alt="일기 쓰기 화면"></div></div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 일기를 교재로 바꾸는 문제 하나만 푼다 · 포기한 것: 번역기·단어 앱과 같은 기능으로 경쟁하기</span><span><b>다음</b> 그래서 만든 앱이 어떤 모습인지 보겠습니다.</span></div>
-  <aside class="notes">외국어를 공부해도 내가 오늘 겪은 일을 그 말로 해 볼 기회는 거의 없습니다. 번역기는 번역만 해 주고, 단어 앱은 남의 예문입니다. 그래서 내 일기를 교재로 쓰자고 생각했습니다. 근거는 제가 직접 써 보며 모은 불편이고, 다른 사람에게 해 본 테스트는 없다는 점을 먼저 말씀드립니다.</aside>
+  <div class="sidephone"><div class="phone" style="--ph:720px"><img src="../images/03-write.png" alt="일기 쓰기 화면"></div></div>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>번역기나 단어 앱과 경쟁하지 않고, “내 일기를 교재로”라는 한 가지만 푼다</span></div>
 </section>
 
-<!-- 3 앱 한눈에 -->
-<section class="slide sp3" data-title="앱 한눈에" data-section="서비스">
+<!-- 3 앱 한눈에 + 모션 1 -->
+<section class="slide sp2" data-title="어떤 앱인가" data-section="서비스">
   <div class="kicker"><i></i>서비스 소개</div>
-  <h2 class="title">Say My Day는<br>어떤 앱인가요?</h2>
-  <p class="answer" style="font-size:36px">일기를 쓰면 외국어 학습 카드로 바뀝니다.</p>
-  <div class="body stp">
-    <div class="frag" data-step="1"><b>1 쓰기</b> 날씨를 고르고, 오늘 있었던 일을 일기장에 쓰듯 한국어로 씁니다.</div>
-    <div class="frag" data-step="2"><b>2 배우기</b> 일기가 중국어(또는 일본어)로 번역됩니다. 문장마다 듣고 따라 말하고, 단어를 익힙니다.</div>
-    <div class="frag" data-step="3"><b>3 키우기</b> 공부를 마치면 깃털이 한 장 쌓이고, 앱 속 새가 조금씩 자랍니다.</div>
+  <h2 class="title">어떤 앱인가</h2>
+  <p class="answer">내 일기가 외국어 학습 카드가 된다. <u class="ask">화면을 눌러 번역되는 모습을 보세요.</u></p>
+  <div class="body stp3 s3">
+    <div class="w3"><b>1 쓰기</b><p>오늘 있었던 일을 한국어로 일기처럼 쓴다.</p></div>
+    <div class="w3"><b>2 배우기</b><p>외국어로 바뀐 문장을 듣고 따라 말하고, 단어와 문법을 익힌다.</p></div>
+    <div class="w3"><b>3 키우기</b><p>공부를 마치면 깃털이 쌓이고 앱 속 새가 자란다.</p></div>
   </div>
-  <div class="trio">
-    <figure class="frag" data-step="1"><div class="phone"><img src="../images/03-write.png" alt="쓰기 화면"></div><figcaption><span>1</span>쓰기</figcaption></figure>
-    <figure class="frag" data-step="2"><div class="phone"><img src="../images/04-learn-sentence.png" alt="배우기 화면"></div><figcaption><span>2</span>배우기</figcaption></figure>
-    <figure class="frag" data-step="3"><div class="phone"><img src="../images/08-stats.png" alt="키우기 화면"></div><figcaption><span>3</span>키우기</figcaption></figure>
+  <div class="chips" style="margin-top:26px"><span class="chip solid">쓰는 말 → 배울 말</span><span class="chip">한국어 → 중국어</span><span class="chip">한국어 → 일본어</span><span class="chip">중국어 → 일본어</span><span class="chip muted">영어는 다음에</span></div>
+  <div class="conv" id="conv">
+    <div class="cv-card"><small>내가 쓴 일기</small><p>오늘은 비가 와서 카페에서 책을 읽었다.</p></div>
+    <div class="cv-arrow">번역 ↓</div>
+    <div class="cv-card cv-out frag" data-step="1"><small>중국어로 바뀐 문장</small><span class="chip solid cv-play">▶ 듣고 따라 말하기</span>
+      <p class="zh"><ruby>今天<rt>jīntiān</rt></ruby><ruby>下雨<rt>xiàyǔ</rt></ruby>，<br><ruby>我<rt>wǒ</rt></ruby><ruby>在<rt>zài</rt></ruby><ruby>咖啡馆<rt>kāfēiguǎn</rt></ruby><ruby>看书<rt>kàn shū</rt></ruby>。</p></div>
+    <div class="cv-words frag" data-step="2"><small>이 문장에서 나온 단어</small><div><span>咖啡馆 · 카페</span><span>下雨 · 비가 오다</span><span>看书 · 책을 읽다</span></div></div>
   </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 쓰고, 배우고, 키우는 세 단계로 단순하게 · 포기한 것: 한 화면에 모든 기능을 보여 주기</span><span><b>다음</b> 키우기 단계에서 새가 어떻게 자라는지 보겠습니다.</span></div>
-  <aside class="notes">앱은 세 단계입니다. 일기를 쓰고, 번역된 문장으로 듣고 말하며 배우고, 끝나면 깃털이 쌓여 새가 자랍니다. 다음 장에서 배우기 단계를 하나씩 보겠습니다.</aside>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>쓰고, 배우고, 키우는 세 단계로 단순하게 · 한 화면에 모든 기능을 넣지 않는다</span></div>
 </section>
 
-<!-- 새 성장 -->
-<section class="slide" data-title="새가 자라는 모습" data-section="서비스">
-  <div class="kicker"><i></i>서비스 소개 · 키우기</div>
-  <h2 class="title">공부한 날이 쌓이면 새가 자랍니다</h2>
-  <p class="answer">일기로 공부한 날이 하나씩 쌓일 때마다 새가 <mark>10단계</mark>로 자랍니다.</p>
-  <div class="body">
-    <div class="growth frag" data-step="1"><div class="gc"><img src="../images/growth/G01.webp" alt="알"><b>1단계 알</b><span>처음 시작</span></div><div class="gc"><img src="../images/growth/G02.webp" alt="깨어나는 알"><b>2단계 깨어나는 알</b><span>공부 1일째</span></div><div class="gc"><img src="../images/growth/G03.webp" alt="아기새"><b>3단계 아기새</b><span>공부 3일째</span></div><div class="gc"><img src="../images/growth/G04.webp" alt="유치원새"><b>4단계 유치원새</b><span>공부 7일째</span></div><div class="gc"><img src="../images/growth/G05.webp" alt="초등학생새"><b>5단계 초등학생새</b><span>공부 14일째</span></div></div>
-    <div class="growth frag" data-step="2"><div class="gc"><img src="../images/growth/G06.webp" alt="중학생새"><b>6단계 중학생새</b><span>공부 24일째</span></div><div class="gc"><img src="../images/growth/G07.webp" alt="고등학생새"><b>7단계 고등학생새</b><span>공부 36일째</span></div><div class="gc"><img src="../images/growth/G08.webp" alt="대학생새"><b>8단계 대학생새</b><span>공부 50일째</span></div><div class="gc"><img src="../images/growth/G09.webp" alt="어른새"><b>9단계 어른새</b><span>공부 70일째</span></div><div class="gc"><img src="../images/growth/G10.webp" alt="이야기 작가새"><b>10단계 이야기 작가새</b><span>공부 100일째</span></div></div>
-  </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 점수 대신 새가 자라는 모습으로 공부를 이어 가게 한다 · 포기한 것: 순위·경쟁 같은 압박</span><span><b>다음</b> 배우기 단계를 하나씩 자세히 보겠습니다.</span></div>
-  <aside class="notes">공부를 마칠 때마다 깃털이 쌓이고, 공부한 날 수에 따라 새가 알에서 이야기 작가새까지 10단계로 자랍니다. 매일 다시 오고 싶은 이유를 만들기 위한 장치입니다.</aside>
-</section>
-
-<!-- 4 단계별 설명 -->
-<section class="slide sp" data-title="배우기 단계" data-section="서비스">
-  <div class="kicker"><i></i>서비스 소개 · 배우기 단계</div>
-  <h2 class="title">배울 때는 이렇게 진행됩니다</h2>
-  <p class="answer">한 번에 <mark>한 가지</mark>만 보여 줍니다. <u class="ask">단계를 눌러 보세요.</u></p>
-  <div class="body" data-tabs>
-    <div class="tabs" role="tablist">
-      <button role="tab" aria-selected="true" data-tab="a">① 번역 확인</button>
-      <button role="tab" aria-selected="false" data-tab="b">② 따라 말하기</button>
-      <button role="tab" aria-selected="false" data-tab="c">③ 단어</button>
-      <button role="tab" aria-selected="false" data-tab="d">④ 문법</button>
-      <button role="tab" aria-selected="false" data-tab="e">⑤ 전체 읽기</button>
-      <button role="tab" aria-selected="false" data-tab="f">⑥ 오늘의 학습</button>
-    </div>
-    <div class="panels">
-      <div class="panel on" data-panel="a"><div class="two"><div><b>무엇을 하나요</b>번역된 문장과 읽는 법이 나옵니다. 읽는 법(병음)은 중국어 발음을 알파벳으로 적은 것입니다. 번역이 불확실한 부분에는 ‘확인 필요’ 표시가 붙습니다.</div><div><b>왜 이렇게 했나요</b>AI 번역을 그대로 믿지 않고, 사용자가 직접 확인할 수 있게 하려는 것입니다.</div></div><div class="sidephone"><div class="phone"><video data-clip="27.5,35.5" muted loop playsinline preload="metadata" poster="../images/04-learn-sentence.png" src="demo.mp4"></video></div></div></div>
-      <div class="panel" data-panel="b"><div class="two"><div><b>무엇을 하나요</b>문장을 하나씩 소리로 들려주고, 소리 내어 따라 말하게 합니다. 글자를 누르면 뜻과 발음이 나옵니다.</div><div><b>왜 이렇게 했나요</b>눈으로 읽기만 해서는 입으로 말하는 연습이 되지 않기 때문입니다.</div></div><div class="sidephone"><div class="phone"><video data-clip="66,83" muted loop playsinline preload="metadata" poster="../images/04-learn-sentence.png" src="demo.mp4"></video></div></div></div>
-      <div class="panel" data-panel="c"><div class="two"><div><b>무엇을 하나요</b>일기에 나온 단어를 한 목록으로 모아 보여 줍니다. 뜻을 가리고 떠올려 볼 수 있고, 마음에 드는 단어는 단어장에 저장합니다.</div><div><b>왜 이렇게 했나요</b>내 일기에서 나온 단어라서 외우기 쉽다고 봤습니다.</div></div><div class="sidephone"><div class="phone"><video data-clip="42,53" muted loop playsinline preload="metadata" poster="../images/05-learn-words.png" src="demo.mp4"></video></div></div></div>
-      <div class="panel" data-panel="d"><div class="two"><div><b>무엇을 하나요</b>내 문장에 쓰인 문법을 한 줄로 설명하고, 예문을 보여 줍니다.</div><div><b>왜 이렇게 했나요</b>문법을 따로 공부하지 않고, 내 문장에서 바로 이해하게 하려는 것입니다.</div></div><div class="sidephone"><div class="phone"><video data-clip="53,61" muted loop playsinline preload="metadata" poster="../images/06-learn-grammar.png" src="demo.mp4"></video></div></div></div>
-      <div class="panel" data-panel="e"><div class="two"><div><b>무엇을 하나요</b>마지막에 내 일기 전체를 처음부터 끝까지 이어서 읽습니다.</div><div><b>왜 이렇게 했나요</b>조각조각 배운 문장을 다시 하나의 이야기로 묶어 주기 위해서입니다.</div></div><div class="sidephone"><div class="phone"><img src="../images/07-fullread.png" alt="전체 읽기"></div></div></div>
-      <div class="panel" data-panel="f"><div class="two"><div><b>무엇을 하나요</b>공부를 마치면 깃털이 한 장 쌓이고, 앱 속 새가 조금씩 자랍니다.</div><div><b>왜 이렇게 했나요</b>내일도 다시 오고 싶은 이유를 만들어 주려는 것입니다.</div></div><div class="sidephone"><div class="phone"><video data-clip="83,92" muted loop playsinline preload="metadata" poster="../images/08-stats.png" src="demo.mp4"></video></div></div></div>
-    </div>
-  </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 한 번에 하나씩 보여 주는 카드 · 포기한 것: 한 화면에 모든 정보 보여 주기</span><span><b>다음</b> 실제로 쓰는 모습을 영상으로 보겠습니다.</span></div>
-  <aside class="notes">배우는 단계를 눌러 가며 설명합니다. 오른쪽 화면은 실제 앱 사용 영상의 일부이고 소리는 나지 않습니다. 핵심은 한 번에 한 가지만 보여 준다는 점입니다.</aside>
-</section>
-
-<!-- 5 시연 -->
-<section class="slide sp" data-title="시연 영상" data-section="서비스">
-  <div class="kicker"><i></i>시연 영상</div>
-  <h2 class="title">직접 써 보면 이렇습니다</h2>
-  <p class="answer"><u class="ask">장면을 눌러 보세요.</u> 그 부분만 바로 재생됩니다.</p>
+<!-- 4 시연 -->
+<section class="slide sp" data-title="시연" data-section="서비스">
+  <div class="kicker"><i></i>서비스 소개 · 시연</div>
+  <h2 class="title">직접 써 보면 이렇다</h2>
+  <p class="answer"><u class="ask">장면을 눌러 보세요.</u> 그 부분만 바로 재생된다.</p>
   <div class="body" style="margin-top:30px">
     <div class="clips">
-      <button data-from="3" data-to="15" data-desc="오늘 있었던 일을 한국어로 씁니다. 글 쓰는 시간은 8배속으로 줄였습니다.">일기 쓰기 <small>12초</small></button>
-      <button data-from="15" data-to="27" data-desc="번역 버튼을 누르면 일기가 초급 중국어로 바뀝니다. 기다리는 시간은 8배속으로 줄였습니다.">번역 받기 <small>12초</small></button>
-      <button data-from="27.5" data-to="42" data-desc="번역된 문장과 읽는 법을 확인하고, 문장을 소리로 듣습니다.">문장 듣기 <small>15초</small></button>
-      <button data-from="35.6" data-to="42" data-desc="같은 낱말이 사람 이름일 때와 음식일 때를 구분해서 번역합니다.">이름과 음식 구분 <small>6초</small></button>
-      <button data-from="42" data-to="53" data-desc="단어의 뜻과 발음을 확인하고 단어장에 저장합니다. 뜻을 가리고 떠올려 볼 수도 있습니다.">단어 익히기 <small>11초</small></button>
-      <button data-from="53" data-to="61" data-desc="내 일기에 쓰인 문법과 예문을 확인합니다.">문법 보기 <small>8초</small></button>
-      <button data-from="83" data-to="92" data-desc="공부를 마치면 깃털이 쌓이고, 앱 속 새가 자랍니다.">깃털과 새 <small>9초</small></button>
-      <button data-from="92" data-to="114" data-desc="달력에서 지난 일기를 찾아 다시 듣고 배웁니다. 쌓인 일기가 나만의 교재가 됩니다.">지난 일기 복습 <small>22초</small></button>
-      <button data-from="126" data-to="134" data-desc="번역이 불확실한 부분은 ‘확인 필요’로 표시하고, 내 일기가 어디에 저장되는지 안내합니다.">확인 필요 표시 <small>8초</small></button>
-      <button data-from="134.5" data-to="148" data-desc="저장한 단어 목록과 일기책을 PDF 파일로 저장해 간직할 수 있습니다.">PDF 저장 <small>14초</small></button>
-      <button data-from="0" data-to="151" data-desc="처음부터 끝까지 2분 31초 전체 영상입니다.">전체 보기 <small>2분 31초</small></button>
+      <button data-from="3" data-to="15" data-desc="오늘 있었던 일을 한국어로 쓴다. 글 쓰는 시간은 8배속으로 줄였다.">1 일기 쓰기 <small>12초</small></button>
+      <button data-from="15" data-to="27" data-desc="번역 버튼을 누르면 일기가 초급 중국어로 바뀐다. 기다리는 시간은 8배속으로 줄였다.">2 번역 받기 <small>12초</small></button>
+      <button data-from="27.5" data-to="42" data-desc="번역된 문장과 읽는 법을 보고, 소리로 듣고 따라 말한다.">3 듣고 따라 말하기 <small>15초</small></button>
+      <button data-from="42" data-to="61" data-desc="내 일기에서 나온 단어와 문법을 확인하고, 마음에 드는 단어는 단어장에 저장한다.">4 단어·문법 <small>19초</small></button>
+      <button data-from="83" data-to="92" data-desc="공부를 마치면 깃털이 쌓이고, 앱 속 새가 자란다.">5 깃털과 새 <small>9초</small></button>
+      <button data-from="92" data-to="114" data-desc="달력에서 지난 일기를 찾아 다시 듣고 배운다. 쌓인 일기가 나만의 교재가 된다.">6 지난 일기 복습 <small>22초</small></button>
     </div>
-    <div class="clipdesc" id="clipdesc">왼쪽 장면을 눌러 보세요. 영상에는 소리가 있습니다.</div>
+    <div class="clipdesc" id="clipdesc">왼쪽 장면을 눌러 보세요. 영상에는 소리가 있다.</div>
   </div>
   <div class="sidephone"><div class="phone"><video id="demoVid" controls playsinline preload="metadata" poster="../images/04-learn-sentence.png" src="demo.mp4"></video></div></div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 핵심 사용 흐름을 짧은 장면으로 나눠 보여 준다 · 포기한 것: 기능을 하나씩 늘어놓는 설명</span><span><b>다음</b> 처음부터 이런 모습은 아니었습니다.</span></div>
-  <aside class="notes">장면 버튼을 눌러 필요한 부분만 보여 줍니다. 입력하고 기다리는 구간은 8배속으로 줄였고, 발음은 원래 속도입니다. 영상이 열리지 않으면 제출한 영상 파일을 사용합니다.</aside>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>핵심 흐름(쓰기 → 번역 → 듣고 말하기 → 복습)을 짧은 장면으로 보여 준다</span></div>
 </section>
 
-<!-- 6 변천 -->
-<section class="slide sp" data-title="처음엔 어땠고" data-section="서비스">
-  <div class="kicker"><i></i>만들어 온 과정</div>
-  <h2 class="title">처음엔 어땠고, 어떻게 달라졌나요?</h2>
-  <p class="answer">15일 동안 다섯 번 바뀌었습니다. 이유는 늘 <mark>써 보며 느낀 불편</mark>이었습니다. <u class="ask">시점을 눌러 보세요.</u></p>
+<!-- 5 내 일기답게 -->
+<section class="slide sp" data-title="내 일기답게" data-section="서비스">
+  <div class="kicker"><i></i>서비스 소개 · 내 이야기를 지키는 장치</div>
+  <h2 class="title">내 일기답게 쓰려고 넣은 것</h2>
+  <p class="answer">번역이 내 말과 달라지면 몰입이 깨진다. <u class="ask">눌러서 보세요.</u></p>
   <div class="body" data-tabs>
     <div class="tabs" role="tablist">
-      <button role="tab" aria-selected="true" data-tab="v1">10/19 첫 배포</button>
-      <button role="tab" aria-selected="false" data-tab="v2">10/19 디자인 개편</button>
-      <button role="tab" aria-selected="false" data-tab="v3">10/27 Say My Day</button>
-      <button role="tab" aria-selected="false" data-tab="v4">10/30 그림일기</button>
-      <button role="tab" aria-selected="false" data-tab="v5">11/03 카드 학습</button>
+      <button role="tab" aria-selected="true" data-tab="k1">내 용어사전</button>
+      <button role="tab" aria-selected="false" data-tab="k2">애매한 번역 펼쳐 보기</button>
+      <button role="tab" aria-selected="false" data-tab="k3">PDF로 복습</button>
     </div>
     <div class="panels">
-      <div class="panel on" data-panel="v1"><div class="two"><div><b>바뀐 것</b>강의용 중국어 다이어리. 번역, 읽는 법, 단어, 문법, 퀴즈가 한 페이지에 길게 이어져 있었습니다.</div><div><b>바꾼 이유</b>일기를 번역해 주는 것이 가장 먼저 필요하다고 봤습니다.</div></div><div class="sidephone"><div class="phone"><img src="../images/old/v1-0919-result.png" alt="첫 배포 화면"></div></div></div>
-      <div class="panel" data-panel="v2"><div class="two"><div><b>바뀐 것</b>디자인을 새로 하고, 처음 열 때 나오는 인트로 화면과 사용 안내를 넣었습니다.</div><div><b>바꾼 이유</b>처음 여는 사람이 무슨 앱인지 알 수 있어야 한다고 생각했습니다.</div></div><div class="sidephone"><div class="phone"><img src="../images/old/v2-0919-B-result.png" alt="디자인 개편 화면"></div></div></div>
-      <div class="panel" data-panel="v3"><div class="two"><div><b>바뀐 것</b>이름을 Say My Day로 바꾸고 배울 언어를 고르게 했습니다(한→중, 한→일, 중→일). 일본어에는 읽는 법(후리가나)도 붙였습니다.</div><div><b>바꾼 이유</b>중국어 하나에만 묶여 있지 않은 앱으로 넓히고 싶었습니다.</div></div><div class="sidephone"><div class="phone"><img src="../images/old/v3-1029-pre-result.png" alt="Say My Day 화면"></div></div></div>
-      <div class="panel" data-panel="v4"><div class="two"><div><b>바뀐 것</b>쓰는 화면을 그림일기처럼 바꾸고, 앱 속 작은 새를 넣었습니다.</div><div><b>바꾼 이유</b>직접 써 보니 일기장 같은 느낌이 아직 부족했습니다.</div></div><div class="sidephone"><div class="phone"><img src="../images/old/v4-1030-picturediary-result.png" alt="그림일기 화면"></div></div></div>
-      <div class="panel" data-panel="v5"><div class="two"><div><b>바뀐 것</b>길게 이어진 결과 페이지를, 한 번에 하나씩 넘겨 보는 카드로 바꿨습니다. 끝내면 깃털이 쌓이고 새가 자랍니다.</div><div><b>바꾼 이유</b>써 보니 한 화면에 너무 많은 것이 있어 복잡했습니다.</div></div><div class="sidephone"><div class="phone"><img src="../images/04-learn-sentence.png" alt="카드 학습 화면"></div></div></div>
+      <div class="panel on" data-panel="k1"><div class="two"><div><b>겪은 일</b>여자친구 이름이 ‘우동’인데, 일기에 쓰면 음식 우동으로 번역됐다. 이름을 풀어서 쓰면 더 이상 내 일기가 아니었다.</div><div><b>그래서 넣은 것</b>내 용어사전을 만들고, 문맥을 보고 이름인지 음식인지 구분하게 했다. 구분이 어려우면 내가 고를 수 있다.</div></div><div class="sidephone"><div class="phone"><video data-clip="35.6,42" muted loop playsinline preload="metadata" poster="../images/04-learn-sentence.png" src="demo.mp4"></video></div></div></div>
+      <div class="panel" data-panel="k2"><div class="two"><div><b>겪은 일</b>일기는 말투가 자유롭다. 어떤 단어는 틀리게 번역되고, 그 언어로는 자연스럽게 바꿔야 하는 말도 있다.</div><div><b>그래서 넣은 것</b>애매한 문장에는 ‘확인 필요’를 붙이고, 펼쳐서 왜 그렇게 번역했는지 볼 수 있게 했다.</div></div><div class="sidephone"><div class="phone"><video data-clip="126,134" muted loop playsinline preload="metadata" poster="../images/04-learn-sentence.png" src="demo.mp4"></video></div></div></div>
+      <div class="panel" data-panel="k3"><div class="two"><div><b>겪은 일</b>앱을 열지 않고도, 저장해 둔 단어를 복습하고 싶을 때가 있을 것 같았다.</div><div><b>그래서 넣은 것</b>저장한 단어와 문장을 PDF로 뽑아서, 따라 써 보며 공부할 수 있게 했다. 가장 잘 넣었다고 생각하는 기능이다.</div></div><div class="sidephone"><div class="phone"><video data-clip="134.5,148" muted loop playsinline preload="metadata" poster="../images/08-stats.png" src="demo.mp4"></video></div></div></div>
     </div>
   </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 기능을 더하기 전에 써 보며 느낀 불편부터 고친다 · 근거: 제가 직접 쓴 경험</span><span><b>다음</b> 이 과정에서 무엇을 먼저 만들었는지 보겠습니다.</span></div>
-  <aside class="notes">시점별 화면을 눌러 가며 보여 줍니다. 모든 변화는 만들기 전에 계획한 것이 아니라, 써 보면서 느낀 불편에서 나왔습니다. 마지막이 지금의 카드 학습입니다.</aside>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>번역이 편하더라도 내 이야기를 바꾸지 않는다 · 헷갈리는 곳은 내가 고르게 한다</span></div>
 </section>
 
-<!-- 7 무엇부터 -->
-<section class="slide" data-title="무엇부터 만들었나" data-section="설계 판단">
-  <div class="kicker"><i></i>우선순위</div>
-  <h2 class="title">무엇부터 만들었나요?</h2>
-  <p class="answer">내 일기가 공부로 이어지는 <mark>가장 짧은 길</mark>부터 만들었습니다.</p>
-  <div class="body steps">
-    <div class="st frag" data-step="1"><i>1</i><h3>쓰고 번역하기</h3><p>여기서 시작하지 않으면 아무것도 할 수 없습니다.</p></div>
-    <div class="st frag" data-step="2"><i>2</i><h3>듣고 따라 말하기</h3><p>눈으로만 읽으면 말하기는 늘지 않습니다.</p></div>
-    <div class="st frag" data-step="3"><i>3</i><h3>단어·문법 보기</h3><p>내 문장에 나온 것만 모아서 보여 줍니다.</p></div>
-    <div class="st frag" data-step="4"><i>4</i><h3>전체 읽기</h3><p>배운 조각을 다시 내 이야기로 묶습니다.</p></div>
-    <div class="st frag" data-step="5"><i>5</i><h3>깃털 받기</h3><p>끝냈다는 느낌이 있어야 내일 또 쓰고 싶어집니다.</p></div>
+<!-- 6 새 성장 + 모션 3 -->
+<section class="slide" data-title="새가 자라는 모습" data-section="서비스">
+  <div class="kicker"><i></i>서비스 소개 · 키우기</div>
+  <h2 class="title">공부한 날이 쌓이면 새가 자란다</h2>
+  <p class="answer">점수나 순위 대신, <mark>키우는 재미</mark>로 다시 오게 하고 싶었다.</p>
+  <div class="gro" id="gro">
+    <div class="gro-main">
+      <div class="gro-big" id="groBig">
+        <img src="../images/growth/G01.webp" alt="알"><img src="../images/growth/G02.webp" alt="깨어나는 알"><img src="../images/growth/G03.webp" alt="아기새"><img src="../images/growth/G04.webp" alt="유치원새"><img src="../images/growth/G05.webp" alt="초등학생새"><img src="../images/growth/G06.webp" alt="중학생새"><img src="../images/growth/G07.webp" alt="고등학생새"><img src="../images/growth/G08.webp" alt="대학생새"><img src="../images/growth/G09.webp" alt="어른새"><img class="on" src="../images/growth/G10.webp" alt="이야기 작가새">
+      </div>
+      <div class="gro-text">
+        <div class="gro-day"><span id="groDay">100</span><small>일째</small></div>
+        <div class="gro-name" id="groName">이야기 작가새</div>
+        <p>깃털이 모일수록 다음 모습이 궁금해졌다. 오래 써 보지는 못해서, 새가 자라는 걸 끝까지 본 건 아니다.</p>
+        <button class="btn" id="groReplay">처음부터 다시 보기</button>
+      </div>
+    </div>
+    <div class="gro-strip" id="groStrip">
+      <span class="on"><img src="../images/growth/G01.webp" alt=""><b>알</b></span><span class="on"><img src="../images/growth/G02.webp" alt=""><b>깨어나는 알</b></span><span class="on"><img src="../images/growth/G03.webp" alt=""><b>아기새</b></span><span class="on"><img src="../images/growth/G04.webp" alt=""><b>유치원새</b></span><span class="on"><img src="../images/growth/G05.webp" alt=""><b>초등학생새</b></span><span class="on"><img src="../images/growth/G06.webp" alt=""><b>중학생새</b></span><span class="on"><img src="../images/growth/G07.webp" alt=""><b>고등학생새</b></span><span class="on"><img src="../images/growth/G08.webp" alt=""><b>대학생새</b></span><span class="on"><img src="../images/growth/G09.webp" alt=""><b>어른새</b></span><span class="on cur"><img src="../images/growth/G10.webp" alt=""><b>이야기 작가새</b></span>
+    </div>
   </div>
-  <div class="card frag" data-step="6" style="margin-top:34px;padding:26px 36px"><p style="font-size:32px"><b>순서를 정한 기준</b> 이 단계가 없으면 일기가 공부로 이어지지 않는가? 이어지지 않는 것부터 만들고, 꾸미는 기능은 뒤로 미뤘습니다.</p></div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 핵심 흐름을 먼저 · 이유: 이 흐름이 끊기면 앱을 만든 의미가 없다 · 포기한 것: 꾸미는 기능은 뒤로</span><span><b>다음</b> 만든 것만큼, 일부러 뺀 것도 있습니다.</span></div>
-  <aside class="notes">다섯 단계를 하나씩 켭니다. 순서를 정한 기준은 하나입니다. 이 단계가 없으면 일기가 공부로 이어지지 않는가.</aside>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>꾸준함을 점수로 압박하지 않고, 쌓이는 느낌으로 보여 준다</span></div>
 </section>
 
-<!-- 8 안 만든 것 -->
+<!-- 7 달라진 과정 -->
+<section class="slide sp" data-title="어떻게 달라졌나" data-section="설계 판단">
+  <div class="kicker"><i></i>설계 판단 · 만든 순서와 변화</div>
+  <h2 class="title">처음엔 어땠고, 어떻게 달라졌나</h2>
+  <div class="flow" style="margin-top:22px"><span class="chip solid">만든 순서</span><span>번역</span><i>→</i><span>듣기·읽기</span><i>→</i><span>단어·문법</span><i>→</i><span>새 키우기</span></div>
+  <p class="answer" style="font-size:34px;margin-top:16px">기준은 하나였다. 내 일기가 외국어가 되고, 그 문장을 <mark>소리 내어 읽어 볼 수 있는가.</mark> <u class="ask">단계를 눌러 보세요.</u></p>
+  <div class="body" data-tabs style="margin-top:26px">
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="v1">1 중국어 다이어리</button>
+      <button role="tab" aria-selected="false" data-tab="v2">2 Say My Day</button>
+      <button role="tab" aria-selected="false" data-tab="v3">3 그림일기와 새</button>
+      <button role="tab" aria-selected="false" data-tab="v4">4 카드 학습</button>
+    </div>
+    <div class="panels" style="margin-top:24px">
+      <div class="panel on" data-panel="v1"><div class="two"><div><b>그때 모습</b>한국인이 중국어를 배우는 일기 앱. 차분한 디자인에, 결과는 한 페이지에 길게 이어졌다.</div><div><b>써 보며 든 불편</b>애정이 안 생겼다. ‘우동’이 음식으로 번역돼 몰입이 깨졌고, 쌓이는 느낌은 달력에 표시되는 정도였다.</div></div><div class="sidephone"><div class="phone"><img src="../images/old/v1-0919-write.png" alt="처음 쓰기 화면"></div></div></div>
+      <div class="panel" data-panel="v2"><div class="two"><div><b>바꾼 것</b>이름을 Say My Day로 바꾸고, 쓰는 말과 배울 말을 고르게 했다. 내 용어사전과 맥락 선택도 넣었다.</div><div><b>계기</b>여자친구가 중국인인데 일본어를 배우고 싶어 했다. 앱을 따로 만드는 대신 언어 조합을 고르게 했다.</div></div><div class="sidephone"><div class="phone"><img src="../images/old/v3-1029-pre-write.png" alt="언어를 고르는 쓰기 화면"></div></div></div>
+      <div class="panel" data-panel="v3"><div class="two"><div><b>바꾼 것</b>쓰는 화면을 그림일기처럼 바꾸고, 앱 속에 작은 새를 넣었다.</div><div><b>계기</b>디자인이 일기와 상관없이 정적이라 몰입이 약했다. 키우는 요소가 있으면 애정이 생길 것 같았다.</div></div><div class="sidephone"><div class="phone"><img src="../images/old/v4-1030-picturediary-write.png" alt="그림일기 쓰기 화면"></div></div></div>
+      <div class="panel" data-panel="v4"><div class="two"><div><b>바꾼 것</b>길게 이어진 결과 페이지를, 카드 한 장씩 넘기는 방식으로 바꿨다.</div><div><b>계기</b>스크롤 호흡이 너무 길어서 끝까지 안 읽게 됐다.</div></div><div class="sidephone"><div class="phone"><img src="../images/04-learn-sentence.png" alt="카드 학습 화면"></div></div></div>
+    </div>
+  </div>
+  <div class="bridge"><span class="po"><em>같이 바꾼 것</em>기본 음성이 기계음처럼 끊겨서 자연스러운 음성으로 바꿨다. 말하기가 이 앱의 핵심이라서.</span></div>
+</section>
+
+<!-- 8 일부러 뺀 것 -->
 <section class="slide" data-title="일부러 뺀 것" data-section="설계 판단">
-  <div class="kicker"><i></i>범위 결정</div>
-  <h2 class="title">이런 기능은 왜 안 넣었나요?</h2>
-  <p class="answer">있으면 좋아 보이지만 <mark>일부러 뺀 것</mark>입니다. <u class="ask">카드를 눌러</u> 이유를 보세요.</p>
-  <div class="body grid g3" style="margin-top:34px">
-    <button class="flip s" aria-pressed="false"><div class="in"><div class="f"><h3>회원가입·로그인</h3><p>“계정을 만들어야 쓸 수 있게 하면 어떨까?”</p><span class="hint">눌러서 이유 보기</span></div><div class="bk"><p>일기는 아주 개인적인 글입니다. 처음 열자마자 가입부터 시키면 쓰기 전에 떠납니다. 그래서 가입 없이 바로 쓰게 하고, 일기는 내 기기 안에만 저장합니다.</p></div></div></button>
-    <button class="flip s" aria-pressed="false"><div class="in"><div class="f"><h3>친구와 공유·순위</h3><p>“친구와 공부한 날을 비교하면 더 열심히 하지 않을까?”</p><span class="hint">눌러서 이유 보기</span></div><div class="bk"><p>이 앱의 재료는 비밀스러운 일기입니다. 남에게 보이거나 비교당한다고 느끼면 솔직하게 쓰기 어렵습니다. 그래서 오직 나 혼자 쓰는 앱으로 정했습니다.</p></div></div></button>
-    <button class="flip s" aria-pressed="false"><div class="in"><div class="f"><h3>한국어 일기 고쳐 주기</h3><p>“AI가 내 일기를 더 멋진 문장으로 고쳐 주면 어떨까?”</p><span class="hint">눌러서 이유 보기</span></div><div class="bk"><p>고쳐 주면 더 이상 내 이야기가 아닙니다. 이 앱은 내가 쓴 그대로를 외국어로 바꿔 말해 보는 것이 목적이라서, 내 문장을 바꾸지 않습니다.</p></div></div></button>
-    <button class="flip s" aria-pressed="false"><div class="in"><div class="f"><h3>내 발음에 점수 매기기</h3><p>“말한 것을 듣고 몇 점인지 알려 주면 어떨까?”</p><span class="hint">눌러서 이유 보기</span></div><div class="bk"><p>점수가 정확한지 확인할 방법이 없었습니다. 틀린 점수를 받으면 맞게 말하고도 자신감을 잃습니다. 확인할 수 있을 때까지 넣지 않습니다.</p></div></div></button>
-    <button class="flip s" aria-pressed="false"><div class="in"><div class="f"><h3>유료 결제·구독</h3><p>“AI 사용료가 드니 돈을 받으면 어떨까?”</p><span class="hint">눌러서 이유 보기</span></div><div class="bk"><p>지금은 쓸 사람이 정말 있는지 확인하는 단계입니다. 돈을 받으면 그 확인이 어려워집니다. 그래서 무료로 두고, AI 사용료는 제가 부담합니다.</p></div></div></button>
-    <div class="card dark"><h3>뺄지 말지 정한 기준</h3><p>① 일기가 공부로 이어지는 흐름에 꼭 필요한가<br>② 내 일기가 남에게 보일 위험은 없는가<br>③ 제대로 되는지 확인할 수 있는가</p></div>
+  <div class="kicker"><i></i>설계 판단 · 뺀 것</div>
+  <h2 class="title">일부러 뺀 것</h2>
+  <p class="answer">있으면 좋아 보이지만 <mark>이유가 있어서</mark> 뺐다. <u class="ask">카드를 눌러 이유를 보세요.</u></p>
+  <div class="body grid g2" style="margin-top:34px;gap:24px">
+    <button class="flip s" aria-pressed="false"><div class="in"><div class="f"><h3>일기 고쳐 주기</h3><p>AI가 내 일기를 더 좋은 문장으로 고쳐 주면?</p><span class="hint">고민했다 · 눌러서 이유 보기</span></div><div class="bk"><p>틀린 걸 지적받으면 쓰는 게 부담스러워지고, 고친 문장은 더 이상 내 이야기가 아니다. 이 앱은 내가 쓴 그대로를 바꿔 말하는 게 목적이다.</p></div></div></button>
+    <button class="flip s" aria-pressed="false"><div class="in"><div class="f"><h3>마이크로 발음 점수</h3><p>말한 걸 듣고 몇 점인지 알려 주면?</p><span class="hint">만들어 보고 뺐다 · 눌러서 이유 보기</span></div><div class="bk"><p>직접 구현해 보니 소리와 글자 수가 얼마나 맞는지만 알려 주고, 성조 같은 세밀한 구분은 못 했다. 정확하지 않으면 복잡함만 늘어서 뺐다. 정확도가 높은 서비스로 다시 시험해 볼 계획이다.</p></div></div></button>
+    <button class="flip s" aria-pressed="false"><div class="in"><div class="f"><h3>회원가입·로그인</h3><p>계정을 만들어야 쓰게 하면?</p><span class="hint">처음부터 안 넣었다 · 눌러서 이유 보기</span></div><div class="bk"><p>혼자 쓰는 일기 앱이라 필요하지 않다. 넣으면 개인정보와 서버 관리 부담만 늘어난다. 그래서 가입 없이 바로 쓰고, 일기는 내 기기에 둔다.</p></div></div></button>
+    <button class="flip s" aria-pressed="false"><div class="in"><div class="f"><h3>공유·순위·유료 결제</h3><p>친구와 비교하거나 돈을 받으면?</p><span class="hint">처음부터 안 넣었다 · 눌러서 이유 보기</span></div><div class="bk"><p>일기는 비밀스러운 글이라 비교하면 솔직하게 못 쓴다. 지금은 쓸 사람이 있는지 확인하는 단계라서, 돈도 받지 않는다.</p></div></div></button>
   </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 세 기준에 맞지 않으면 넣지 않는다 · 포기한 것: 눈에 띄고 자랑하기 좋은 기능들</span><span><b>다음</b> 넣은 것에도 얻은 것과 잃은 것이 있습니다.</span></div>
-  <aside class="notes">카드 앞면은 누구나 떠올릴 만한 기능 아이디어이고, 뒷면이 안 넣은 이유입니다. 모든 결정은 오른쪽 아래 세 기준으로 했습니다. 마이크 따라 말하기는 다음 장에서 말씀드립니다.</aside>
+  <div class="card dark" style="margin-top:24px;padding:22px 36px"><p style="font-size:29px;line-height:1.5"><b>뺄지 정한 기준</b> ① 일기가 공부로 이어지는 흐름에 꼭 필요한가 ② 내 일기가 남에게 보일 위험은 없는가 ③ 제대로 되는지 확인할 수 있는가</p></div>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>세 기준에 맞지 않으면 넣지 않는다 · 눈에 띄는 기능보다 일기의 안전을 먼저 둔다</span></div>
 </section>
 
 <!-- 9 맞바꾼 것 -->
 <section class="slide" data-title="얻은 것과 잃은 것" data-section="설계 판단">
-  <div class="kicker"><i></i>설계 판단</div>
-  <h2 class="title">무엇을 얻고, 무엇을 잃었나요?</h2>
-  <p class="answer">바꿀 때마다 좋아진 점과 나빠진 점이 있었습니다. <u class="ask">카드를 눌러 보세요.</u></p>
-  <div class="body grid g3">
-    <button class="flip m" aria-pressed="false"><div class="in"><div class="f"><h3>긴 한 페이지 → 카드 한 장씩</h3><p>한 페이지에 다 들어 있던 결과를, 카드를 넘기며 하나씩 보게 바꿨습니다.</p><span class="hint">눌러서 뒤집기</span></div><div class="bk"><h3>얻은 것 · 잃은 것</h3><p><b>얻은 것</b> 한 화면에 눌러야 할 것이 25.9개에서 13.2개로, 절반이 됐습니다.<br><b>잃은 것</b> 끝까지 가는 데 넘기는 횟수가 9.3번에서 13번으로 늘었습니다.</p><span class="hint">다시 누르면 앞면</span></div></div></button>
-    <button class="flip m" aria-pressed="false"><div class="in"><div class="f"><h3>단어: 중요한 것만 → 전부</h3><p>예전에는 중요한 단어 10개 안팎만 보여 줬습니다. 지금은 문장에 나온 단어를 모두 보여 줍니다.</p><span class="hint">눌러서 뒤집기</span></div><div class="bk"><h3>얻은 것 · 잃은 것</h3><p><b>얻은 것</b> 문장 속 단어 중 목록에 들어간 비율이 38%에서 100%가 됐습니다.<br><b>잃은 것</b> 단어가 많은 날은 단어 카드가 아주 길어집니다(화면 6개 분량).</p><span class="hint">다시 누르면 앞면</span></div></div></button>
-    <button class="flip m" aria-pressed="false"><div class="in"><div class="f"><h3>마이크 → 직접 누르는 버튼</h3><p>마이크로 맞는지 확인하는 대신, ‘소리 내어 말했어요’ 버튼을 직접 누르게 했습니다.</p><span class="hint">눌러서 뒤집기</span></div><div class="bk"><h3>얻은 것 · 잃은 것</h3><p><b>얻은 것</b> 어떤 기기에서도 끝까지 할 수 있습니다.<br><b>잃은 것</b> 앱이 내 발음이 맞는지는 알려 주지 못합니다.</p><span class="hint">다시 누르면 앞면</span></div></div></button>
+  <div class="kicker"><i></i>설계 판단 · 맞바꾼 것</div>
+  <h2 class="title">무엇을 얻고, 무엇을 잃었나</h2>
+  <p class="answer">바꿀 때마다 좋아진 점과 나빠진 점이 있었다. <u class="ask">카드를 눌러 보세요.</u></p>
+  <div class="body grid g3" style="margin-top:44px">
+    <button class="flip m" aria-pressed="false"><div class="in"><div class="f"><h3>긴 한 페이지<br>→ 카드 한 장씩</h3><p>한 번에 하나만 보며 그 순간에 몰입하게 했다.</p><span class="hint">눌러서 뒤집기</span></div><div class="bk"><h3>얻은 것 · 잃은 것</h3><p><b>얻은 것</b> 한 화면에 눌러야 할 것이 25.9개 → 13.2개<br><b>잃은 것</b> 끝까지 가는 데 넘기는 횟수가 9.3번 → 13번</p><span class="hint">다시 누르면 앞면</span></div></div></button>
+    <button class="flip m" aria-pressed="false"><div class="in"><div class="f"><h3>단어: 중요한 것만<br>→ 전부</h3><p>예전엔 10개 안팎만, 지금은 문장에 나온 단어를 모두 보여 준다.</p><span class="hint">눌러서 뒤집기</span></div><div class="bk"><h3>얻은 것 · 잃은 것</h3><p><b>얻은 것</b> 문장 속 단어가 목록에 든 비율 38% → 100%<br><b>잃은 것</b> 단어가 많은 날은 단어 카드가 아주 길어진다</p><span class="hint">다시 누르면 앞면</span></div></div></button>
+    <button class="flip m" aria-pressed="false"><div class="in"><div class="f"><h3>마이크 확인<br>→ 직접 누르는 버튼</h3><p>‘소리 내어 말했어요’ 버튼을 직접 누르게 했다.</p><span class="hint">눌러서 뒤집기</span></div><div class="bk"><h3>얻은 것 · 잃은 것</h3><p><b>얻은 것</b> 어떤 기기에서도 끝까지 할 수 있다<br><b>잃은 것</b> 내 발음이 맞는지는 앱이 알려 주지 못한다</p><span class="hint">다시 누르면 앞면</span></div></div></button>
   </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 눌러야 할 것을 줄이는 대신 넘기는 횟수가 늘어나는 것을 받아들인다 · 확인: 다음 장의 숫자</span><span><b>다음</b> 예상 밖의 상황에서도 길을 잃지 않아야 합니다.</span></div>
-  <aside class="notes">세 가지 바꿈을 뒤집으며 얻은 것과 잃은 것을 같이 말합니다. 넘기는 횟수가 늘었다는 점은 결과 장에서 숫자로 다시 보여 드립니다.</aside>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>누를 것을 줄이는 대신, 넘기는 횟수가 늘어나는 건 받아들인다 · 이게 맞는지는 다음 장에서 숫자로 본다</span></div>
 </section>
 
-<!-- 10 예외 상황 -->
-<section class="slide sp" data-title="예상 밖 상황" data-section="설계 판단">
-  <div class="kicker"><i></i>예외 상황 설계</div>
-  <h2 class="title">잘못 쓰거나 고장 나면 어떻게 되나요?</h2>
-  <p class="answer">어떤 경우에도 <mark>쓴 글은 지켜지고</mark>, 다음에 할 일을 알려 줍니다. <u class="ask">상황을 눌러 보세요.</u></p>
+<!-- 10 평가 + 모션 2 -->
+<section class="slide sp" data-title="확인 방법과 결과" data-section="평가">
+  <div class="kicker"><i></i>평가 리포트</div>
+  <h2 class="title">잘 만들었는지 어떻게 확인했나</h2>
+  <p class="answer res-a">같은 일기로 <mark>예전 화면과 지금 화면</mark>을 비교했다.</p>
+  <div class="body res">
+    <div class="bars">
+      <div class="bar-row"><div class="name">한 화면에 눌러야 할 것의 수<small>4개 결과의 평균</small></div>
+        <div class="track"><div class="b before" style="--w:100%"><i></i><span>예전 <n class="cu" data-to="25.9" data-dec="1">25.9</n></span></div><div class="b after" style="--w:51%"><i></i><span>지금 <n class="cu" data-to="13.2" data-dec="1">13.2</n></span></div></div></div>
+      <div class="bar-row"><div class="name">스크롤해야 하는 가장 긴 길이<small>화면 몇 개 분량인지</small></div>
+        <div class="track"><div class="b before" style="--w:100%"><i></i><span>예전 <n class="cu" data-to="9.9" data-dec="1">9.9</n>개</span></div><div class="b after" style="--w:32%"><i></i><span>지금 <n class="cu" data-to="3.2" data-dec="1">3.2</n>개</span></div></div></div>
+      <div class="bar-row"><div class="name">문장 속 단어가 목록에 든 비율<small>예시 결과 기준</small></div>
+        <div class="track"><div class="b before" style="--w:38%"><i></i><span>예전 <n class="cu" data-to="38" data-dec="0">38</n>%</span></div><div class="b after" style="--w:100%"><i></i><span>지금 <n class="cu" data-to="100" data-dec="0">100</n>%</span></div></div></div>
+      <div class="bar-row"><div class="name">끝까지 가는 데 누르는 횟수<small>늘어난 것도 그대로 보여 준다</small></div>
+        <div class="track"><div class="b before" style="--w:71%"><i></i><span>예전 <n class="cu" data-to="9.3" data-dec="1">9.3</n>번</span></div><div class="b after" style="--w:100%"><i></i><span>지금 <n class="cu" data-to="13" data-dec="0">13</n>번 (늘어남)</span></div></div></div>
+    </div>
+    <div class="row warn" style="margin-top:24px;grid-template-columns:200px 1fr;padding:16px 30px"><span class="rl" style="font-size:28px">못 한 것</span><p style="font-size:27px">사람에게 써 보게 하는 테스트. 그래서 쓰기 편한지, 이해가 잘 되는지는 재지 못했다.</p></div>
+  </div>
+  <div class="ab">
+    <figure><div class="phone noz"><div class="scr anim-scroll"><img src="../images/30-old-scroll-full.png" alt="예전: 길게 이어진 한 페이지"></div></div><figcaption><b>예전</b> 쭉 이어진 스크롤</figcaption></figure>
+    <figure><div class="phone noz"><div class="scr"><img class="cf" style="animation-delay:0s" src="../images/04-learn-sentence.png" alt=""><img class="cf" style="animation-delay:3s" src="../images/05-learn-words.png" alt=""><img class="cf" style="animation-delay:6s" src="../images/06-learn-grammar.png" alt=""><img class="cf" style="animation-delay:9s" src="../images/07-fullread.png" alt=""><img class="cf" style="animation-delay:12s" src="../images/08-stats.png" alt=""></div></div><figcaption><b>지금</b> 카드를 한 장씩 넘김</figcaption></figure>
+  </div>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>못 잰 것은 못 쟀다고 말한다 · 넘기는 횟수가 늘어도 괜찮은지는 사람에게 다시 묻는다</span></div>
+</section>
+
+<!-- 11 AI와 일한 방식 -->
+<section class="slide" data-title="AI와 일한 방식" data-section="AI 활용">
+  <div class="kicker"><i></i>AI 활용 과정 ①</div>
+  <h2 class="title">AI와 어떻게 일했나</h2>
+  <p class="answer">AI가 제안하고, <mark>내가 승인한 뒤</mark> 한 장씩 만들었다. <u class="ask">탭을 눌러 보세요.</u></p>
+  <div class="chips" style="margin-top:18px"><span class="chip">작업 카드 66장</span><span class="chip">지시문 5번 수정</span><span class="chip">다른 AI의 독립 감수</span></div>
+  <div class="body" data-tabs style="margin-top:24px">
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="w1">일하는 순서</button>
+      <button role="tab" aria-selected="false" data-tab="w2">두 AI를 나눠 쓰기</button>
+      <button role="tab" aria-selected="false" data-tab="w3">AI의 규칙 파일</button>
+    </div>
+    <div class="panels" style="margin-top:24px">
+      <div class="panel on" data-panel="w1"><div class="flow"><span>내가 요구</span><i>→</i><span>AI가 검토·제안</span><i>→</i><span class="me">내가 승인</span><i>→</i><span>만들기</span><i>→</i><span>시험</span><i>→</i><span>기록</span></div>
+        <div class="two wide" style="margin-top:26px"><div><b>카드 한 장 = 기능 하나 = 새 대화 하나</b>처음엔 큰 기능을 한 번에 맡겼다가 결과가 흩어지고 화면이 깨졌다. 기능 단위로 쪼개니 점검이 쉽고 토큰도 아꼈다.</div><div><b>실제로 한 요청</b>“사용자 입장과 UI/UX 전문가 입장에서 이 학습 부분 설계를 심도 있게 검토해서 제안해줘. 이게 이 앱의 핵심이야.”</div></div></div>
+      <div class="panel" data-panel="w2"><div class="lane"><b>이미지 트랙</b><span>Claude Code가 이미지 지시문 작성</span><i>→</i><span>GPT가 이미지 생성 (오래 걸림)</span><i>→</i><span>앱에 적용</span></div>
+        <div class="lane"><b>기능 트랙</b><span>이미지를 기다리는 동안</span><i>→</i><span class="me">이미지와 상관없는 기능부터 구현</span></div>
+        <div class="two wide" style="margin-top:22px"><div><b>이중 트랙</b>이미지는 시간이 오래 걸려서, 그동안 기다리지 않고 다른 기능을 만들었다.</div><div><b>GPT로 독립 감수</b>Claude로만 감수할 때보다 놓친 걸 찾아 줘서, 감수의 빈틈이 메워졌다.</div></div></div>
+      <div class="panel" data-panel="w3"><div class="rules">
+        <div><b>시험은 따로 띄운 서버에서</b>시험용 가짜 데이터가 진짜 데이터에 섞인 사고가 난 뒤에 넣은 규칙이다.</div>
+        <div><b>키는 화면·저장소에 올리지 않는다</b>AI 서비스 이용 키가 새면 비용과 보안 사고가 된다. 올리기 전에 검사한다.</div>
+        <div><b>‘배포 진행’이라고 말한 뒤에만 올린다</b>배포하면 바로 사용자에게 반영된다. 이번 준비 중에도 승인 전 업로드는 막혔다.</div>
+        <div><b>스킬로 절차를 고정</b>디자인 기준 적용, 글자와 배경의 색 대비 검사 같은 절차를 AI에게 가르쳐 매번 같게 했다.</div></div></div>
+    </div>
+  </div>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>AI는 만들고, 무엇을 만들지와 언제 올릴지는 내가 정한다</span></div>
+</section>
+
+<!-- 12 프롬프트 -->
+<section class="slide" data-title="프롬프트가 바뀐 과정" data-section="AI 활용">
+  <div class="kicker"><i></i>AI 활용 과정 ②</div>
+  <h2 class="title">번역이 덜 틀리게 어떻게 했나</h2>
+  <p class="answer">AI에게 주는 지시문(프롬프트)을 <mark>5번</mark> 고쳤고, AI가 틀려도 앱이 걸러 내게 했다. <u class="ask">버전을 눌러 보세요.</u></p>
+  <div class="body" data-tabs>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="p1">v0.1</button>
+      <button role="tab" aria-selected="false" data-tab="p2">v0.2</button>
+      <button role="tab" aria-selected="false" data-tab="p3">v0.3</button>
+      <button role="tab" aria-selected="false" data-tab="p4">v0.4 (다른 AI의 검토)</button>
+      <button role="tab" aria-selected="false" data-tab="p5">v0.5</button>
+      <button role="tab" aria-selected="false" data-tab="p6">AI 밖의 안전장치</button>
+    </div>
+    <div class="panels">
+      <div class="panel on" data-panel="p1"><div class="two wide"><div><b>문제</b>규칙이 통하는지 모른다. 처음에는 AI를 부르지 않고 확인하고 싶었다.</div><div><b>바꾼 것</b>초급 수준, 자연스러운 번역, 애매한 말 표시, <u>일기에 없는 내용 금지</u>. 규칙대로 만든 가짜 결과로 먼저 점검했다.</div></div></div>
+      <div class="panel" data-panel="p2"><div class="two wide"><div><b>문제</b>문장이 길어 읽기 어렵고, 번역이 왜 그렇게 나왔는지 모른다. 내 표현(별명)이 반영되지 않았다.</div><div><b>바꾼 것</b>긴 문장 끊기, 단어를 고른 이유 적기, 내 용어사전 반영.</div></div></div>
+      <div class="panel" data-panel="p3"><div class="two wide"><div><b>문제</b>예문만 있으면 그 뜻이 맞는지 확인할 수 없다.</div><div><b>바꾼 것</b>단어·문법·예문마다 한국어 뜻을 붙였다.</div></div></div>
+      <div class="panel" data-panel="p4"><div class="two wide"><div><b>문제</b>다른 AI에게 검토를 시켰더니 문제 6가지가 나왔다. 원문 ‘자격증’이 ‘자격证’으로 바뀌어 표시됐다.</div><div><b>바꾼 것</b>원문은 AI가 아니라 <u>앱이 보관</u>하게 했다. 난이도 규칙, 어감 설명, 단어 고르는 기준도 정했다.</div></div></div>
+      <div class="panel" data-panel="p5"><div class="two wide"><div><b>문제</b>단어를 누르면 뜻을 보여 주고, 문장 옆에 ‘확인 필요’를 붙이려면 구조가 필요했다.</div><div><b>바꾼 것</b>문장마다 단어를 쪼개 담고, 애매한 말에 문장 번호를 붙이게 했다.</div></div></div>
+      <div class="panel" data-panel="p6"><div class="two wide"><div><b>앱이 직접 하는 것</b>읽는 법은 앱이 만들고, 틀리기 쉬운 곳은 교정표로 고친다. 등록한 표현은 문맥이 맞을 때만 적용한다.</div><div><b>자동 시험</b>읽는 법, 문장 나누기, 화면 점검, 접근성(90개 화면 조건)을 시험하고, 시험 중에는 AI를 부르지 않는다.</div></div></div>
+    </div>
+  </div>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>AI가 낸 결과는 그대로 믿지 않고, 앱과 시험이 다시 확인한다</span></div>
+</section>
+
+<!-- 13 AI 실수와 내가 한 결정 -->
+<section class="slide" data-title="AI 실수와 내 결정" data-section="AI 활용">
+  <div class="kicker"><i></i>AI 활용 과정 ③</div>
+  <h2 class="title">AI의 실수, 그리고 내가 정한 것</h2>
+  <p class="answer">AI를 믿지 않는 게 아니라, <mark>믿을 곳과 아닌 곳을 나눴다.</mark></p>
+  <div class="body grid g2" style="margin-top:30px;align-items:start;gap:34px">
+    <div>
+      <h3 class="colh">AI가 한 실수 (6건 중 2건)</h3>
+      <div class="card frag" data-step="1"><h3 style="font-size:34px">시험이 유료 AI를 몰래 불렀다</h3><p>“API 벌써 다 썼어?”라고 물어서 찾았다. 시험이 진짜 키로 AI를 부르고 있었다. 시험에서는 키를 비워 호출 0회로 만들었다.</p></div>
+      <div class="card frag" data-step="2" style="margin-top:16px"><h3 style="font-size:34px">일기 삭제가 안 됐다</h3><p>AI는 “다 됐다”고 했지만, 하나씩 직접 눌러 보다 발견했다. 한꺼번에 구현하면 놓친다는 걸 알았다.</p></div>
+    </div>
+    <div>
+      <h3 class="colh">내가 정한 것</h3>
+      <div class="card dark frag" data-step="3"><ol class="decide"><li><b>무엇을 만들지</b> 내 일기를 외국어로 바꿔 배우는 앱</li><li><b>문제를 짚은 것</b> 결과가 길고 복잡하다 → 카드 학습으로</li><li><b>AI가 놓친 모순</b> “음식 이야기도 사람 이름으로 번역될 것 같다”</li><li><b>AI 말을 의심한 것</b> “API 벌써 다 썼어?”</li><li><b>제출 기준</b> 승인 뒤에만 올리고, 못 잰 것은 못 쟀다고 쓴다</li></ol></div>
+    </div>
+  </div>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>실수는 규칙과 시험으로 남긴다 · 나머지 4건과 전체 기록은 제출한 프롬프트.md에 있다</span></div>
+</section>
+
+<!-- 14 느낀 점 -->
+<section class="slide refl" data-title="느낀 점" data-section="회고">
+  <div class="kicker"><i></i>회고 ①</div>
+  <h2 class="title">이 프로젝트에서 느낀 것</h2>
+  <div class="quotes">
+    <p class="q frag" data-step="1">사용자의 흔적이 없는 앱은, <mark>안개 속에서 만드는 것</mark> 같았다.<small>나와 AI의 이야기만으로는 누가 어디서 막히는지, 왜 안 쓰게 되는지 알 수 없다.</small></p>
+    <p class="q frag" data-step="2">구현은 AI가 하지만, <mark>내가 오래 고민한 시간</mark>이 이유 있는 제품을 만든다.<small>많이 맡기다 보니 어느새 내가 만들고 싶던 것과 거리가 생겼다.</small></p>
+    <p class="q frag" data-step="3"><mark>애정</mark>이 꽤 중요했다.</p>
+  </div>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>다음엔 AI에게 맡기기 전에, 누구를 위한 것인지부터 내가 먼저 확인한다</span></div>
+</section>
+
+<!-- 15 개선점 -->
+<section class="slide" data-title="개선점과 다음" data-section="회고">
+  <div class="kicker"><i></i>회고 ②</div>
+  <h2 class="title">아쉬운 점, 그리고 시간이 더 있다면</h2>
+  <div class="body grid g2" style="margin-top:34px;align-items:start;gap:34px">
+    <div>
+      <h3 class="colh">마음에 걸리는 것</h3>
+      <div class="card frag" data-step="1"><p><b>사용자 테스트 데이터가 없다.</b> 실제로 어디서 막히는지, 왜 안 쓰게 되는지 모른다.</p></div>
+      <div class="card frag" data-step="2" style="margin-top:14px"><p><b>번역 품질을 사람이 점검하지 못했다.</b> 이 앱에서 가장 중요한 부분인데 AI 검토까지만 했다.</p></div>
+      <div class="card frag" data-step="3" style="margin-top:14px"><p><b>번역 비용 대비 가성비를 따져 보지 못했다.</b></p></div>
+      <div class="card frag" data-step="4" style="margin-top:14px"><p><b>알고 있는 약점.</b> 일기가 내 브라우저에만 저장돼서 백업이 필요하고, 300편이 넘으면 오래된 것부터 빠진다.</p></div>
+    </div>
+    <div>
+      <h3 class="colh">시간이 더 있다면, 이 순서로</h3>
+      <div class="nlist">
+        <div class="card dark frag" data-step="5"><i>1</i><p><b>사용자 테스트</b> 초급 학습자 3~5명이 일기를 끝까지 쓰는지, 카드 넘기기가 번거로운지, 다음 날 다시 쓰는지. 성공 기준은 “3일 안에 한 번 더 연다”.</p></div>
+        <div class="card dark frag" data-step="6"><i>2</i><p><b>원어민 번역 검토</b> 번역 품질을 믿고 쓸 수 있는지부터 확인한다.</p></div>
+        <div class="card dark frag" data-step="7"><i>3</i><p><b>영어 추가</b> 한→영, 그다음 영→한·일·중.</p></div>
+        <div class="card dark frag" data-step="8"><i>4</i><p><b>발음 평가 다시 시험</b> 정확도 높은 서비스로 성조까지 잡을 수 있는지.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>기능을 더하기 전에, 지금 앱이 맞는지 사람에게 먼저 확인한다</span></div>
+</section>
+
+<!-- 16 부록 예외 -->
+<section class="slide sp" data-title="예외 상황" data-section="부록">
+  <div class="kicker"><i></i>부록 · 안정성</div>
+  <h2 class="title">잘못 쓰거나 고장 나면</h2>
+  <p class="answer">어떤 경우에도 <mark>쓴 글은 지켜지고</mark>, 다음에 할 일을 알려 준다. <u class="ask">상황을 눌러 보세요.</u></p>
   <div class="body" data-tabs>
     <div class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-tab="e1">비워 둠</button>
@@ -463,189 +654,31 @@ aside.notes{display:none}
       <button role="tab" aria-selected="false" data-tab="e6">중간에 나감</button>
     </div>
     <div class="panels">
-      <div class="panel on" data-panel="e1"><div class="two"><div><b>이럴 때</b>일기를 쓰지 않고 번역 버튼을 눌렀습니다. 앱은 ‘일기를 먼저 입력해 주세요’라고 알려 주고, 번역 요청은 보내지 않습니다.</div><div><b>이유</b>쓸데없는 요청을 막아 비용과 실패를 줄입니다.</div></div><div class="sidephone"><div class="phone"><img src="../images/11-err-empty.png" alt="비워 둔 화면"></div></div></div>
-      <div class="panel" data-panel="e2"><div class="two"><div><b>이럴 때</b>1000자가 넘게 썼습니다. 1000자에서 잘라 주고 ‘최대 글자수예요’라고 알려 줍니다.</div><div><b>이유</b>번역 한 번에 드는 비용과 시간에 한도를 두기 위해서입니다.</div></div><div class="sidephone"><div class="phone"><img src="../images/12-err-long.png" alt="글자 수 초과"></div></div></div>
-      <div class="panel" data-panel="e3"><div class="two"><div><b>이럴 때</b>한국어를 쓰는 칸에 중국어를 썼습니다. 번역하기 전에 ‘한국어가 아닌 글 같아요’라고 알려 주고, 언어를 바로 바꾸게 합니다.</div><div><b>이유</b>잘못된 언어로 번역을 요청하는 일을 막습니다.</div></div><div class="sidephone"><div class="phone"><img src="../images/13-err-lang.png" alt="언어가 다름"></div></div></div>
-      <div class="panel" data-panel="e4"><div class="two"><div><b>이럴 때</b>번역 서버에 문제가 생겼습니다. ‘입력한 일기는 그대로 남아 있어요’라고 알리고, [다시 시도] 버튼을 보여 줍니다.</div><div><b>이유</b>실패해도 쓴 글이 사라지지 않아야 사용자가 떠나지 않습니다.</div></div><div class="sidephone"><div class="phone"><img src="../images/14-err-api.png" alt="서버 오류"></div></div></div>
-      <div class="panel" data-panel="e5"><div class="two"><div><b>이럴 때</b>아직 쓴 일기가 하나도 없습니다. ‘아직 쓴 일기가 없어요’라는 안내와 새 일기 쓰기 버튼을 보여 줍니다.</div><div><b>이유</b>빈 화면에서도 무엇을 하면 되는지 알려 주려는 것입니다.</div></div><div class="sidephone"><div class="phone"><img src="../images/15-empty-hist.png" alt="쓴 일기가 없는 화면"></div></div></div>
-      <div class="panel" data-panel="e6"><div class="two"><div><b>이럴 때</b>공부하다가 창을 닫거나 새로고침했습니다. 다시 열면 보던 카드부터 이어서 할 수 있습니다.</div><div><b>이유</b>중간에 나갔다고 처음부터 다시 하게 하지 않으려는 것입니다.</div></div><div class="sidephone"><div class="phone"><img src="../images/17-resume.png" alt="이어서 하기"></div></div></div>
+      <div class="panel on" data-panel="e1"><div class="two"><div><b>이럴 때</b>일기 없이 번역 버튼을 눌렀다. ‘일기를 먼저 입력해 주세요’라고 알려 주고 요청은 보내지 않는다.</div><div><b>이유</b>쓸데없는 요청을 막아 비용과 실패를 줄인다.</div></div><div class="sidephone"><div class="phone"><img src="../images/11-err-empty.png" alt="비워 둔 화면"></div></div></div>
+      <div class="panel" data-panel="e2"><div class="two"><div><b>이럴 때</b>1000자가 넘게 썼다. 최대 글자 수를 알려 준다.</div><div><b>이유</b>번역 한 번에 드는 비용과 시간에 한도를 둔다.</div></div><div class="sidephone"><div class="phone"><img src="../images/12-err-long.png" alt="글자 수 초과"></div></div></div>
+      <div class="panel" data-panel="e3"><div class="two"><div><b>이럴 때</b>한국어 칸에 중국어를 썼다. ‘한국어가 아닌 글 같아요’라고 알려 주고 언어를 바로 바꾸게 한다.</div><div><b>이유</b>잘못된 언어로 번역을 요청하는 일을 막는다.</div></div><div class="sidephone"><div class="phone"><img src="../images/13-err-lang.png" alt="언어가 다름"></div></div></div>
+      <div class="panel" data-panel="e4"><div class="two"><div><b>이럴 때</b>번역 서버에 문제가 생겼다. ‘입력한 일기는 그대로 남아 있어요’라고 알리고 [다시 시도]를 보여 준다.</div><div><b>이유</b>실패해도 쓴 글이 사라지지 않아야 떠나지 않는다.</div></div><div class="sidephone"><div class="phone"><img src="../images/14-err-api.png" alt="서버 오류"></div></div></div>
+      <div class="panel" data-panel="e5"><div class="two"><div><b>이럴 때</b>아직 쓴 일기가 하나도 없다. 안내와 ‘새 일기 쓰기’ 버튼을 보여 준다.</div><div><b>이유</b>빈 화면에서도 무엇을 하면 되는지 알려 준다.</div></div><div class="sidephone"><div class="phone"><img src="../images/15-empty-hist.png" alt="쓴 일기가 없는 화면"></div></div></div>
+      <div class="panel" data-panel="e6"><div class="two"><div><b>이럴 때</b>공부하다가 창을 닫거나 새로고침했다. 다시 열면 보던 카드부터 이어서 할 수 있다.</div><div><b>이유</b>중간에 나갔다고 처음부터 다시 하게 하지 않는다.</div></div><div class="sidephone"><div class="phone"><img src="../images/17-resume.png" alt="이어서 하기"></div></div></div>
     </div>
   </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 실패해도 사용자의 글은 잃지 않는다 · 포기한 것: 오류를 개발자 말로 보여 주기</span><span><b>다음</b> 이렇게 만든 것이 잘 됐는지 확인한 방법입니다.</span></div>
-  <aside class="notes">여섯 가지 상황을 눌러 보여 줍니다. 공통 원칙은 쓴 글을 지키고, 다음에 할 일을 쉬운 말로 알려 주는 것입니다. 개인 일기는 사용자 기기 안에만 저장됩니다.</aside>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>실패해도 사용자의 글은 잃지 않는다 · 오류를 개발자 말로 보여 주지 않는다</span></div>
 </section>
 
-<!-- 11 어떻게 확인 -->
-<section class="slide" data-title="어떻게 확인했나" data-section="평가">
-  <div class="kicker"><i></i>평가 방법</div>
-  <h2 class="title">잘 만들었는지 어떻게 확인했나요?</h2>
-  <p class="answer">사람 없이도 측정할 수 있는 것부터 <mark>숫자로</mark> 확인했습니다.</p>
-  <div class="body rows">
-    <div class="row frag" data-step="1"><span class="rl">1 문제 찾기</span><p>예전 화면에는 세 가지 문제가 있었습니다. 한 화면에 누를 것이 너무 많고, 단어 목록이 짧고, 한 번에 봐야 하는 화면이 너무 길었습니다.</p></div>
-    <div class="row frag" data-step="2"><span class="rl">2 측정할 것 4가지</span><p>① 한 화면에 눌러야 할 것의 수 ② 문장 속 단어 중 목록에 든 비율 ③ 끝까지 가는 데 누르는 횟수 ④ 스크롤해야 하는 가장 긴 길이</p></div>
-    <div class="row frag" data-step="3"><span class="rl">3 측정 방법</span><p>같은 일기 번역 결과 4개를 예전 화면과 지금 화면에 똑같이 넣고, 같은 프로그램으로 측정했습니다(휴대폰 크기 기준).</p></div>
-    <div class="row warn frag" data-step="4"><span class="rl">4 못 한 것</span><p>사람에게 써 보게 하는 테스트는 하지 못했습니다. 그래서 쓰기 편한지, 이해가 잘 되는지는 측정하지 못했습니다.</p></div>
-  </div>
-  <p class="frag muted" data-step="5" style="margin:22px 0 0;font-size:28px;line-height:1.5">추가로 일부러 망가뜨린 데이터까지 10가지 경우로 끝까지 돌려 봤고, 자동 시험 8단계도 모두 통과합니다.</p>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 측정하지 못한 것은 못 했다고 밝힌다 · 포기한 것: 근거 없는 만족도 숫자</span><span><b>다음</b> 결과를 보겠습니다.</span></div>
-  <aside class="notes">문제 찾기, 측정할 것, 측정 방법, 못 한 것을 차례로 엽니다. 사람에게 써 보게 하는 테스트를 못 했다는 한계를 숨기지 않고, 대신 화면에서 측정할 수 있는 것을 숫자로 확인했다고 말씀드립니다.</aside>
-</section>
-
-<!-- 12 결과 -->
-<section class="slide sp" data-title="결과" data-section="평가">
-  <div class="kicker"><i></i>평가 결과</div>
-  <h2 class="title">결과는 어땠나요?</h2>
-  <p class="answer res-a">누를 것은 <mark>절반</mark>으로 줄고 단어는 <mark>빠짐없이</mark> 들어갔습니다. 대신 넘기는 횟수는 늘었습니다.</p>
-  <div class="body res">
-    <div class="bars">
-      <div class="bar-row"><div class="name">한 화면에 눌러야 할 것의 수<small>4개 결과의 평균</small></div>
-        <div class="track"><div class="b before" style="--w:100%"><i></i><span>예전 25.9</span></div><div class="b after" style="--w:51%"><i></i><span>지금 13.2</span></div></div></div>
-      <div class="bar-row"><div class="name">문장 속 단어 중 목록에 든 비율<small>예시 결과 기준(실제 AI 응답은 21% → 100%)</small></div>
-        <div class="track"><div class="b before" style="--w:38%"><i></i><span>예전 38%</span></div><div class="b after" style="--w:100%"><i></i><span>지금 100%</span></div></div></div>
-      <div class="bar-row"><div class="name">끝까지 가는 데 누르는 횟수<small>4개 결과의 평균</small></div>
-        <div class="track"><div class="b before" style="--w:71%"><i></i><span>예전 9.3번</span></div><div class="b after" style="--w:100%"><i></i><span>지금 13번 (늘어남)</span></div></div></div>
-      <div class="bar-row"><div class="name">스크롤해야 하는 가장 긴 길이<small>화면 몇 개 분량인지, 4개 결과의 평균</small></div>
-        <div class="track"><div class="b before" style="--w:100%"><i></i><span>예전 9.9개</span></div><div class="b after" style="--w:32%"><i></i><span>지금 3.2개</span></div></div></div>
-    </div>
-    <div class="ab">
-      <figure><div class="phone noz"><div class="scr anim-scroll"><img src="../images/30-old-scroll-full.png" alt="예전: 길게 이어진 한 페이지"></div></div><figcaption><b>예전</b> 쭉 이어진 스크롤</figcaption></figure>
-      <figure><div class="phone noz"><div class="scr"><img class="cf" style="animation-delay:0s" src="../images/04-learn-sentence.png" alt=""><img class="cf" style="animation-delay:3s" src="../images/05-learn-words.png" alt=""><img class="cf" style="animation-delay:6s" src="../images/06-learn-grammar.png" alt=""><img class="cf" style="animation-delay:9s" src="../images/07-fullread.png" alt=""><img class="cf" style="animation-delay:12s" src="../images/08-stats.png" alt=""></div></div><figcaption><b>지금</b> 카드를 한 장씩 넘김</figcaption></figure>
-    </div>
-  </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 넘기는 횟수가 늘어도 괜찮은지는 사용자에게 다시 물어본다</span><span><b>다음</b> 좋아지지 않은 것과 그 이유를 말씀드립니다.</span></div>
-  <aside class="notes">오른쪽 화면은 예전에는 한 페이지가 길게 이어졌고, 지금은 카드를 한 장씩 넘긴다는 것을 보여 줍니다. 막대는 장이 열릴 때 늘어납니다. 눌러야 할 것과 단어 비율은 좋아졌고, 넘기는 횟수는 늘었다는 점을 같은 무게로 말씀드립니다.</aside>
-</section>
-
-<!-- 13 아쉬운 점 -->
-<section class="slide" data-title="아쉬운 점" data-section="평가">
-  <div class="kicker"><i></i>좋아지지 않은 것</div>
-  <h2 class="title">무엇이 아쉬웠고, 왜 그런가요?</h2>
-  <p class="answer">좋아지지 않은 것도 <mark>이유</mark>까지 적었습니다. <u class="ask">눌러서 펼쳐 보세요.</u></p>
-  <div class="body acc tight" data-acc>
-    <div class="acc-item open"><button aria-expanded="true">① 끝까지 가는 데 누르는 횟수가 늘었다 (9.3번 → 13번)</button><div class="acc-body"><div><b>확인한 것</b>끝까지 보려면 카드를 평균 13번 넘겨야 합니다.</div><div><b>이유</b>한 번에 하나씩 보여 주려고 화면을 나눴기 때문입니다.</div><div><b>다음에 할 일</b>이 정도가 번거로운지 사람에게 물어봅니다.</div></div></div>
-    <div class="acc-item"><button aria-expanded="false">② 단어 목록 카드가 너무 길다 (최대 화면 6.2개 분량)</button><div class="acc-body"><div><b>확인한 것</b>단어가 48개 나온 날은 카드 하나가 화면 6개 분량이었습니다.</div><div><b>이유</b>문장에 나온 단어를 전부 보여 주도록 바꿨기 때문입니다.</div><div><b>다음에 할 일</b>목록을 접어 두거나, 중요한 단어부터 보여 주는 방법을 시험합니다.</div></div></div>
-    <div class="acc-item"><button aria-expanded="false">③ 일부 결과는 단어 비율을 측정하지 못했다</button><div class="acc-body"><div><b>확인한 것</b>실제 AI 응답 3개 중 2개는 단어 정보가 없어 계산에서 뺐습니다.</div><div><b>이유</b>그 2개는 단어 정보를 만들기 전 버전(v0.4)의 응답이었습니다.</div><div><b>다음에 할 일</b>새 버전으로 응답을 다시 모아 같은 방법으로 측정합니다.</div></div></div>
-    <div class="acc-item"><button aria-expanded="false">④ 번역은 AI가 하기 때문에 틀릴 수 있다</button><div class="acc-body"><div><b>확인한 것</b>다른 AI에게 검토를 맡겼더니 원문이 바뀌어 표시되는 등 문제 6가지가 나왔습니다.</div><div><b>이유</b>AI가 낸 결과를 그대로 믿으면 틀린 채로 보여 주게 됩니다.</div><div><b>해 둔 것</b>불확실한 부분에 ‘확인 필요’를 표시하고, 다시 번역하는 버튼을 넣었습니다.</div></div></div>
-  </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 아쉬운 점을 숨기지 않고 다음 개선에 쓴다</span><span><b>다음</b> 번역이 덜 틀리게 어떻게 했는지 보겠습니다.</span></div>
-  <aside class="notes">네 가지를 눌러 가며 확인한 것, 이유, 다음에 할 일을 말씀드립니다. 모두 아직 해결된 것이 아니라 다음 단계로 넘긴 것이라고 분명히 말합니다.</aside>
-</section>
-
-<!-- 14 프롬프트 -->
-<section class="slide" data-title="프롬프트 변경" data-section="AI 활용">
-  <div class="kicker"><i></i>AI 활용 기록 ①</div>
-  <h2 class="title">번역이 덜 틀리게 어떻게 했나요?</h2>
-  <p class="answer">AI에게 주는 지시문(프롬프트)을 <mark>5번</mark> 고쳤고, AI가 틀려도 앱이 걸러 내게 했습니다. <u class="ask">버전을 눌러 보세요.</u></p>
-  <div class="body" data-tabs>
-    <div class="tabs" role="tablist">
-      <button role="tab" aria-selected="true" data-tab="p1">v0.1</button>
-      <button role="tab" aria-selected="false" data-tab="p2">v0.2</button>
-      <button role="tab" aria-selected="false" data-tab="p3">v0.3</button>
-      <button role="tab" aria-selected="false" data-tab="p4">v0.4 (다른 AI의 검토 반영)</button>
-      <button role="tab" aria-selected="false" data-tab="p5">v0.5</button>
-      <button role="tab" aria-selected="false" data-tab="p6">AI 밖의 안전장치</button>
-    </div>
-    <div class="panels">
-      <div class="panel on" data-panel="p1"><div class="two wide"><div><b>바꾼 것</b>초급 수준으로 자연스럽게 번역하고, 애매한 말은 따로 표시하고, 일기에 없는 내용은 넣지 말라고 적었습니다. 읽는 법(병음)은 앱이 만들기로 했습니다.</div><div><b>이유</b>처음에는 AI를 부르지 않고 규칙대로 직접 만든 가짜 결과로, 이 규칙이 통하는지부터 확인했습니다.</div></div></div>
-      <div class="panel" data-panel="p2"><div class="two wide"><div><b>바꾼 것</b>긴 문장은 나눠서 번역하고, 단어를 고른 이유를 적게 했습니다. 사용자가 등록한 표현(예: 별명)도 반영하게 했습니다.</div><div><b>이유</b>문장이 길면 소리 내어 읽기 어렵고, 번역이 왜 그렇게 나왔는지 알아야 배울 수 있기 때문입니다.</div></div></div>
-      <div class="panel" data-panel="p3"><div class="two wide"><div><b>바꾼 것</b>단어, 문법, 예문마다 한국어 뜻을 붙였습니다.</div><div><b>이유</b>예문만 있으면 그 뜻이 맞는지 사용자가 확인할 수 없었습니다.</div></div></div>
-      <div class="panel" data-panel="p4"><div class="two wide"><div><b>바꾼 것</b>일기를 번호 붙인 문장 목록으로 보내고, 원문은 AI가 아니라 앱이 보관하게 했습니다. 난이도 규칙, 어감 설명, 단어 고르는 기준도 정했습니다.</div><div><b>이유</b>다른 AI에게 결과를 검토시켰더니 문제 6가지가 나왔습니다. 예를 들어 원문의 ‘자격증’이 ‘자격证’으로 바뀌어 표시됐고, 쉬운 말이라면서 어려운 단어를 썼습니다.</div></div></div>
-      <div class="panel" data-panel="p5"><div class="two wide"><div><b>바꾼 것</b>문장마다 단어를 쪼개 담게 하고, 애매한 말에는 몇 번째 문장인지 번호를 붙이게 했습니다.</div><div><b>이유</b>앱에서 단어를 누르면 뜻을 보여 주고, 문장 옆에 ‘확인 필요’를 붙이려면 이런 구조가 필요했습니다.</div></div></div>
-      <div class="panel" data-panel="p6"><div class="two wide"><div><b>앱이 직접 하는 것</b>읽는 법(병음)은 앱이 만들고, 틀리기 쉬운 곳은 교정표로 고칩니다. 원문은 앱이 보관합니다. 등록한 표현은 문맥이 맞을 때만 적용합니다.</div><div><b>자동 시험 8단계</b>읽는 법, 문맥, 문장 나누기, 화면 문구, 따라 말하기, 일본어 읽기, 화면 점검, 접근성(90개 화면)을 시험하며, 시험 중에는 AI를 부르지 않습니다.</div></div></div>
-    </div>
-  </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: AI가 낸 결과는 그대로 믿지 않고 앱과 시험이 다시 확인한다 · 포기한 것: 지시문 하나로 다 해결된다는 기대</span><span><b>다음</b> 개발할 때 AI와 어떻게 일했는지도 기록했습니다.</span></div>
-  <aside class="notes">버전마다 무엇이 문제였고 어떻게 고쳤는지를 짧게 말합니다. 핵심은 v0.4의 다른 AI 검토와, 지시문 밖에서 앱과 시험이 다시 확인하는 장치입니다.</aside>
-</section>
-
-<!-- 15 AI와 일한 방식 -->
-<section class="slide" data-title="AI와 일한 방식" data-section="AI 활용">
-  <div class="kicker"><i></i>AI 활용 기록 ②</div>
-  <h2 class="title">AI와 어떻게 일했나요?</h2>
-  <p class="answer">카드 한 장씩, AI가 제안하면 <mark>제가 승인한 뒤</mark> 만들었습니다. <u class="ask">탭을 눌러 보세요.</u></p>
-  <div class="chips"><span class="chip">작업 카드 66장</span><span class="chip">저장 기록(커밋) 130번</span><span class="chip">지시문 5번 수정</span><span class="chip">다른 AI의 검토 1회</span><span class="chip">자동 시험 8단계</span></div>
-  <div class="body" data-tabs style="margin-top:28px">
-    <div class="tabs" role="tablist">
-      <button role="tab" aria-selected="true" data-tab="w1">일하는 순서</button>
-      <button role="tab" aria-selected="false" data-tab="w2">AI의 규칙 파일(CLAUDE.md)</button>
-      <button role="tab" aria-selected="false" data-tab="w3">AI에게 가르친 절차(스킬)</button>
-    </div>
-    <div class="panels" style="margin-top:26px">
-      <div class="panel on" data-panel="w1"><div class="flow"><span>내가 요구</span><i>→</i><span>AI가 세 관점으로 검토·제안</span><i>→</i><span class="me">내가 승인</span><i>→</i><span>만들기</span><i>→</i><span>시험</span><i>→</i><span>기록</span></div>
-        <div class="two wide" style="margin-top:26px"><div><b>실제로 한 요청 ①</b>“사용자 입장과 UIUX 전문가의 입장에서 이 학습 부분 설계를 심도 있게 검토해서 제안해줘. 이게 이 앱의 핵심이야.”<br>→ AI가 학습 흐름의 문제 7가지를 찾고 새 설계안을 냈습니다.</div><div><b>실제로 한 요청 ②</b>“지금 번역해서 진행하는 구성이 너무 복잡해. … 전체 읽어보기로 끝내자.”<br>→ 카드 수를 줄이고, 단어 목록을 9개에서 24개로 늘렸습니다(같은 일기 기준).</div></div></div>
-      <div class="panel" data-panel="w2"><div class="rules">
-        <div><b>데이터 보호</b>시험은 항상 따로 띄운 서버에서 합니다. 시험용 가짜 데이터가 진짜 데이터에 섞인 사고가 난 뒤에 규칙으로 넣었습니다.</div>
-        <div><b>키 보호</b>AI 서비스 이용 키가 화면에 나오거나 인터넷 저장소에 올라가면 안 됩니다. 올리기 전에 검사합니다.</div>
-        <div><b>승인 뒤에만 배포</b>제가 ‘배포 진행’이라고 하기 전에는 인터넷에 올리지 않습니다. 이번 발표 준비 중에도 승인 전 업로드는 막혔습니다.</div>
-        <div><b>카드 한 장씩</b>한 번에 한 가지만 하고, 크게 고치기 전에는 백업하고, 끝나면 기록을 남깁니다.</div></div></div>
-      <div class="panel" data-panel="w3"><div class="rules">
-        <div><b>/say-my-day-design</b>정해 둔 디자인 기준을 매번 똑같이 적용하는 절차입니다(작업 카드 T19~T28).</div>
-        <div><b>contrast-check</b>글자와 배경의 색 차이가 읽기에 충분한지 검사합니다(작업 카드 T18).</div>
-        <div><b>디자인 검사</b>이 발표 자료를 만들 때도 글자가 배경에 묻히는 곳과 안쪽 여백이 좁은 곳을 찾아 줘서 고쳤습니다.</div>
-        <div><b>내 습관 기억</b>‘이모지 쓰지 말 것’, ‘한 번에 한 가지씩’ 같은 제 습관을 저장해 다음 작업에도 지키게 합니다.</div></div></div>
-    </div>
-  </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: AI가 제안하고 사람이 승인한다 · 근거: 작업 카드 66장의 기록 · 포기한 것: 한 번에 크게 맡기기</span><span><b>다음</b> 그 과정에서 AI도 실수를 했습니다.</span></div>
-  <aside class="notes">일하는 순서, 규칙 파일, 스킬을 나눠 말씀드립니다. CLAUDE.md는 AI가 작업을 시작할 때마다 먼저 읽는 규칙 파일이고, 스킬은 AI에게 가르쳐 둔 작업 절차입니다. 승인 뒤에만 배포한다는 규칙은 이번에도 실제로 작동했습니다.</aside>
-</section>
-
-<!-- 16 AI 실수 -->
-<section class="slide" data-title="AI 실수" data-section="AI 활용">
-  <div class="kicker"><i></i>AI 활용 기록 ③</div>
-  <h2 class="title">AI는 어떤 실수를 했고, 어떻게 고쳤나요?</h2>
-  <p class="answer">실수를 찾아 <mark>규칙과 시험</mark>으로 남겼습니다. <u class="ask">눌러서 펼쳐 보세요.</u></p>
-  <div class="body acc tight" data-acc style="margin-top:12px">
-    <div class="acc-item open"><button aria-expanded="true">① 등록한 표현의 규칙이 서로 맞지 않았다</button><div class="acc-body"><div><b>어떻게 알았나</b>제가 “음식 이야기도 사람 이름으로 번역될 것 같다”고 지적했고, 확인해 보니 규칙 두 개가 부딪쳤습니다.</div><div><b>어떻게 고쳤나</b>‘항상 이렇게 번역’ 규칙을 없애고, 문맥이 맞을 때만 적용하게 했습니다.</div><div><b>앞으로 막으려고</b>표현 종류(이름/일반 표현) 선택, ‘반영됨’ 표시와 되돌리기 버튼을 넣었습니다.</div></div></div>
-    <div class="acc-item"><button aria-expanded="false">② 자동 시험이 유료 AI를 몰래 불렀다</button><div class="acc-body"><div><b>어떻게 알았나</b>제가 “API가 벌써 다 떨어졌어?”라고 물어서 찾아보니, 시험이 진짜 키로 AI를 부르고 있었습니다.</div><div><b>어떻게 고쳤나</b>시험할 때는 키를 비워서 AI를 부를 수 없게 했습니다.</div><div><b>앞으로 막으려고</b>‘시험은 AI를 부르지 않는다’는 규칙을 저장했습니다.</div></div></div>
-    <div class="acc-item"><button aria-expanded="false">③ 시험용 가짜 데이터가 진짜 데이터에 섞였다</button><div class="acc-body"><div><b>어떻게 알았나</b>앱 속 새가 이유 없이 높은 단계로 올라가 있었습니다.</div><div><b>어떻게 고쳤나</b>섞이기 전 파일을 따로 보관하고, 가짜 항목만 지웠습니다.</div><div><b>앞으로 막으려고</b>날짜 형식이 아닌 항목을 걸러 내는 코드를 넣고, 시험은 따로 띄운 서버에서만 하게 했습니다.</div></div></div>
-    <div class="acc-item"><button aria-expanded="false">④ 일기 삭제 확인창이 바로 닫혔다</button><div class="acc-body"><div><b>어떻게 알았나</b>제가 “삭제가 안 돼”라고 알렸고, 브라우저에서 똑같이 재현했습니다.</div><div><b>어떻게 고쳤나</b>화면이 다시 그려지면서 삭제 버튼을 ‘바깥을 누른 것’으로 잘못 알던 것을 고쳤습니다.</div><div><b>앞으로 막으려고</b>삭제를 확인하는 시험을 추가했습니다.</div></div></div>
-    <div class="acc-item"><button aria-expanded="false">⑤ 마이크가 꺼져 있다는 사실을 놓쳤다</button><div class="acc-body"><div><b>어떻게 알았나</b>AI가 설계를 제안할 때 이 사실을 빠뜨렸고, 만들다가 코드를 보고서야 알았습니다.</div><div><b>어떻게 고쳤나</b>마이크 없이 되는 ‘소리 내어 말했어요’ 버튼으로 먼저 만들고, 사실을 저에게 알렸습니다.</div><div><b>얻은 교훈</b>제안하기 전에 코드의 현재 상태부터 확인합니다.</div></div></div>
-    <div class="acc-item"><button aria-expanded="false">⑥ 용량이 큰 디자인 파일이 올라갈 뻔했다</button><div class="acc-body"><div><b>어떻게 알았나</b>인터넷에 올리기 직전에 올라가는 크기를 점검하다가 171MB 압축 파일이 섞인 것을 발견했습니다.</div><div><b>어떻게 고쳤나</b>따로 복사한 곳에서 기록을 정리해 올렸고, 원본은 그대로 두었습니다.</div><div><b>앞으로 막으려고</b>그 폴더를 올리지 않는 목록에 넣었습니다.</div></div></div>
-  </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 실수는 규칙과 시험으로 남겨 반복되지 않게 한다 · 포기한 것: AI가 알아서 잘하리라는 기대</span><span><b>다음</b> 마지막으로 한계와 다음 단계입니다.</span></div>
-  <aside class="notes">여섯 건을 모두 말하기보다 두세 건을 골라, 어떻게 알았고 어떻게 고쳤고 앞으로 어떻게 막는지 말씀드립니다. 공통점은 실수가 규칙이나 시험으로 남았다는 점입니다.</aside>
-</section>
-
-<!-- 17 회고 -->
-<section class="slide" data-title="회고" data-section="회고">
-  <div class="kicker"><i></i>회고</div>
-  <h2 class="title">남은 한계와 다음 단계는 무엇인가요?</h2>
-  <p class="answer">다음에 할 일은 기능을 더하는 것이 아니라, <mark>사람에게 확인하는 것</mark>입니다.</p>
-  <div class="body grid g2" style="margin-top:20px">
-    <div>
-      <h3 class="colh">남은 한계</h3>
-      <div class="card frag" data-step="1"><p><b>사람에게 써 보게 하는 테스트를 못 했습니다.</b> 쓰기 편한지, 이해되는지는 모릅니다.</p></div>
-      <div class="card frag" data-step="2" style="margin-top:14px"><p><b>마이크로 따라 말하기는 확인하지 못했습니다.</b> 그래서 기본으로 켜지 않았습니다.</p></div>
-      <div class="card frag" data-step="3" style="margin-top:14px"><p><b>단어가 많은 날은 단어 카드가 아주 깁니다.</b> 화면 6개 분량까지 늘어납니다.</p></div>
-      <div class="card frag" data-step="4" style="margin-top:14px"><p><b>번역은 AI라서 틀릴 수 있습니다.</b> ‘확인 필요’ 표시로 줄였을 뿐입니다.</p></div>
-    </div>
-    <div>
-      <h3 class="colh">다음에 확인할 것 (계획)</h3>
-      <div class="card dark frag" data-step="5"><p><b>3~5명</b>에게 일기 한 편을 끝까지 써 보게 하고, 끝까지 한 비율·걸린 시간·만족도를 측정합니다.</p></div>
-      <div class="card dark frag" data-step="6" style="margin-top:14px"><p>단어 목록을 <b>접어 두는 방법</b>과 지금 방법을 비교합니다.</p></div>
-      <div class="card dark frag" data-step="7" style="margin-top:14px"><p><b>가리고 말하기</b>가 말하기 실력에 도움이 되는지 확인합니다.</p></div>
-      <div class="card dark frag" data-step="8" style="margin-top:14px"><p>새 버전의 AI 응답을 더 모아서 <b>숫자를 다시</b> 측정합니다.</p></div>
-    </div>
-  </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 다음 확인 계획을 먼저 세우고, 그 결과를 보고 다음 기능을 고른다</span><span><b>마무리</b> 감사합니다. 질문을 받겠습니다.</span></div>
-  <aside class="notes">한계를 먼저, 다음에 확인할 것을 뒤에 말씀드립니다. 오른쪽은 계획이지 이미 한 일이 아니라는 점을 분명히 말합니다.</aside>
-</section>
-
-<!-- 18 부록 -->
+<!-- 17 부록 요구 대응표 -->
 <section class="slide" data-title="요구 대응표·제출물" data-section="부록">
   <div class="kicker"><i></i>부록</div>
-  <h2 class="title">요구한 내용이 모두 들어갔나요?</h2>
-  <p class="answer">칩을 누르면 해당 장으로 이동합니다.</p>
+  <h2 class="title">요구한 내용이 모두 들어갔나</h2>
+  <p class="answer">칩을 누르면 해당 장으로 이동한다.</p>
   <div class="body grid g3" style="margin-top:30px">
-    <div class="card"><h3>① 문제 정의</h3><p><button class="chip" data-goto="2">2장</button></p></div>
-    <div class="card"><h3>② 서비스 소개·사용법</h3><p><button class="chip" data-goto="3">앱 한눈에</button> <button class="chip" data-goto="4">성장</button> <button class="chip" data-goto="5">단계</button> <button class="chip" data-goto="6">시연</button> <button class="chip" data-goto="7">변천</button></p></div>
-    <div class="card"><h3>③ PO 설계 판단</h3><p><button class="chip" data-goto="8">우선순위</button> <button class="chip" data-goto="9">뺀 것</button> <button class="chip" data-goto="10">얻고 잃은 것</button> <button class="chip" data-goto="11">예외</button></p></div>
-    <div class="card"><h3>④ 평가 리포트</h3><p><button class="chip" data-goto="12">방법</button> <button class="chip" data-goto="13">결과</button> <button class="chip" data-goto="14">아쉬운 점</button></p></div>
-    <div class="card"><h3>⑤ AI 활용 과정 기록</h3><p><button class="chip" data-goto="15">지시문</button> <button class="chip" data-goto="16">일한 방식</button> <button class="chip" data-goto="17">AI 실수</button></p></div>
-    <div class="card"><h3>⑥ 설계 문서 + 회고</h3><p><button class="chip" data-goto="9">뺀 것</button> <button class="chip" data-goto="10">얻고 잃은 것</button> <button class="chip" data-goto="18">한계</button></p></div>
+    <div class="card"><h3>① 문제 정의</h3><p><button class="chip" data-goto="2">왜 만들었나</button></p></div>
+    <div class="card"><h3>② 서비스 소개·시연</h3><p><button class="chip" data-goto="3">앱</button> <button class="chip" data-goto="4">시연</button> <button class="chip" data-goto="5">내 일기답게</button> <button class="chip" data-goto="6">새</button></p></div>
+    <div class="card"><h3>③ PO 설계 판단</h3><p><button class="chip" data-goto="7">달라진 과정</button> <button class="chip" data-goto="8">뺀 것</button> <button class="chip" data-goto="9">맞바꾼 것</button></p></div>
+    <div class="card"><h3>④ 평가 리포트</h3><p><button class="chip" data-goto="10">확인과 결과</button> <button class="chip" data-goto="16">예외 상황</button></p></div>
+    <div class="card"><h3>⑤ AI 활용 과정 기록</h3><p><button class="chip" data-goto="11">일한 방식</button> <button class="chip" data-goto="12">프롬프트</button> <button class="chip" data-goto="13">AI 실수</button></p></div>
+    <div class="card"><h3>⑥ 설계 문서 + 회고</h3><p><button class="chip" data-goto="8">뺀 것</button> <button class="chip" data-goto="14">느낀 점</button> <button class="chip" data-goto="15">개선점</button></p></div>
   </div>
-  <div class="card" style="margin-top:28px;padding:24px 36px"><p style="font-size:28px;line-height:1.7"><b>GitHub</b> github.com/kang0712-97/say-my-day &nbsp;·&nbsp; <b>배포 주소</b> chinese-diary.onrender.com &nbsp;·&nbsp; <b>시연 영상</b> 제출물 참고</p></div>
-  <aside class="notes">빠짐없이 구성했는지 한 장으로 확인합니다. 질문이 나오면 해당 칩을 눌러 그 장으로 이동합니다.</aside>
+  <div class="card" style="margin-top:26px;padding:24px 36px"><p style="font-size:28px;line-height:1.7"><b>GitHub</b> github.com/kang0712-97/say-my-day &nbsp;·&nbsp; <b>배포 주소</b> chinese-diary.onrender.com &nbsp;·&nbsp; <b>시연 영상</b> 제출물 참고</p><p style="font-size:26px;line-height:1.6;margin-top:8px" class="muted"><b>배포 이유</b> 번역·음성·AI 키 보호를 서버가 맡아야 해서 정적 호스팅은 맞지 않았다. 무료 요금제에 설정이 단순해서 Render를 썼다(다른 곳과 비교해서 고른 것은 아니다).</p></div>
 </section>
 
 </div></div>
@@ -653,39 +686,40 @@ aside.notes{display:none}
 <nav class="chrome" aria-label="발표 이동">
   <button class="nbtn" id="prev" aria-label="이전">←</button>
   <span class="sec" id="sec"></span>
-  <div class="dots" id="dots"></div>
+  <div class="secs" id="secs"></div>
   <span class="cnt" id="cnt"></span>
   <button class="tool" id="bov" aria-pressed="false">목차 G</button>
-  <button class="tool" id="bnotes" aria-pressed="false">대본 N</button>
   <button class="tool" id="bfs">전체화면 F</button>
   <button class="nbtn" id="next" aria-label="다음">→</button>
 </nav>
 <div class="overview" id="overview" role="dialog" aria-label="목차"><h2>목차</h2><div class="ov-grid" id="ovgrid"></div></div>
 <div class="zoom" id="zoom" aria-label="확대 보기"><div class="zh">아무 곳이나 누르거나 Esc로 닫기</div><div class="zbox" id="zbox"></div></div>
-<div class="notes-panel" id="notes" aria-live="polite"></div>
 
 <script>
 (() => {
   const $ = (s, r = document) => r.querySelector(s), $$ = (s, r = document) => [...r.querySelectorAll(s)];
-  const stage = $('#stage'), slides = $$('.slide'), dots = $('#dots'), N = slides.length;
+  const stage = $('#stage'), slides = $$('.slide'), N = slides.length;
   let cur = 0, step = 0;
   /* 화면 크기에 맞춰 1920×1080 무대를 줄이거나 늘린다 */
   const fit = () => { const vp = $('.viewport').getBoundingClientRect(), k = Math.min(vp.width / 1920, vp.height / 1080); stage.style.transform = `scale(${k})`; stage.style.margin = `${-(1080 * (1 - k)) / 2}px ${-(1920 * (1 - k)) / 2}px`; };
   addEventListener('resize', fit); fit();
   /* 이동 막대 */
-  slides.forEach((s, n) => { const b = document.createElement('button'); b.setAttribute('aria-label', `${n + 1}장 ${s.dataset.title || ''}`); b.onclick = () => go(n); dots.appendChild(b); });
-  const ov = $('#ovgrid');
-  slides.forEach((s, n) => { const b = document.createElement('button'); b.innerHTML = `<small>${n + 1}장 · ${s.dataset.section || ''}</small><span>${s.dataset.title || ''}</span>`; b.onclick = () => { toggleOv(false); go(n); }; ov.appendChild(b); });
+  /* 묶음 버튼: 같은 묶음의 첫 장으로 이동 */
+  const secNames = []; slides.forEach((s) => { const k = s.dataset.section; if (k && k !== '시작' && !secNames.includes(k)) secNames.push(k); });
+  secNames.forEach((k) => { const b = document.createElement('button'); b.textContent = k; b.dataset.sec = k; b.onclick = () => go(slides.findIndex((s) => s.dataset.section === k)); $('#secs').appendChild(b); });
+  const ov = $('#ovgrid'), ovBtn = [];
+  let lastSec = '';
+  slides.forEach((s, n) => { if (s.dataset.section !== lastSec) { lastSec = s.dataset.section; const h = document.createElement('div'); h.className = 'ov-sec'; h.textContent = lastSec; ov.appendChild(h); } const b = document.createElement('button'); b.innerHTML = `<small>${n + 1}장</small><span>${s.dataset.title || ''}</span>`; b.onclick = () => { toggleOv(false); go(n); }; ov.appendChild(b); ovBtn.push(b); });
   const frags = (s) => $$('[data-step]', s).sort((a, b) => a.dataset.step - b.dataset.step);
   function show(n, dir) {
     cur = Math.max(0, Math.min(N - 1, n)); step = dir < 0 ? frags(slides[cur]).length : 0;
     slides.forEach((s, k) => { s.classList.toggle('active', k === cur); s.classList.toggle('past', k < cur); s.classList.remove('on-slide'); frags(s).forEach((f, j) => f.classList.toggle('on', k < cur || (k === cur && j < step))); });
-    const s = slides[cur]; setTimeout(() => s.classList.add('on-slide'), 60);
-    $$('.dots button').forEach((b, k) => b.classList.toggle('on', k === cur));
-    $('#sec').textContent = s.dataset.section || ''; $('#cnt').textContent = `${cur + 1} / ${N}`;
+    const s = slides[cur]; slides.forEach((x) => x !== s && x.dispatchEvent(new CustomEvent('slideoff')));
+    setTimeout(() => { s.classList.add('on-slide'); s.dispatchEvent(new CustomEvent('slideon')); }, 60);
+    $$('.secs button').forEach((b) => b.classList.toggle('on', b.dataset.sec === s.dataset.section));
+    $('#cnt').textContent = `${cur + 1} / ${N}`;
     $('#progress').style.width = `${((cur + 1) / N) * 100}%`;
-    $$('.cur', ov).forEach((x) => x.classList.remove('cur')); ov.children[cur].classList.add('cur');
-    const nt = $('aside.notes', s); $('#notes').textContent = nt ? nt.textContent.trim() : '';
+    ovBtn.forEach((b, k) => b.classList.toggle('cur', k === cur));
     $$('video').forEach((v) => v.pause());
     history.replaceState(null, '', `#${cur + 1}`);
   }
@@ -700,14 +734,13 @@ aside.notes{display:none}
     if (k === 'ArrowRight' || k === 'PageDown' || (k === ' ' && !inEl('button'))) { next(); e.preventDefault(); }
     else if (k === 'ArrowLeft' || k === 'PageUp') { prev(); e.preventDefault(); }
     else if (k === 'Home') go(0); else if (k === 'End') go(N - 1);
-    else if (k === 'g' || k === 'G') toggleOv(); else if (k === 'n' || k === 'N') toggleNotes(); else if (k === 'f' || k === 'F') fs();
+    else if (k === 'g' || k === 'G') toggleOv(); else if (k === 'f' || k === 'F') fs();
     else if (k === 'Escape') toggleOv(false);
   });
   $('#prev').onclick = prev; $('#next').onclick = next;
   const toggleOv = (on) => { const o = $('#overview'); const v = on ?? !o.classList.contains('on'); o.classList.toggle('on', v); $('#bov').setAttribute('aria-pressed', v); };
-  const toggleNotes = () => { const p = $('#notes'); const v = !p.classList.contains('on'); p.classList.toggle('on', v); $('#bnotes').setAttribute('aria-pressed', v); };
   const fs = () => { document.fullscreenElement ? document.exitFullscreen() : document.documentElement.requestFullscreen?.(); };
-  $('#bov').onclick = () => toggleOv(); $('#bnotes').onclick = toggleNotes; $('#bfs').onclick = fs;
+  $('#bov').onclick = () => toggleOv(); $('#bfs').onclick = fs;
   let x0 = null; addEventListener('touchstart', (e) => { x0 = e.touches[0].clientX; }, { passive: true });
   addEventListener('touchend', (e) => { if (x0 == null) return; const dx = e.changedTouches[0].clientX - x0; if (Math.abs(dx) > 70) (dx < 0 ? next : prev)(); x0 = null; }, { passive: true });
   /* 컴포넌트 */
@@ -750,9 +783,36 @@ aside.notes{display:none}
   },true);
   addEventListener('keydown',e=>{ if(e.key==='Escape'&&zm.classList.contains('on')){ zm.classList.remove('on'); zb.innerHTML=''; e.stopImmediatePropagation(); } },true);
 })();
+
+(function(){
+  const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  /* 숫자 올라가기(평가 장): 장이 열릴 때 한 번 */
+  const evSlide = document.querySelector('.slide .cu') && document.querySelector('.slide .cu').closest('.slide');
+  if (evSlide) {
+    const cus = [...evSlide.querySelectorAll('.cu')]; let raf = 0;
+    const fmt = (el, v) => { el.textContent = Number(v).toFixed(+el.dataset.dec); };
+    evSlide.addEventListener('slideon', () => {
+      if (reduce) return; cancelAnimationFrame(raf); const t0 = performance.now();
+      const tick = (t) => { const k = Math.min(1, (t - t0) / 1100), e = 1 - Math.pow(1 - k, 3); cus.forEach((el) => fmt(el, el.dataset.to * e)); if (k < 1) raf = requestAnimationFrame(tick); };
+      cus.forEach((el) => fmt(el, 0)); raf = requestAnimationFrame(tick);
+    });
+    evSlide.addEventListener('slideoff', () => { cancelAnimationFrame(raf); cus.forEach((el) => fmt(el, el.dataset.to)); });
+  }
+  /* 새 성장: 알에서 이야기 작가새까지 한 번 자동 재생 */
+  const gro = document.getElementById('gro');
+  if (gro) {
+    const sl = gro.closest('.slide'), imgs = [...document.querySelectorAll('#groBig img')], strip = [...document.querySelectorAll('#groStrip span')];
+    const TH = [0, 1, 3, 7, 14, 24, 36, 50, 70, 100], NM = ['알', '깨어나는 알', '아기새', '유치원새', '초등학생새', '중학생새', '고등학생새', '대학생새', '어른새', '이야기 작가새'];
+    let timer = 0;
+    const set = (i) => { imgs.forEach((im, k) => im.classList.toggle('on', k === i)); strip.forEach((s, k) => { s.classList.toggle('on', k <= i); s.classList.toggle('cur', k === i); }); document.getElementById('groDay').textContent = TH[i]; document.getElementById('groName').textContent = NM[i]; };
+    const play = () => { clearInterval(timer); if (reduce) { set(9); return; } let i = 0; set(0); timer = setInterval(() => { i++; set(i); if (i >= 9) clearInterval(timer); }, 1000); };
+    sl.addEventListener('slideon', play); sl.addEventListener('slideoff', () => { clearInterval(timer); set(9); });
+    document.getElementById('groReplay').addEventListener('click', (e) => { e.stopPropagation(); play(); });
+  }
+})();
 </script>
 <!--
-수치 출처(metrics.json): 선택지 25.9→13.2 = compare.visibleChoices / 단어 포함 0.38→1(예시), 0.21→1.02(실제 3) = compare.wordCoverage / 조작 횟수 이전 (7+10+10+10)/4=9.3, 지금 (10+14+14+14)/4=13 = compare.stepsToFinish / 가장 긴 덩어리 이전 (7.6+11+10.7+10.4)/4=9.9, 지금 (3.2+1.7+1.7+6.2)/4=3.2 = compare.longestUnit / 작업 카드 66·커밋 130·프롬프트 5버전·시험 8단계 = project, automated_tests / 영상 구간 = submission/video/captions.srt
+수치 출처(metrics.json): 선택지 25.9→13.2 = compare.visibleChoices / 단어 포함 38%→100%(예시) = compare.wordCoverage / 조작 횟수 9.3→13 = compare.stepsToFinish / 가장 긴 덩어리 9.9→3.2 = compare.longestUnit / 작업 카드 66 = project / 영상 구간 = submission/video/captions.srt
 -->
 </body>
 </html>
