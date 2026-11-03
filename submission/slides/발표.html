@@ -363,6 +363,27 @@ n.cu{font-style:normal}
 .map span{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .map .chip{font-size:22px;padding:6px 16px;background:var(--paper)}
 .card.sub{margin-top:24px;padding:22px 34px}.card.sub p{font-size:27px;line-height:1.6;margin:0}.card.sub p.muted{margin-top:8px;font-size:25px}
+
+.big4 .card{padding:40px 46px;min-height:210px}.big4 .card h3{font-size:42px;margin-bottom:14px}.big4 .card p{font-size:32px;line-height:1.55}
+.nlist.big{gap:16px}.nlist.big .card{grid-template-columns:60px 1fr;padding:20px 34px}.nlist.big .card i{width:52px;height:52px;font-size:30px}.nlist.big .card p{font-size:29px;line-height:1.45}.nlist.big .card p b{font-size:34px;margin-bottom:2px}
+.slide:first-of-type .cover{margin-top:70px}
+/* 감사 슬라이드 */
+.thanks{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding-bottom:90px}
+.th-wrap{position:relative;width:1100px;height:640px;display:flex;justify-content:center;align-items:flex-end}
+.th-bird{position:relative;width:540px;height:540px;transform-origin:50% 100%}
+.th-bird img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
+.th-bird .b1{opacity:0}
+.th-bubble{position:absolute;right:20px;top:10px;background:var(--ink);color:#fff;font:800 80px/1.2 var(--f);letter-spacing:-.02em;padding:26px 56px;border-radius:72px;transform-origin:10% 100%}
+.th-bubble::after{content:"";position:absolute;left:80px;bottom:-30px;border-left:24px solid transparent;border-right:24px solid transparent;border-top:36px solid var(--ink)}
+.th-sub{margin:30px 0 0;font:600 38px/1.5 var(--f);color:#444}
+.thanks.on-slide .th-bird{animation:bob 1s ease-in-out infinite}
+.thanks.on-slide .th-bird .b1{animation:sw1 1.2s steps(1,end) infinite}
+.thanks.on-slide .th-bird .b2{animation:sw2 1.2s steps(1,end) infinite}
+.thanks.on-slide .th-bubble{animation:pop .7s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-28px) rotate(2deg)}}
+@keyframes sw1{0%,49%{opacity:1}50%,100%{opacity:0}}
+@keyframes sw2{0%,49%{opacity:0}50%,100%{opacity:1}}
+@keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
 .ov-grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr))}
 .ov-grid button{min-height:70px;padding:12px 16px}.ov-grid span{font-size:17px}
 @media print{.sl{opacity:1!important}.scenes .scene{opacity:0!important}.scenes .scene.s2{opacity:1!important}.slide.sp>.body.res{max-width:880px!important}.ask{display:none}}
@@ -377,7 +398,6 @@ n.cu{font-style:normal}
 <div class="viewport"><div class="stage" id="stage">
 <!-- 1 표지 -->
 <section class="slide" data-title="표지" data-section="시작">
-  <div class="kicker"><i></i>PO 직군 · 바이브 코딩 프로젝트 · 2026.10.29 – 11.03</div>
   <div class="cover">
     <div>
       <img src="../images/wordmark.webp" alt="say my day" style="height:130px">
@@ -648,49 +668,13 @@ n.cu{font-style:normal}
   <div class="bridge"><span class="po"><em>내가 정한 것</em>실수는 규칙과 시험으로 남긴다 · 나머지 4건과 전체 기록은 제출한 프롬프트.md에 있다</span></div>
 </section>
 
-<!-- 14 느낀 점 -->
-<section class="slide refl" data-title="느낀 점" data-section="회고">
-  <div class="kicker"><i></i>회고 ①</div>
-  <h2 class="title">이 프로젝트에서 느낀 것</h2>
-  <div class="quotes">
-    <p class="q frag" data-step="1">사용자의 흔적이 없는 앱은, <mark>안개 속에서 만드는 것</mark> 같았다.<small>나와 AI의 이야기만으로는 누가 어디서 막히는지, 왜 안 쓰게 되는지 알 수 없다.</small></p>
-    <p class="q frag" data-step="2">구현은 AI가 하지만, <mark>내가 오래 고민한 시간</mark>이 이유 있는 제품을 만든다.<small>많이 맡기다 보니 어느새 내가 만들고 싶던 것과 거리가 생겼다.</small></p>
-    <p class="q frag" data-step="3"><mark>애정</mark>이 꽤 중요했다.</p>
-  </div>
-  <div class="bridge"><span class="po"><em>내가 정한 것</em>다음엔 AI에게 맡기기 전에, 누구를 위한 것인지부터 내가 먼저 확인한다</span></div>
-</section>
-
-<!-- 15 개선점 -->
-<section class="slide" data-title="개선점과 다음" data-section="회고">
-  <div class="kicker"><i></i>회고 ②</div>
-  <h2 class="title">아쉬운 점, 그리고 시간이 더 있다면</h2>
-  <div class="body grid g2" style="margin-top:34px;align-items:start;gap:34px">
-    <div>
-      <h3 class="colh">마음에 걸리는 것</h3>
-      <div class="card frag" data-step="1"><p><b>사용자 테스트 데이터가 없다.</b> 실제로 어디서 막히는지, 왜 안 쓰게 되는지 모른다.</p></div>
-      <div class="card frag" data-step="2" style="margin-top:14px"><p><b>번역 품질을 사람이 점검하지 못했다.</b> 이 앱에서 가장 중요한 부분인데 AI 검토까지만 했다.</p></div>
-      <div class="card frag" data-step="3" style="margin-top:14px"><p><b>번역 비용 대비 가성비를 따져 보지 못했다.</b></p></div>
-      <div class="card frag" data-step="4" style="margin-top:14px"><p><b>알고 있는 약점.</b> 일기가 내 브라우저에만 저장돼서 백업이 필요하고, 300편이 넘으면 오래된 것부터 빠진다.</p></div>
-    </div>
-    <div>
-      <h3 class="colh">시간이 더 있다면, 이 순서로</h3>
-      <div class="nlist">
-        <div class="card dark frag" data-step="5"><i>1</i><p><b>사용자 테스트</b> 초급 학습자 3~5명이 일기를 끝까지 쓰는지, 카드 넘기기가 번거로운지, 다음 날 다시 쓰는지. 성공 기준은 “3일 안에 한 번 더 연다”.</p></div>
-        <div class="card dark frag" data-step="6"><i>2</i><p><b>원어민 번역 검토</b> 번역 품질을 믿고 쓸 수 있는지부터 확인한다.</p></div>
-        <div class="card dark frag" data-step="7"><i>3</i><p><b>영어 추가</b> 한→영, 그다음 영→한·일·중.</p></div>
-        <div class="card dark frag" data-step="8"><i>4</i><p><b>발음 평가 다시 시험</b> 정확도 높은 서비스로 성조까지 잡을 수 있는지.</p></div>
-      </div>
-    </div>
-  </div>
-  <div class="bridge"><span class="po"><em>내가 정한 것</em>기능을 더하기 전에, 지금 앱이 맞는지 사람에게 먼저 확인한다</span></div>
-</section>
-
-<!-- 16 부록 예외 -->
-<section class="slide sp" data-title="예외 상황" data-section="부록">
-  <div class="kicker"><i></i>부록 · 안정성</div>
+<!-- 14 안정성 -->
+<section class="slide sp" data-title="안정성" data-section="안정성">
+  <div class="kicker"><i></i>안정성</div>
   <h2 class="title">잘못 쓰거나 고장 나면</h2>
   <p class="answer">어떤 경우에도 <mark>쓴 글은 지켜지고</mark>, 다음에 할 일을 알려 준다. <u class="ask">상황을 눌러 보세요.</u></p>
-  <div class="body" data-tabs>
+  <div class="chips" style="margin-top:8px"><span class="chip">예외 상황 6가지</span><span class="chip">자동 시험 · 시험 중 AI 호출 0회</span><span class="chip">접근성 시험 90개 화면 조건</span></div>
+  <div class="body" data-tabs style="margin-top:22px">
     <div class="tabs" role="tablist">
       <button role="tab" aria-selected="true" data-tab="e1">비워 둠</button>
       <button role="tab" aria-selected="false" data-tab="e2">너무 김</button>
@@ -711,7 +695,56 @@ n.cu{font-style:normal}
   <div class="bridge"><span class="po"><em>내가 정한 것</em>실패해도 사용자의 글은 잃지 않는다 · 오류를 개발자 말로 보여 주지 않는다</span></div>
 </section>
 
-<!-- 17 부록 요구 대응표 -->
+<!-- 15 느낀 점 -->
+<section class="slide refl" data-title="느낀 점" data-section="회고">
+  <div class="kicker"><i></i>회고 ①</div>
+  <h2 class="title">이 프로젝트에서 느낀 것</h2>
+  <div class="quotes">
+    <p class="q frag" data-step="1">사용자의 흔적이 없는 앱은, <mark>안개 속에서 만드는 것</mark> 같았다.<small>나와 AI의 이야기만으로는 누가 어디서 막히는지, 왜 안 쓰게 되는지 알 수 없다.</small></p>
+    <p class="q frag" data-step="2">구현은 AI가 하지만, <mark>내가 오래 고민한 시간</mark>이 이유 있는 제품을 만든다.<small>많이 맡기다 보니 어느새 내가 만들고 싶던 것과 거리가 생겼다.</small></p>
+    <p class="q frag" data-step="3"><mark>애정</mark>이 꽤 중요했다.</p>
+  </div>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>다음엔 AI에게 맡기기 전에, 누구를 위한 것인지부터 내가 먼저 확인한다</span></div>
+</section>
+
+<!-- 16 아쉬운 점 -->
+<section class="slide" data-title="아쉬운 점" data-section="회고">
+  <div class="kicker"><i></i>회고 ②</div>
+  <h2 class="title">아쉬운 점</h2>
+  <p class="answer">만들면서 가장 마음에 걸린 것들이다.</p>
+  <div class="body grid g2 big4" style="margin-top:40px;gap:28px">
+    <div class="card frag" data-step="1"><h3>사용자 테스트 데이터가 없다</h3><p>실제로 어디서 막히는지, 왜 안 쓰게 되는지 모른다.</p></div>
+    <div class="card frag" data-step="2"><h3>번역 품질을 사람이 못 봤다</h3><p>이 앱에서 가장 중요한 부분인데, AI 검토까지만 했다.</p></div>
+    <div class="card frag" data-step="3"><h3>번역 비용이 부담이다</h3><p>일기 한 편마다 AI 사용료가 드는데, 비용 대비 가성비를 따져 보지 못했다.</p></div>
+    <div class="card frag" data-step="4"><h3>알고 있는 약점</h3><p>일기가 내 브라우저에만 저장돼서 백업이 필요하고, 300편이 넘으면 오래된 것부터 빠진다.</p></div>
+  </div>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>기능을 더하기 전에, 지금 앱이 맞는지 사람에게 먼저 확인한다</span></div>
+</section>
+
+<!-- 17 시간이 더 있다면 -->
+<section class="slide" data-title="시간이 더 있다면" data-section="회고">
+  <div class="kicker"><i></i>회고 ③</div>
+  <h2 class="title">시간이 더 있다면, 이 순서로</h2>
+  <p class="answer">1·2번은 지금 앱이 맞는지 확인하는 일이고, 3·4번은 그다음 확장이다.</p>
+  <div class="nlist big" style="margin-top:36px">
+    <div class="card dark frag" data-step="1"><i>1</i><p><b>사용자 테스트</b>초급 학습자 3~5명이 일기를 끝까지 쓰는지, 카드 넘기기가 번거로운지, 다음 날 다시 쓰는지 본다. 성공 기준은 “3일 안에 한 번 더 연다”.</p></div>
+    <div class="card dark frag" data-step="2"><i>2</i><p><b>원어민 번역 검토</b>번역 품질을 믿고 쓸 수 있는지부터 확인한다.</p></div>
+    <div class="card dark frag" data-step="3"><i>3</i><p><b>영어 추가</b>한국어 → 영어를 먼저, 그다음 영어 → 한국어·일본어·중국어.</p></div>
+    <div class="card dark frag" data-step="4"><i>4</i><p><b>발음 평가 다시 시험</b>정확도가 높은 서비스로 성조까지 잡을 수 있는지 시험한다.</p></div>
+  </div>
+  <div class="bridge"><span class="po"><em>내가 정한 것</em>확인한 결과를 보고 다음 기능을 고른다</span></div>
+</section>
+
+<!-- 18 감사 -->
+<section class="slide thanks" data-title="감사합니다" data-section="회고">
+  <div class="th-wrap">
+    <div class="th-bubble">감사합니짹!</div>
+    <div class="th-bird"><img class="b1" src="../images/bird/01-hello.webp" alt=""><img class="b2" src="../images/bird/07-saved.webp" alt="웃고 있는 짹짹이"></div>
+  </div>
+  <p class="th-sub">끝까지 들어 주셔서 감사합니다. 질문을 받겠습니다.</p>
+</section>
+
+<!-- 19 부록 요구 대응표 -->
 <section class="slide" data-title="요구 대응표·제출물" data-section="부록">
   <div class="kicker"><i></i>부록</div>
   <h2 class="title">요구한 내용이 모두 들어갔나</h2>
@@ -720,9 +753,9 @@ n.cu{font-style:normal}
     <div class="map"><b><i>1</i>문제 정의</b><span><button class="chip" data-goto="2">왜 만들었나</button></span></div>
     <div class="map"><b><i>2</i>서비스 소개·시연</b><span><button class="chip" data-goto="3">앱</button><button class="chip" data-goto="4">시연</button><button class="chip" data-goto="5">내 일기답게</button><button class="chip" data-goto="6">새</button></span></div>
     <div class="map"><b><i>3</i>PO 설계 판단</b><span><button class="chip" data-goto="7">달라진 과정</button><button class="chip" data-goto="8">뺀 것</button><button class="chip" data-goto="9">맞바꾼 것</button></span></div>
-    <div class="map"><b><i>4</i>평가 리포트</b><span><button class="chip" data-goto="10">비교 결과</button><button class="chip" data-goto="16">예외 상황</button></span></div>
+    <div class="map"><b><i>4</i>평가 리포트</b><span><button class="chip" data-goto="10">비교 결과</button><button class="chip" data-goto="14">안정성</button></span></div>
     <div class="map"><b><i>5</i>AI 활용 과정 기록</b><span><button class="chip" data-goto="11">일한 방식</button><button class="chip" data-goto="12">프롬프트</button><button class="chip" data-goto="13">AI 실수</button></span></div>
-    <div class="map"><b><i>6</i>설계 문서 + 회고</b><span><button class="chip" data-goto="8">뺀 것</button><button class="chip" data-goto="14">느낀 점</button><button class="chip" data-goto="15">개선점</button></span></div>
+    <div class="map"><b><i>6</i>설계 문서 + 회고</b><span><button class="chip" data-goto="8">뺀 것</button><button class="chip" data-goto="15">느낀 점</button><button class="chip" data-goto="16">아쉬운 점</button><button class="chip" data-goto="17">다음 순서</button></span></div>
   </div>
   <div class="card sub"><p><b>GitHub</b> github.com/kang0712-97/say-my-day &nbsp;·&nbsp; <b>배포 주소</b> chinese-diary.onrender.com &nbsp;·&nbsp; <b>시연 영상</b> 제출물 참고</p><p class="muted"><b>배포 이유</b> 번역·음성·AI 키 보호를 서버가 맡아야 해서 정적 호스팅은 맞지 않았고, 무료 요금제에 설정이 단순해서 Render를 썼다. (11장에 자세히)</p></div>
 </section>
