@@ -245,6 +245,11 @@ aside.notes{display:none}
 }
 .rot{display:none}
 @media (max-width:900px) and (orientation:portrait){.rot{display:block;position:fixed;top:14px;left:0;right:0;text-align:center;font:700 18px var(--f);color:#111;z-index:40}}
+.growth{display:grid;grid-template-columns:repeat(5,1fr);gap:22px;margin-bottom:18px}
+.gc{background:var(--gray);border-radius:var(--r);padding:14px 10px 16px;text-align:center}
+.gc img{display:block;height:170px;width:auto;margin:0 auto 6px}
+.gc b{display:block;font:800 28px/1.3 var(--f)}
+.gc span{display:block;font:600 24px/1.4 var(--f);color:var(--muted)}
 </style>
 </head>
 <body>
@@ -300,8 +305,21 @@ aside.notes{display:none}
     <figure class="frag" data-step="2"><div class="phone"><img src="../images/04-learn-sentence.png" alt="배우기 화면"></div><figcaption><span>2</span>배우기</figcaption></figure>
     <figure class="frag" data-step="3"><div class="phone"><img src="../images/08-stats.png" alt="키우기 화면"></div><figcaption><span>3</span>키우기</figcaption></figure>
   </div>
-  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 쓰고, 배우고, 키우는 세 단계로 단순하게 · 포기한 것: 한 화면에 모든 기능을 보여 주기</span><span><b>다음</b> 배우기 단계를 하나씩 자세히 보겠습니다.</span></div>
+  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 쓰고, 배우고, 키우는 세 단계로 단순하게 · 포기한 것: 한 화면에 모든 기능을 보여 주기</span><span><b>다음</b> 키우기 단계에서 새가 어떻게 자라는지 보겠습니다.</span></div>
   <aside class="notes">앱은 세 단계입니다. 일기를 쓰고, 번역된 문장으로 듣고 말하며 배우고, 끝나면 깃털이 쌓여 새가 자랍니다. 다음 장에서 배우기 단계를 하나씩 보겠습니다.</aside>
+</section>
+
+<!-- 새 성장 -->
+<section class="slide" data-title="새가 자라는 모습" data-section="서비스">
+  <div class="kicker"><i></i>서비스 소개 · 키우기</div>
+  <h2 class="title">공부한 날이 쌓이면 새가 자랍니다</h2>
+  <p class="answer">일기로 공부한 날이 하나씩 쌓일 때마다 새가 <mark>10단계</mark>로 자랍니다.</p>
+  <div class="body">
+    <div class="growth frag" data-step="1"><div class="gc"><img src="../images/growth/G01.webp" alt="알"><b>1단계 알</b><span>처음 시작</span></div><div class="gc"><img src="../images/growth/G02.webp" alt="깨어나는 알"><b>2단계 깨어나는 알</b><span>공부 1일째</span></div><div class="gc"><img src="../images/growth/G03.webp" alt="아기새"><b>3단계 아기새</b><span>공부 3일째</span></div><div class="gc"><img src="../images/growth/G04.webp" alt="유치원새"><b>4단계 유치원새</b><span>공부 7일째</span></div><div class="gc"><img src="../images/growth/G05.webp" alt="초등학생새"><b>5단계 초등학생새</b><span>공부 14일째</span></div></div>
+    <div class="growth frag" data-step="2"><div class="gc"><img src="../images/growth/G06.webp" alt="중학생새"><b>6단계 중학생새</b><span>공부 24일째</span></div><div class="gc"><img src="../images/growth/G07.webp" alt="고등학생새"><b>7단계 고등학생새</b><span>공부 36일째</span></div><div class="gc"><img src="../images/growth/G08.webp" alt="대학생새"><b>8단계 대학생새</b><span>공부 50일째</span></div><div class="gc"><img src="../images/growth/G09.webp" alt="어른새"><b>9단계 어른새</b><span>공부 70일째</span></div><div class="gc"><img src="../images/growth/G10.webp" alt="이야기 작가새"><b>10단계 이야기 작가새</b><span>공부 100일째</span></div></div>
+  </div>
+  <div class="bridge"><span class="po"><em>PO 판단</em>정한 것: 점수 대신 새가 자라는 모습으로 공부를 이어 가게 한다 · 포기한 것: 순위·경쟁 같은 압박</span><span><b>다음</b> 배우기 단계를 하나씩 자세히 보겠습니다.</span></div>
+  <aside class="notes">공부를 마칠 때마다 깃털이 쌓이고, 공부한 날 수에 따라 새가 알에서 이야기 작가새까지 10단계로 자랍니다. 매일 다시 오고 싶은 이유를 만들기 위한 장치입니다.</aside>
 </section>
 
 <!-- 4 단계별 설명 -->
@@ -620,11 +638,11 @@ aside.notes{display:none}
   <p class="answer">칩을 누르면 해당 장으로 이동합니다.</p>
   <div class="body grid g3" style="margin-top:30px">
     <div class="card"><h3>① 문제 정의</h3><p><button class="chip" data-goto="2">2장</button></p></div>
-    <div class="card"><h3>② 서비스 소개·사용법</h3><p><button class="chip" data-goto="3">앱 한눈에</button> <button class="chip" data-goto="4">단계</button> <button class="chip" data-goto="5">시연</button> <button class="chip" data-goto="6">변천</button></p></div>
-    <div class="card"><h3>③ PO 설계 판단</h3><p><button class="chip" data-goto="7">우선순위</button> <button class="chip" data-goto="8">뺀 것</button> <button class="chip" data-goto="9">얻고 잃은 것</button> <button class="chip" data-goto="10">예외</button></p></div>
-    <div class="card"><h3>④ 평가 리포트</h3><p><button class="chip" data-goto="11">방법</button> <button class="chip" data-goto="12">결과</button> <button class="chip" data-goto="13">아쉬운 점</button></p></div>
-    <div class="card"><h3>⑤ AI 활용 과정 기록</h3><p><button class="chip" data-goto="14">지시문</button> <button class="chip" data-goto="15">일한 방식</button> <button class="chip" data-goto="16">AI 실수</button></p></div>
-    <div class="card"><h3>⑥ 설계 문서 + 회고</h3><p><button class="chip" data-goto="8">뺀 것</button> <button class="chip" data-goto="9">얻고 잃은 것</button> <button class="chip" data-goto="17">한계</button></p></div>
+    <div class="card"><h3>② 서비스 소개·사용법</h3><p><button class="chip" data-goto="3">앱 한눈에</button> <button class="chip" data-goto="4">성장</button> <button class="chip" data-goto="5">단계</button> <button class="chip" data-goto="6">시연</button> <button class="chip" data-goto="7">변천</button></p></div>
+    <div class="card"><h3>③ PO 설계 판단</h3><p><button class="chip" data-goto="8">우선순위</button> <button class="chip" data-goto="9">뺀 것</button> <button class="chip" data-goto="10">얻고 잃은 것</button> <button class="chip" data-goto="11">예외</button></p></div>
+    <div class="card"><h3>④ 평가 리포트</h3><p><button class="chip" data-goto="12">방법</button> <button class="chip" data-goto="13">결과</button> <button class="chip" data-goto="14">아쉬운 점</button></p></div>
+    <div class="card"><h3>⑤ AI 활용 과정 기록</h3><p><button class="chip" data-goto="15">지시문</button> <button class="chip" data-goto="16">일한 방식</button> <button class="chip" data-goto="17">AI 실수</button></p></div>
+    <div class="card"><h3>⑥ 설계 문서 + 회고</h3><p><button class="chip" data-goto="9">뺀 것</button> <button class="chip" data-goto="10">얻고 잃은 것</button> <button class="chip" data-goto="18">한계</button></p></div>
   </div>
   <div class="card" style="margin-top:28px;padding:24px 36px"><p style="font-size:28px;line-height:1.7"><b>GitHub</b> github.com/kang0712-97/say-my-day &nbsp;·&nbsp; <b>배포 주소</b> chinese-diary.onrender.com &nbsp;·&nbsp; <b>시연 영상</b> 제출물 참고</p></div>
   <aside class="notes">빠짐없이 구성했는지 한 장으로 확인합니다. 질문이 나오면 해당 칩을 눌러 그 장으로 이동합니다.</aside>
