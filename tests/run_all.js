@@ -8,6 +8,8 @@ const steps = [
   ['화면 문구 사전 키·자리표', 'i18n_keys_check.js', /^통과/m],
   ['따라 말하기 비교·기록', 'speak_check.js', /^통과/m],
   ['일본어 읽기 누락 검사', 'ja/missing_reading_check.js'],
+  ['서버 안전(응답 검증·시간 제한)', 'data_safety/server_check.js', /^통과/m],
+  ['화면 안전(저장·수정·가져오기·경고)', 'data_safety/run.js', /^통과/m],
   ['화면 스모크(3개 조합)', 'smoke/run.js', /^통과/m],
   ['접근성 검사(3개 조합)', 'a11y/run.js', /^통과/m],
 ];

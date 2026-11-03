@@ -179,6 +179,22 @@ function mergeOriginals(result, parts) {
   return { ...result, sentences, ambiguities: [...amb, ...warnings.map((text) => ({ n: 0, text }))] };
 }
 
+// 외부 AI 요청에 시간 제한을 두고, 사용자가 요청을 끊으면(parent 신호) 함께 중단한다. 멈춘 요청이 동시 처리 자리를 붙잡지 않게 한다.
+const UPSTREAM_TIMEOUT_MS = Number(process.env.UPSTREAM_TIMEOUT_MS) || 90000;
+function abortable(parent, ms = UPSTREAM_TIMEOUT_MS) {
+  const c = new AbortController(), t = setTimeout(() => c.abort(), ms);
+  if (parent) { if (parent.aborted) c.abort(); else parent.addEventListener('abort', () => c.abort(), { once: true }); }
+  return { signal: c.signal, clear: () => clearTimeout(t) };
+}
+
+// 모델 응답이 학습 화면에서 쓸 수 있는 구조인지 확인한다. 쓸 수 없으면 성공으로 전달하지 않는다.
+const bad = (msg) => Object.assign(new Error(msg), { code: 'service', http: 502 });
+function checkResultShape(result) {
+  if (!result || typeof result !== 'object' || Array.isArray(result)) throw bad('응답이 객체가 아닙니다.');
+  if (!Array.isArray(result.sentences) || !result.sentences.length) throw bad('번역 문장이 비어 있습니다.');
+  for (const k of ['vocab', 'grammar', 'ambiguities', 'extra_sentences']) if (result[k] != null && !Array.isArray(result[k])) throw bad(`${k} 형식이 올바르지 않습니다.`);
+}
+
 function extractJson(text) {
   const fenced = text.match(/```(?:json)?\s*([\s\S]*?)```/);
   const body = fenced ? fenced[1] : text;
@@ -188,10 +204,14 @@ function extractJson(text) {
   return JSON.parse(body.slice(start, end + 1));
 }
 
-async function translateWithGemini(userText, key, glossary = [], file) {
+async function translateWithGemini(userText, key, glossary = [], file, sig) {
+  const ab = abortable(sig);
+  try { return await geminiCall(userText, key, glossary, file, ab.signal); } finally { ab.clear(); }
+}
+async function geminiCall(userText, key, glossary, file, signal) {
   const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-goog-api-key': key },
+    headers: { 'content-type': 'application/json', 'x-goog-api-key': key }, signal,
     body: JSON.stringify({
       systemInstruction: { parts: [{ text: buildSystemPrompt(glossary, file) }] },
       contents: [{ role: 'user', parts: [{ text: userText }] }],
@@ -205,10 +225,11 @@ async function translateWithGemini(userText, key, glossary = [], file) {
   return { mock: false, result: extractJson(text), usage: { in: data.usageMetadata?.promptTokenCount, out: data.usageMetadata?.candidatesTokenCount } };
 }
 
-async function translate(diary, glossary = [], file, tgt = 'zh', src = 'ko') {
+async function translate(diary, glossary = [], file, tgt = 'zh', src = 'ko', sig) {
   const parts = splitSentences(diary, src);
   const userText = parts.map((s, i) => `${i + 1}. ${s}`).join('\n');
-  const out = await callModel(userText, glossary, file);
+  const out = await callModel(userText, glossary, file, sig);
+  if (!out.mock) checkResultShape(out.result);
   // 목업 응답은 입력과 무관하므로 원문 보존 처리를 하지 않는다.
   if (out.mock) return out;
   let result = out.result;
@@ -219,15 +240,19 @@ async function translate(diary, glossary = [], file, tgt = 'zh', src = 'ko') {
   return { ...out, result: mergeOriginals(result, parts) };
 }
 
-async function callModel(userText, glossary = [], file) {
-  if (process.env.GEMINI_API_KEY) return translateWithGemini(userText, process.env.GEMINI_API_KEY, glossary, file);
+async function callModel(userText, glossary = [], file, sig) {
+  if (process.env.GEMINI_API_KEY) return translateWithGemini(userText, process.env.GEMINI_API_KEY, glossary, file, sig);
   const key = process.env.ANTHROPIC_API_KEY;
   if (!key) {
     const mock = JSON.parse(fs.readFileSync(path.join(PUBLIC, 'mock.json'), 'utf8'));
     return { mock: true, result: mock };
   }
+  const ab = abortable(sig);
+  try { return await claudeCall(userText, glossary, file, key, ab.signal); } finally { ab.clear(); }
+}
+async function claudeCall(userText, glossary, file, key, signal) {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
+    method: 'POST', signal,
     headers: {
       'content-type': 'application/json',
       'x-api-key': key,
@@ -316,7 +341,7 @@ function upstreamError(status, data) {
 async function callJsonModel(system, userText, maxTokens) {
   if (process.env.GEMINI_API_KEY) {
     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`, {
-      method: 'POST', headers: { 'content-type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
+      method: 'POST', signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS), headers: { 'content-type': 'application/json', 'x-goog-api-key': process.env.GEMINI_API_KEY },
       body: JSON.stringify({ systemInstruction: { parts: [{ text: system }] }, contents: [{ role: 'user', parts: [{ text: userText }] }], generationConfig: { responseMimeType: 'application/json', maxOutputTokens: maxTokens } }),
     });
     const data = await res.json();
@@ -324,7 +349,7 @@ async function callJsonModel(system, userText, maxTokens) {
     return extractJson((data.candidates?.[0]?.content?.parts || []).map((p) => p.text || '').join(''));
   }
   const res = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST', headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
+    method: 'POST', signal: AbortSignal.timeout(UPSTREAM_TIMEOUT_MS), headers: { 'content-type': 'application/json', 'x-api-key': process.env.ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01' },
     body: JSON.stringify({ model: CHARS_MODEL, max_tokens: maxTokens, thinking: { type: 'between_tools' }, output_config: { effort: 'low' }, system, messages: [{ role: 'user', content: userText }] }),
   });
   const data = await res.json();
@@ -552,7 +577,7 @@ const server = http.createServer(async (req, res) => {
     // 공개 모드에서는 일기를 서버에 두지 않는다. 남의 일기가 섞이지 않도록 저장도 읽기도 하지 않는다.
     if (PUBLIC_MODE && req.url.startsWith('/api/data')) {
       if (req.method === 'POST') { req.resume(); return sendJson(res, 200, { ok: true, at: Date.now() }); }
-      return sendJson(res, 200, { keys: {} });
+      return sendJson(res, 200, { keys: {}, public: true });
     }
     if (req.method === 'GET' && req.url.startsWith('/api/data')) {
       return sendJson(res, 200, readData());
@@ -596,9 +621,10 @@ const server = http.createServer(async (req, res) => {
       req.logInfo = { pair: `${pair.src}>${pair.tgt}`, chars: diary.length };
       if (blocked) { req.logInfo.limited = blocked.code; return sendJson(res, 429, { error: blocked.msg, code: blocked.code, n: blocked.n }); }
       running += 1;
+      const gone = new AbortController(); res.on('close', () => { if (!res.writableEnded) gone.abort(); }); // 사용자가 요청을 끊으면 외부 AI 요청도 멈춘다
       try {
         const gl = cleanGlossary(body.glossary); gl.noFile = !!body.noGlossary;
-        const { usage, ...out } = await translate(diary, gl, pair.file, pair.tgt, pair.src);
+        const { usage, ...out } = await translate(diary, gl, pair.file, pair.tgt, pair.src, gone.signal);
         out.glossaryUsed = usedTerms(diary, gl); out.glossarySkipped = !!body.noGlossary;
         if (usage) req.logInfo.tokens = usage; // 응답에는 싣지 않는다
         return sendJson(res, 200, out);
@@ -668,6 +694,7 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(405); res.end();
   } catch (err) {
     req.logInfo.err = (err && err.code) || (err && err.name); // 메시지에는 입력 일부가 섞일 수 있어 기록하지 않는다
+    if (err && (err.name === 'AbortError' || err.name === 'TimeoutError')) return sendJson(res, 504, { error: UPSTREAM_MSG.service, code: 'service' });
     if (err && err.code && UPSTREAM_MSG[err.code]) return sendJson(res, err.http || 502, { error: UPSTREAM_MSG[err.code], code: err.code });
     sendJson(res, 500, { error: err.message });
   }
