@@ -2,7 +2,7 @@
 // 받지 않는 것: 일기 내용, 번역 결과, 이름·이메일. 자유 입력은 Q6 하나뿐이다.
 (() => {
   // ----- 설정(한 곳) -----
-  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwaE9JjFM66NLjiDacHHX77UNgc9JAb3NnitwaxTDkaYH39l-ukf8UqgYCrevYa3xr_Dw/exec';
+  const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzX0GGSDPftbhiBnSibnDKKOg-8Uxbdgm6covfr6vkj4bptML43XN8HR8rt3SYFcC4RPQ/exec';
   const BIRD = (name, size) => { try { return window.bird ? window.bird(name, size) : (typeof bird === 'function' ? bird(name, size) : ''); } catch (e) { return ''; } };
   const KEY = 'smd-eval-state', DONE = 'smd-eval-done';
   const MISSIONS = ['한 줄 일기 쓰기', '번역 결과 보기', '단어 눌러 소리 듣기', '퀴즈 1문제'];
