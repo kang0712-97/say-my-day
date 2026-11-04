@@ -30,6 +30,7 @@
   const css = document.createElement('style');
   css.textContent = `
   :root { --ev-h: 72px; }
+  body.eval-on { padding-top: var(--ev-h); }
   body.eval-on header.top { top: var(--ev-h); }
   body.eval-on .overlay, body.eval-on .wpage, body.eval-on .learn-ov { top: var(--ev-h); }
   #ev-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 90; height: var(--ev-h); display: flex; flex-direction: column; background: var(--ink); color: var(--paper); font-family: var(--f-ui); }
@@ -92,6 +93,7 @@
   // ----- 진행 표시 + 지금 할 일 안내 -----
   // 위쪽 줄: 진행 칸 + 지금 할 일 한 줄(항상). 팝업: 화면이 크게 바뀌는 세 순간(홈·카드 학습·퀴즈)에 한 번만 설명하고,
   // 입력 중이거나 문제를 풀 때는 띄우지 않는다. 팝업은 위치를 바꾸지 않는다.
+  let wasLearn = false, autoGo = null;
   let bar = null, hl = null, pop = null, popStage = '', dismissed = {}, lastTxt = '';
   const vis = (el) => !!el && el.getClientRects().length > 0 && !el.closest('.hidden');
   const g = (f) => { try { return f(); } catch (e) { return undefined; } };
@@ -109,11 +111,13 @@
       return { ...q, n: 4, pose: 'thinking', t: '답을 쓰고 "확인"을 눌러 보세요', d: '읽는 법을 직접 써 보는 문제예요. 모르면 힌트를 보고 써도 돼요.', target: document.getElementById('q-check') };
     }
     if (st.t[1] != null) {
-      const learn = { stage: 'learn', ptitle: '카드로 공부해 볼게요', pdesc: `내가 쓴 일기가 문장·단어·문법 카드로 나뉘어 있어요. 아래 "다음"으로 카드를 넘기며 뜻과 읽는 법을 보고, 스피커 버튼이 나오면 눌러 ${tn()} 발음을 들어 보세요. 충분히 봤다면 "퀴즈로 넘어가기"를 눌러 주세요.` };
+      const learn = { stage: 'learn', ptitle: '카드로 공부해 볼게요', pdesc: `내가 쓴 일기가 카드로 나뉘어 있어요. 아래 "시작하기"를 눌러 카드를 넘기며 뜻과 읽는 법을 보고, 스피커 버튼을 눌러 ${tn()} 발음을 들어 보세요. 마지막 카드까지 보면 퀴즈로 이어져요.` };
       const play = onTop('#learn .play') || onTop('#result .play');
       const nx = document.getElementById('ln-next');
-      if (play) return { ...learn, n: 3, pose: 'listening', t: st.t[2] != null ? '다 봤으면 "퀴즈로 넘어가기"를 눌러 주세요' : '스피커 버튼을 눌러 소리를 들어 보세요', d: `스피커를 누르면 ${tn()} 발음을 들려 줘요. 읽는 속도에 맞춰 글자 색이 바뀌니 따라 읽어 보세요.`, target: st.t[2] != null ? null : play, act: skip() };
-      return { ...learn, n: 3, pose: 'read-aloud', t: '아래 버튼으로 카드를 넘겨 보세요', d: '내 일기가 문장·단어·문법 카드로 나뉘어 있어요. "다음"으로 넘기면서 뜻과 읽는 법을 보세요.', target: vis(nx) ? nx : null, act: skip() };
+      const intro = g(() => lnS.cards[lnS.i].t === 'intro');
+      if (intro) return { ...learn, n: 3, pose: 'read-aloud', t: '아래 "시작하기"를 눌러 주세요', d: '내 일기가 카드로 나뉘어 있어요. "시작하기"를 누르면 첫 카드가 열려요.', target: vis(nx) ? nx : null };
+      if (play && st.t[2] == null) return { ...learn, n: 3, pose: 'listening', t: '스피커 버튼을 눌러 소리를 들어 보세요', d: `스피커를 누르면 ${tn()} 발음을 들려 줘요. 읽는 속도에 맞춰 글자 색이 바뀌니 따라 읽어 보세요.`, target: play };
+      return { ...learn, n: 3, pose: 'read-aloud', t: st.t[2] == null ? '아래 버튼으로 카드를 넘겨 보세요' : '카드를 끝까지 넘기면 퀴즈로 이어져요', d: '"다음"으로 카드를 넘기며 뜻과 읽는 법을 보세요. 마지막 카드 다음에는 퀴즈가 자동으로 시작돼요.', target: vis(nx) ? nx : null };
     }
     if (g(() => typeof controller !== 'undefined' && controller)) return { n: 2, pose: 'thinking', t: '번역 중이에요. 30초쯤 걸려요', d: `AI가 일기를 ${tn()}로 바꾸고 읽는 법·단어·문법을 정리하는 중이에요.` };
     const d = document.getElementById('diary');
@@ -131,6 +135,11 @@
   const NAMES = ['일기', '번역', '소리', '퀴즈'];
   function renderBar() {
     if (!bar) return;
+    const learnNow = !!g(() => lnS.open);
+    if (wasLearn && !learnNow && st.t[1] != null && st.t[3] == null && !surveyOpen && !vis(document.getElementById('quiz'))) { wasLearn = false; startQuiz(); }
+    wasLearn = learnNow;
+    const qg = document.getElementById('q-go');
+    if (qg && vis(qg) && qg !== autoGo) { autoGo = qg; setTimeout(() => { if (document.body.contains(qg) && vis(qg)) qg.click(); }, 700); } // 새 단어 설명 카드는 건너뛰고 바로 문제로
     const p = phase(), on = st.t.map((x) => x != null);
     const sig = JSON.stringify([on, p.t, p.act && p.act[0]]);
     if (bar.dataset.sig !== sig) {
@@ -189,6 +198,9 @@
   document.addEventListener('input', (e) => { if (st.t0 && e.target && e.target.id === 'diary' && e.target.value.trim().length >= 2) mark(0); }, true);
   document.addEventListener('click', (e) => {
     if (!st.t0 || done) return;
+    if (e.target.closest && e.target.closest('#ln-next') && g(() => { const n = lnS.cards[lnS.i + 1]; return lnS.cards[lnS.i].t === 'r' || (n && n.t === 'r'); }) && st.t[1] != null && !surveyOpen) {
+      e.stopPropagation(); e.preventDefault(); wasLearn = false; startQuiz(); return; // 마지막 카드 다음은 퀴즈로 바로 이어진다
+    }
     if (e.isTrusted && e.target.closest && e.target.closest('.play')) mark(2); // 앱이 자동으로 누르는 재생은 세지 않는다
     // 퀴즈 1문제를 풀고 "계속/결과 보기"를 누르면 설문으로 넘어간다
     if (e.target.closest && e.target.closest('#q-next') && st.t[3] != null && !surveyOpen) {
@@ -328,6 +340,14 @@
     }
   }
 
+  g(() => { // 마지막 카드 앞에서는 버튼 이름을 "퀴즈 풀기"로 바꾼다
+    const orig = window.lnRender;
+    if (typeof orig === 'function') window.lnRender = function (d) {
+      const r = orig.apply(this, arguments);
+      try { const n = lnS.cards[lnS.i + 1]; if (lnS.cards[lnS.i].t === 'r' || (n && n.t === 'r')) document.getElementById('ln-next-l').textContent = '퀴즈 풀기'; } catch (e) {}
+      return r;
+    };
+  });
   if (done) showGuide();
   else if (st.t0) mountBar();
   else showGuide();
