@@ -5,7 +5,7 @@
 var SHEET = '응답';
 var HEAD = ['응답번호', '시각', 'test', 'Q1 편했나', 'Q2 막힌 곳', 'Q3 문제', 'Q4 다시 쓸 의향', 'Q5 빈도',
   'Q6 한 줄 의견', 'Q7 배우려는 언어', '듣기', '읽기', '말하기', '쓴 언어조합', '기기', '화면폭',
-  '번역실패수', '음성실패수', 't1(초)', 't2(초)', 't3(초)', 't4(초)'];
+  '번역실패수', '음성실패수', 't1(초)', 't2(초)', 't3(초)', 't4(초)', '배움 쉬움', '배움 할 만함'];
 
 function clean(v, max) {
   if (Array.isArray(v)) v = v.join(', ');
@@ -30,6 +30,7 @@ function doPost(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     var sh = ss.getSheetByName(SHEET) || ss.insertSheet(SHEET);
     if (sh.getLastRow() === 0) sh.appendRow(HEAD);
+    else if (sh.getLastColumn() < HEAD.length) sh.getRange(1, 1, 1, HEAD.length).setValues([HEAD]); // 새 열 머리글을 자동으로 채움
 
     // 같은 응답번호는 한 번만 저장(제출 재시도 대비)
     var last = sh.getLastRow();
@@ -44,7 +45,8 @@ function doPost(e) {
       clean(d.q1, 5), clean(d.q2, 200), clean(d.q3, 200), clean(d.q4, 5), clean(d.q5, 20),
       clean(d.q6, 300), clean(d.q7, 20), clean(d.listen, 5), clean(d.read, 5), clean(d.speak, 5),
       clean(d.pair, 20), clean(d.device, 20), clean(d.width, 6),
-      clean(d.tfail, 5), clean(d.vfail, 5), clean(t[0], 8), clean(t[1], 8), clean(t[2], 8), clean(t[3], 8)
+      clean(d.tfail, 5), clean(d.vfail, 5), clean(t[0], 8), clean(t[1], 8), clean(t[2], 8), clean(t[3], 8),
+      clean(d.ease, 5), clean(d.doable, 5)
     ]);
     return out({ ok: true });
   } catch (err) {
