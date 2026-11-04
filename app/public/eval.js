@@ -7,9 +7,10 @@
   const MISSIONS = ['한 줄 일기 쓰기', '번역 결과 보기', '단어 눌러 소리 듣기', '퀴즈 1문제'];
   const isTest = /[?&]test=1(&|$)/.test(location.search) || /^(localhost|127\.0\.0\.1)$/.test(location.hostname);
 
+  const real = window.__realLS || window.localStorage; // 앱은 임시 저장소를 쓰므로, 응답 완료 표시만 진짜 저장소에 둔다
   const ls = {
-    get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
-    set(k, v) { try { localStorage.setItem(k, v); } catch (e) {} },
+    get(k) { try { return real.getItem(k); } catch (e) { return null; } },
+    set(k, v) { try { real.setItem(k, v); } catch (e) {} },
   };
   const ss = {
     get(k) { try { return JSON.parse(sessionStorage.getItem(k)); } catch (e) { return null; } },
@@ -27,14 +28,23 @@
   // ----- 스타일 -----
   const css = document.createElement('style');
   css.textContent = `
-  body.eval-on header.top { top: 30px; }
-  #ev-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 90; height: 30px; display: flex; align-items: center; gap: 4px; padding: 0 8px; background: var(--ink); color: var(--paper); font-size: 12px; line-height: 1; }
-  #ev-bar .m { flex: 1; min-width: 0; display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden; opacity: .6; }
-  #ev-bar .m i { flex: none; width: 12px; height: 12px; border: 1px solid var(--paper); border-radius: 50%; }
-  #ev-bar .m.on { opacity: 1; }
-  #ev-bar .m.on i { background: var(--paper); box-shadow: inset 0 0 0 2px var(--ink); }
-  #ev-bar .m span { overflow: hidden; text-overflow: ellipsis; }
-  #ev-bar button { flex: none; border: 1px solid var(--paper); background: transparent; color: var(--paper); border-radius: 999px; padding: 3px 10px; font: inherit; cursor: pointer; }
+  :root { --ev-h: 74px; }
+  body.eval-on header.top { top: var(--ev-h); }
+  body.eval-on .overlay, body.eval-on .wpage, body.eval-on .learn-ov { top: var(--ev-h); }
+  #ev-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 90; height: var(--ev-h); display: flex; flex-direction: column; background: var(--ink); color: var(--paper); font-family: var(--f-ui); }
+  #ev-bar .ev-chips { display: flex; gap: 4px; padding: 0 12px; height: 22px; align-items: center; font-size: 11px; line-height: 1; }
+  #ev-bar .ev-m { flex: 1; display: flex; align-items: center; gap: 4px; opacity: .55; min-width: 0; }
+  #ev-bar .ev-m i { flex: none; width: 10px; height: 10px; border: 1px solid var(--paper); border-radius: 50%; }
+  #ev-bar .ev-m.on { opacity: 1; }
+  #ev-bar .ev-m.on i { background: var(--paper); box-shadow: inset 0 0 0 2px var(--ink); }
+  #ev-bar .ev-m span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #ev-bar .ev-say { flex: 1; display: flex; align-items: center; gap: 8px; padding: 0 12px 8px; min-height: 0; }
+  #ev-bar .ev-say b { flex: 1; font-size: 15px; line-height: 1.3; font-weight: 700; }
+  #ev-bar button { flex: none; border: 1px solid var(--paper); background: transparent; color: var(--paper); border-radius: 999px; padding: 6px 14px; font: inherit; font-size: 13px; cursor: pointer; }
+  #ev-bar button.go { background: var(--paper); color: var(--ink); font-weight: 700; }
+  .ev-hl { outline: 3px solid var(--ink) !important; outline-offset: 3px; animation: ev-pulse 1.2s ease-in-out infinite; }
+  @keyframes ev-pulse { 50% { outline-color: transparent; } }
+  @media (prefers-reduced-motion: reduce) { .ev-hl { animation: none; } }
   .ev-ov { position: fixed; inset: 0; z-index: 95; overflow: auto; background: var(--paper); color: var(--ink); padding: 24px 16px calc(24px + env(safe-area-inset-bottom)); font-family: var(--f-ui); }
   .ev-box { max-width: 520px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
   .ev-box h2 { margin: 0; font-size: var(--fs-l); line-height: 1.3; }
@@ -59,24 +69,69 @@
   .ev-act .btn, .ev-act .primary { margin: 0; white-space: nowrap; }
   .ev-act .primary { flex: 1; justify-content: center; padding: 0 24px; }
   .ev-act .btn { padding: 4px 20px; }
+  .ev-act [hidden] { display: none !important; }
   .ev-act .primary[disabled] { opacity: .35; }
   .ev-err { color: var(--ink); border: 1px solid var(--ink); border-radius: 12px; padding: 10px 14px; font-size: var(--fs-s); }
   `;
   document.head.appendChild(css);
 
-  // ----- 진행 표시 -----
-  let bar = null;
+  // ----- 진행 표시 + 지금 할 일 안내 -----
+  let bar = null, hl = null, lastKey = '';
+  const vis = (el) => !!el && el.getClientRects().length > 0 && !el.closest('.hidden');
+  const g = (f) => { try { return f(); } catch (e) { return undefined; } };
+  const onTop = (sel) => [...document.querySelectorAll(sel)].filter(vis).filter((el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; })[0] || null;
+  // 지금 단계: 화면 상태로 정한다. {t: 안내 문구, target: 깜박일 요소, act: [버튼 이름, 동작]}
+  function phase() {
+    const quizOpen = vis(document.getElementById('quiz'));
+    if (quizOpen) {
+      if (document.getElementById('q-next')) return { t: '잘했어요! "계속"을 누르면 설문으로 넘어가요', target: document.getElementById('q-next') };
+      if (document.getElementById('q-go')) return { t: '4. 새 단어예요. 아래 버튼을 눌러 문제로 넘어가세요', target: document.getElementById('q-go') };
+      if (document.querySelector('#quiz [data-opt]')) return { t: '4. 알맞은 답을 눌러 보세요' };
+      return { t: '4. 한 문제만 풀어 보세요. 답을 쓰고 "확인"을 누르세요', target: document.getElementById('q-check') };
+    }
+    if (st.t[2] != null) {
+      return { t: '4. 이제 퀴즈 한 문제를 풀어 볼게요', act: ['퀴즈 시작', startQuiz] };
+    }
+    if (st.t[1] != null) {
+      const play = onTop('#learn .play') || onTop('#result .play');
+      if (play) return { t: '3. 스피커 버튼을 눌러 소리를 들어 보세요', target: play };
+      const nx = document.getElementById('ln-next');
+      if (vis(nx)) return { t: '3. 아래 버튼으로 카드를 넘겨 보세요. 스피커 버튼이 나오면 눌러 소리를 들어 보세요', target: nx };
+      return { t: '3. 스피커 버튼을 눌러 소리를 들어 보세요' };
+    }
+    if (g(() => typeof controller !== 'undefined' && controller)) return { t: '2. 번역 중이에요. 30초쯤 기다려 주세요' };
+    const d = document.getElementById('diary');
+    if (!vis(d)) return { t: '1. 아래 "일기 쓰러 가기"를 눌러 주세요', target: document.getElementById('nest-go') };
+    if (d && d.value.trim().length >= 2) return { t: '2. 아래 "번역" 버튼을 눌러 주세요', target: document.getElementById('go') };
+    return { t: '1. 아래 칸에 오늘 일기를 한 줄 써 보세요', target: d };
+  }
+  function startQuiz() {
+    g(() => { if (lnS.open) learnHide(); });
+    let ok = false;
+    g(() => { if (currentSavedEntries().length) { quizFromCurrent(); ok = true; } });
+    if (!ok) g(() => { const e = currentVocab.slice(0, 5).map((item) => ({ item, kind: 'word' })); if (e.length) { startEntries(e); ok = true; } });
+    if (!ok) { st.t[3] = null; openSurvey(); } // 퀴즈를 만들 수 없으면 설문으로 바로 넘어간다
+  }
   function renderBar() {
     if (!bar) return;
-    bar.innerHTML = MISSIONS.map((m, i) => `<div class="m${st.t[i] != null ? ' on' : ''}"><i></i><span>${i + 1}. ${esc(m)}</span></div>`).join('')
-      + '<button type="button" id="ev-go-survey">설문으로</button>';
+    const p = phase(), key = JSON.stringify([st.t.map((x) => x != null), p.t, p.act && p.act[0]]);
+    if (key !== lastKey) {
+      lastKey = key;
+      bar.innerHTML = `<div class="ev-chips">${MISSIONS.map((m, i) => `<div class="ev-m${st.t[i] != null ? ' on' : ''}"><i></i><span>${i + 1}</span></div>`).join('')}</div>
+        <div class="ev-say"><b role="status">${esc(p.t)}</b>${p.act ? `<button type="button" class="go" id="ev-act">${esc(p.act[0])}</button>` : ''}<button type="button" id="ev-go-survey">설문으로</button></div>`;
+    }
+    if (hl !== p.target) { if (hl) hl.classList.remove('ev-hl'); hl = p.target || null; if (hl) hl.classList.add('ev-hl'); }
   }
   function mountBar() {
-    bar = document.createElement('div'); bar.id = 'ev-bar'; bar.setAttribute('aria-label', '미션 진행 표시');
+    bar = document.createElement('div'); bar.id = 'ev-bar'; bar.setAttribute('aria-label', '진행 안내');
     document.body.appendChild(bar); document.body.classList.add('eval-on'); renderBar();
-    bar.addEventListener('click', (e) => { if (e.target.id === 'ev-go-survey') openSurvey(); });
+    setInterval(renderBar, 400);
+    bar.addEventListener('click', (e) => {
+      if (e.target.id === 'ev-go-survey') openSurvey();
+      else if (e.target.id === 'ev-act') { const p = phase(); if (p.act) p.act[1](); }
+    });
   }
-  function unmountBar() { if (bar) bar.remove(); bar = null; document.body.classList.remove('eval-on'); }
+  function unmountBar() { if (bar) bar.remove(); bar = null; if (hl) hl.classList.remove('ev-hl'); document.body.classList.remove('eval-on'); }
 
   function mark(i) {
     if (!st.t0 || st.t[i] != null) return;
@@ -116,11 +171,10 @@
       return;
     }
     ov.innerHTML = `<div class="ev-box">
-      <h2 id="ev-gt">3분 테스트에 참여해 주세요</h2>
-      <p>Say My Day는 내가 쓴 일기를 중국어·일본어로 바꿔 배우는 앱이에요. 아래 네 가지를 해 보고, 끝나면 설문 8문항(약 2분)에 답해 주세요.</p>
-      <ol>${MISSIONS.map((m) => `<li>${esc(m)}</li>`).join('')}</ol>
-      <div class="ev-note">일기 내용과 번역 결과는 수집하지 않아요. 이름·이메일도 받지 않아요. 걸린 시간, 오류 횟수, 기기 종류 같은 사용 기록과 설문 답만 모아요. 일기는 아무 내용이나 한 줄이면 돼요.</div>
-      <div class="ev-act"><span></span><button class="primary" id="ev-start" type="button"><span>시작하기</span></button></div></div>`;
+      <h2 id="ev-gt">Say My Day 3분 테스트</h2>
+      <p>일기 한 줄을 쓰면 중국어로 바꿔 줘요. 화면 위쪽 안내를 따라 눌러 보세요. 끝나면 짧은 설문(약 2분)이 이어져요.</p>
+      <div class="ev-note">일기 내용은 저장·수집하지 않아요. 이름·이메일도 받지 않아요. 걸린 시간과 오류 횟수, 설문 답만 모아요.</div>
+      <div class="ev-act"><button class="primary" id="ev-start" type="button"><span>시작하기</span></button></div></div>`;
     document.body.appendChild(ov);
     const b = ov.querySelector('#ev-start'); b.focus({ preventScroll: true });
     b.addEventListener('click', () => { st.t0 = Date.now(); save(); ov.remove(); mountBar(); const d = document.getElementById('diary'); if (d) d.focus({ preventScroll: true }); });
@@ -160,6 +214,7 @@
     const q = Q[qi], last = qi === Q.length - 1;
     ov.innerHTML = `<div class="ev-box">
       <div class="ev-prog" aria-hidden="true">${Q.map((_, i) => `<i class="${i <= qi ? 'on' : ''}"></i>`).join('')}</div>
+      ${qi === 0 ? '<div class="ev-note">수고하셨어요! 설문 8문항만 남았어요. 약 2분이면 돼요.</div>' : ''}
       <div class="ev-sub">${qi + 1} / ${Q.length}</div>
       <div class="ev-q" id="ev-qt" tabindex="-1">${esc(q.t)}</div>
       ${q.sub ? `<div class="ev-sub">${esc(q.sub)}</div>` : ''}

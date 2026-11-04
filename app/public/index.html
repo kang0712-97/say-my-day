@@ -28,6 +28,17 @@
 <meta name="apple-mobile-web-app-title" content="Say My Day">
 <!-- 저장된 테마를 첫 화면 그리기 전에 적용해서 깜빡임을 막는다 -->
 <script>try { var t = JSON.parse(localStorage.getItem('theme') || 'null'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}</script>
+<!-- 사용자 평가(?eval=1): 내 기기의 기존 일기·단어를 건드리지 않고 빈 상태로 시작하도록, 이 탭 동안만 쓰는 임시 저장소로 바꾼다. 서버 저장 동기화도 막는다. 일반 접속은 달라지지 않는다. -->
+<script>if (/[?&]eval=1(&|$)/.test(location.search)) { try {
+  window.__realLS = window.localStorage;
+  var mem = {}; try { mem = JSON.parse(sessionStorage.getItem('smd-eval-ls')) || {}; } catch (e) {}
+  if (!Object.keys(mem).length) mem = { 'intro-seen': '"1"', 'splash-off': '1', 'hints-seen': '"1"' };
+  var keep = function () { try { sessionStorage.setItem('smd-eval-ls', JSON.stringify(mem)); } catch (e) {} };
+  var fake = { getItem: function (k) { return Object.prototype.hasOwnProperty.call(mem, k) ? mem[k] : null; }, setItem: function (k, v) { mem[k] = String(v); keep(); }, removeItem: function (k) { delete mem[k]; keep(); }, clear: function () { mem = {}; keep(); }, key: function (i) { return Object.keys(mem)[i] || null; } };
+  Object.defineProperty(fake, 'length', { get: function () { return Object.keys(mem).length; } });
+  Object.defineProperty(window, 'localStorage', { configurable: true, get: function () { return fake; } });
+  var rf = window.fetch; window.fetch = function (u, o) { return String(u).indexOf('/api/data') === 0 ? Promise.reject(new TypeError('eval')) : rf.apply(this, arguments); };
+} catch (e) {} }</script>
 <!-- 폰트: UI Pretendard(없으면 Noto Sans KR), 중국어 Noto Sans SC, 일본어 Noto Sans JP. 오프라인이면 시스템 폰트로 대체된다. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
