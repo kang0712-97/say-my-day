@@ -2050,7 +2050,7 @@ const edgeUrl = (text, voice, rate) => `/api/tts?${new URLSearchParams({ text: s
 function speakEdge(btn, voice) {
   const warn = $('voice-warn'); warn.classList.add('hidden');
   btn.dataset.html = btn.innerHTML; btn.classList.add('playing'); btn.innerHTML = `${ICON.stop}<span>${L('불러오는 중…')}</span>`; playingBtn = btn;
-  const fail = (msg) => { if (playingBtn === btn) stopSpeak(); warn.textContent = msg; warn.classList.remove('hidden'); };
+  const fail = (msg) => { EV('vfail'); if (playingBtn === btn) stopSpeak(); warn.textContent = msg; warn.classList.remove('hidden'); };
   if (btn.dataset.ctx && LANG.tgt === 'ja') return speakWhole(btn, voice, fail, jaAloneText(btn.dataset.say)); // 일본어: 문장에서 자르면 끊겨 들리고 소리가 어긋나므로 단어를 읽기(히라가나)로 따로 합성한다
   if (btn.dataset.ctx) return speakSegment(btn, voice, fail); // 문장 속 단어: 문장 소리에서 그 단어 구간만 들려 줘 문맥 발음을 유지한다
   speakWhole(btn, voice, fail);
@@ -2065,7 +2065,7 @@ function speakWhole(btn, voice, fail, text) { // 낱말·문장을 그대로 한
     tp.then((t) => { if (t && currentAudio === a && playingBtn === btn) karUpgrade(timesFor(voiceText, t.bounds), audioClock(a)); });
   });
   a.addEventListener('ended', () => { if (playingBtn === btn) stopSpeak(); });
-  a.addEventListener('error', () => { if (currentAudio !== a) return; edgeDown(); if (playingBtn === btn) { stopSpeak(); speak(btn); } }); // 기기 음성으로 다시 시도
+  a.addEventListener('error', () => { if (currentAudio !== a) return; EV('vfail'); edgeDown(); if (playingBtn === btn) { stopSpeak(); speak(btn); } }); // 기기 음성으로 다시 시도
   a.play().catch((err) => { if (err && err.name === 'NotAllowedError') fail(L('브라우저가 자동 재생을 막았어요. 듣기 버튼을 직접 눌러 주세요.')); });
 }
 // 문장 소리를 한 번 내려받아 풀어 두고(AudioBuffer), 단어의 시작~끝 구간만 정확히 재생한다. 문장에서 잘라 쓰므로 了처럼 문맥에 따라 소리가 달라지는 글자도 문장 속 발음 그대로 나온다.
@@ -2152,6 +2152,7 @@ async function speak(btn) {
   if (!('speechSynthesis' in window)) { warn.textContent = L('이 브라우저는 음성 재생을 지원하지 않아요. 크롬이나 사파리를 써 보세요.'); warn.classList.remove('hidden'); return; }
   const voice = await zhVoice();
   if (!voice) {
+    EV('vfail');
     warn.textContent = L('이 기기에 {tgt} 음성이 없어서 재생하지 않았어요. 다른 언어 음성으로 읽으면 발음이 틀려서 공부에 방해가 돼요. 기기 설정에서 {tgt} 음성 데이터를 설치해 보세요.', { tgt: tgtName() });
     warn.classList.remove('hidden'); return;
   }
@@ -3037,7 +3038,7 @@ function markOpt(b, right) {
   b.insertAdjacentHTML('beforeend', `<span class="tag">${right ? L('정답') : L('오답')}</span>`);
 }
 function showFeedback(t, ok, note = '') {
-  t.answered = true; t.ok = ok;
+  t.answered = true; t.ok = ok; EV('quiz');
   const last = quiz.queue.length === 1 && (ok || t.tries >= 2);
   $('q-fb').innerHTML = `<div class="fb ${ok ? 'ok' : 'no'}" role="status"><div class="fb-h"><span class="fb-i">${ok ? ICON.check : ICON.close}</span><b>${ok ? L('정답이에요!') : L('다시 한번 들어 볼까요? 정답은 이거예요.')}</b></div>${note ? `<p class="fb-n">${note}</p>` : ''}<div class="fb-a">${answerSummary(t.item, t.kind)}</div></div>
     ${center(playBtn(t.item.zh, '발음 듣기') + spkBtn(t.item.zh, t.kind === 'word' ? 'w' : 's') + (t.kind === 'word' && t.item.ex_zh ? playBtn(t.item.ex_zh, '예문 듣기') : '') + '<button class="btn solid" id="q-next">' + (last ? L('결과 보기') : L('계속')) + '</button>')}`;
@@ -4341,9 +4342,10 @@ $('go').addEventListener('click', async () => {
       if (savedId == null) storageFull(true); else glLast = { id: savedId, skip, terms: data.glossaryUsed || [] };
     }
     showGlUsed();
-    showResult(); if (!data.mock) { maybeHints(); prefetchChars(); }
+    showResult(); EV('translated'); if (!data.mock) { maybeHints(); prefetchChars(); }
     if (!tour) learnOpen(false);
   } catch (err) {
+    if (controller.signal.reason !== 'user') EV('tfail');
     const msg = controller.signal.aborted
       ? (controller.signal.reason === 'timeout' ? L('2분이 지나도 응답이 없어서 멈췄어요. 잠시 후 다시 시도해 주세요. 일기는 그대로 남아 있어요.') : L('취소했어요. 일기는 그대로 남아 있어요.'))
       : (err instanceof TypeError ? L('서버에 연결할 수 없어요. 터미널에서 node server.js가 실행 중인지 확인해 주세요.') : err.message);
@@ -4557,6 +4559,9 @@ function maybeHints() { if (!store.get(HINT_KEY, '') && !tour) setTimeout(() => 
   if (window.ResizeObserver) new ResizeObserver(req).observe(document.body);
   upd(); }
 // 홈 화면 설치·오프라인 최소 동작: 서비스 워커는 화면 껍데기만 보관하고 /api 는 건드리지 않는다. 실패해도 앱은 그대로 동작.
+// 사용자 평가(T48): ?eval=1 로 열었을 때만 eval.js를 불러온다. 일반 접속은 달라지지 않는다.
+function EV(name) { try { if (window.smdEval) window.smdEval.ev(name); } catch (e) {} }
+if (/[?&]eval=1(&|$)/.test(location.search)) { const es = document.createElement('script'); es.src = 'eval.js'; document.body.appendChild(es); }
 if ('serviceWorker' in navigator) addEventListener('load', () => { try { navigator.serviceWorker.register('/sw.js').catch(() => {}); } catch (e) {} });
 </script>
 </body>
