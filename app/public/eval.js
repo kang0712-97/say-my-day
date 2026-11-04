@@ -29,17 +29,21 @@
   // ----- 스타일 -----
   const css = document.createElement('style');
   css.textContent = `
-  :root { --ev-h: 34px; }
+  :root { --ev-h: 72px; }
   body.eval-on header.top { top: var(--ev-h); }
   body.eval-on .overlay, body.eval-on .wpage, body.eval-on .learn-ov { top: var(--ev-h); }
-  #ev-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 90; height: var(--ev-h); display: flex; align-items: center; gap: 6px; padding: 0 8px 0 12px; background: var(--ink); color: var(--paper); font-family: var(--f-ui); }
+  #ev-bar { position: fixed; top: 0; left: 0; right: 0; z-index: 90; height: var(--ev-h); display: flex; flex-direction: column; background: var(--ink); color: var(--paper); font-family: var(--f-ui); }
+  #ev-bar .ev-row1 { height: 34px; display: flex; align-items: center; gap: 6px; padding: 0 8px 0 12px; }
+  #ev-bar .ev-row2 { flex: 1; display: flex; align-items: center; gap: 8px; padding: 0 8px 0 12px; border-top: 1px solid rgba(255,255,255,.25); }
+  #ev-bar .ev-hint { flex: 1; font-size: 14px; line-height: 1.3; font-weight: 700; }
   #ev-bar .ev-chips { flex: 1; display: flex; gap: 6px; font-size: 12px; line-height: 1; min-width: 0; }
   #ev-bar .ev-m { flex: 1; display: flex; align-items: center; gap: 4px; opacity: .55; min-width: 0; white-space: nowrap; }
   #ev-bar .ev-m i { flex: none; width: 10px; height: 10px; border: 1px solid var(--paper); border-radius: 50%; }
   #ev-bar .ev-m.on { opacity: 1; }
   #ev-bar .ev-m.on i { background: var(--paper); box-shadow: inset 0 0 0 2px var(--ink); }
   #ev-bar button { flex: none; border: 1px solid var(--paper); background: transparent; color: var(--paper); border-radius: 999px; padding: 4px 10px; font: inherit; font-size: 12px; cursor: pointer; }
-  #ev-pop { position: fixed; left: 12px; right: 12px; z-index: 92; max-width: 496px; margin: 0 auto; background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 18px; box-shadow: 0 8px 28px rgba(0,0,0,.28); padding: 14px 16px; display: flex; gap: 12px; align-items: center; font-family: var(--f-ui); animation: ev-in .25s ease-out; }
+  #ev-bar button.go { background: var(--paper); color: var(--ink); font-weight: 700; font-size: 13px; padding: 6px 12px; }
+  #ev-pop { position: fixed; top: calc(var(--ev-h) + 8px); left: 12px; right: 12px; z-index: 92; max-width: 496px; margin: 0 auto; background: var(--paper); color: var(--ink); border: 2px solid var(--ink); border-radius: 18px; box-shadow: 0 8px 28px rgba(0,0,0,.28); padding: 14px 16px; display: flex; gap: 12px; align-items: center; font-family: var(--f-ui); animation: ev-in .25s ease-out; }
   #ev-pop .ev-bird { flex: none; width: 64px; height: 64px; }
   #ev-pop .ev-bird img { width: 64px; height: 64px; object-fit: contain; }
   #ev-pop .ev-pb { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
@@ -86,34 +90,36 @@
   document.head.appendChild(css);
 
   // ----- 진행 표시 + 지금 할 일 안내 -----
-  let bar = null, hl = null, lastKey = '';
+  // 위쪽 줄: 진행 칸 + 지금 할 일 한 줄(항상). 팝업: 화면이 크게 바뀌는 세 순간(홈·카드 학습·퀴즈)에 한 번만 설명하고,
+  // 입력 중이거나 문제를 풀 때는 띄우지 않는다. 팝업은 위치를 바꾸지 않는다.
+  let bar = null, hl = null, pop = null, popStage = '', dismissed = {}, lastTxt = '';
   const vis = (el) => !!el && el.getClientRects().length > 0 && !el.closest('.hidden');
   const g = (f) => { try { return f(); } catch (e) { return undefined; } };
   const onTop = (sel) => [...document.querySelectorAll(sel)].filter(vis).filter((el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; })[0] || null;
-  // 지금 단계: 화면 상태로 정한다. {t: 안내 문구, target: 깜박일 요소, act: [버튼 이름, 동작]}
   const tn = () => { try { return tgtName(); } catch (e) { return '외국어'; } };
+  const skip = () => ['퀴즈로 넘어가기', startQuiz];
+  // 지금 단계: 화면 상태로 정한다.
+  // {n: 단계, pose: 새 동작, t: 한 줄 안내, d: 설명, target: 깜박일 요소, act: [버튼, 동작], stage: 팝업을 자동으로 띄울 순간, ptitle/pdesc: 그 팝업 문구}
   function phase() {
-    const quizOpen = vis(document.getElementById('quiz'));
-    if (quizOpen) {
-      if (document.getElementById('q-next')) return { n: 4, pose: 'saved', t: '잘했어요! 아래 "계속"을 누르면 설문으로 넘어가요.', d: '정답과 설명을 확인했다면 "계속"을 눌러요. 이 앱의 체험은 여기까지예요. 이어서 짧은 설문이 열려요.', target: document.getElementById('q-next') };
-      if (document.getElementById('q-go')) return { n: 4, pose: 'review', t: '새 단어예요. 읽어 보고 아래 버튼을 눌러 문제로 넘어가세요.', d: '처음 보는 단어는 문제 전에 뜻과 읽는 법을 먼저 보여 줘요. 충분히 읽었으면 문제로 넘어가요.', target: document.getElementById('q-go') };
-      if (document.querySelector('#quiz [data-opt]')) return { n: 4, pose: 'thinking', t: '알맞은 답을 눌러 보세요. 틀려도 괜찮아요.', d: '소리나 뜻을 보고 알맞은 답을 하나 골라요. 틀려도 정답과 설명을 보여 주니 편하게 눌러 보세요.' };
-      return { n: 4, pose: 'thinking', t: '답을 쓰고 "확인"을 눌러 보세요.', d: '읽는 법(병음·히라가나)을 직접 써 보는 문제예요. 모르면 힌트를 보고 써도 돼요.', target: document.getElementById('q-check') };
+    if (vis(document.getElementById('quiz'))) {
+      const q = { stage: 'quiz', ptitle: '퀴즈 한 문제를 풀어 볼게요', pdesc: '배운 단어를 퀴즈로 확인해요. 처음 보는 단어는 뜻을 먼저 보여 준 뒤, 알맞은 답을 고르는 문제가 나와요. 한 문제만 풀고 "계속"을 누르면 설문이 열려요.' };
+      if (document.getElementById('q-next')) return { ...q, n: 4, pose: 'saved', t: '잘했어요! 아래 "계속"을 눌러 주세요', d: '정답과 설명을 확인했다면 "계속"을 눌러요. 체험은 여기까지예요. 이어서 짧은 설문이 열려요.', target: document.getElementById('q-next') };
+      if (document.getElementById('q-go')) return { ...q, n: 4, pose: 'review', t: '새 단어예요. 읽고 아래 버튼을 눌러 주세요', d: '처음 보는 단어는 문제 전에 뜻과 읽는 법을 먼저 보여 줘요. 충분히 읽었으면 문제로 넘어가요.', target: document.getElementById('q-go') };
+      if (document.querySelector('#quiz [data-opt]')) return { ...q, n: 4, pose: 'thinking', t: '알맞은 답을 눌러 보세요', d: '소리나 뜻을 보고 알맞은 답을 하나 골라요. 틀려도 정답과 설명을 보여 주니 편하게 눌러 보세요.' };
+      return { ...q, n: 4, pose: 'thinking', t: '답을 쓰고 "확인"을 눌러 보세요', d: '읽는 법을 직접 써 보는 문제예요. 모르면 힌트를 보고 써도 돼요.', target: document.getElementById('q-check') };
     }
     if (st.t[1] != null) {
+      const learn = { stage: 'learn', ptitle: '카드로 공부해 볼게요', pdesc: `내가 쓴 일기가 문장·단어·문법 카드로 나뉘어 있어요. 아래 "다음"으로 카드를 넘기며 뜻과 읽는 법을 보고, 스피커 버튼이 나오면 눌러 ${tn()} 발음을 들어 보세요. 충분히 봤다면 "퀴즈로 넘어가기"를 눌러 주세요.` };
       const play = onTop('#learn .play') || onTop('#result .play');
-      const skip = ['퀴즈로 넘어가기', startQuiz];
-      if (st.t[2] != null) return { n: 4, pose: 'saved', t: '소리까지 들어 봤어요! 이제 퀴즈 한 문제를 풀어 볼게요. 아래 버튼을 눌러 주세요.', d: '배운 단어를 퀴즈로 확인하는 단계예요. 한 문제만 풀면 돼요. 카드 학습은 여기서 마쳐도 괜찮아요.', act: ['퀴즈 시작', startQuiz], key: 'quiz' };
-      if (play) return { n: 3, pose: 'listening', t: '스피커 버튼을 눌러 소리를 들어 보세요.', d: `스피커를 누르면 ${tn()} 발음을 들려 줘요. 읽는 속도에 맞춰 글자 색이 바뀌니 따라 읽어 보세요.`, target: play, act: skip };
       const nx = document.getElementById('ln-next');
-      if (vis(nx)) return { n: 3, pose: 'read-aloud', t: '아래 버튼으로 카드를 넘겨 보세요. 스피커 버튼이 나오면 눌러 소리를 들어 보세요. 충분히 봤다면 바로 퀴즈로 가도 돼요.', d: '내가 쓴 일기가 문장·단어·문법 카드로 나뉘어 있어요. "다음"으로 넘기면서 뜻과 읽는 법을 보고, 스피커 버튼이 나오면 눌러 보세요. 충분히 봤다면 바로 퀴즈로 가도 돼요.', target: nx, act: skip };
-      return { n: 3, pose: 'listening', t: '스피커 버튼을 눌러 소리를 들어 보세요.', d: `스피커를 누르면 ${tn()} 발음을 들려 줘요.`, act: skip };
+      if (play) return { ...learn, n: 3, pose: 'listening', t: st.t[2] != null ? '다 봤으면 "퀴즈로 넘어가기"를 눌러 주세요' : '스피커 버튼을 눌러 소리를 들어 보세요', d: `스피커를 누르면 ${tn()} 발음을 들려 줘요. 읽는 속도에 맞춰 글자 색이 바뀌니 따라 읽어 보세요.`, target: st.t[2] != null ? null : play, act: skip() };
+      return { ...learn, n: 3, pose: 'read-aloud', t: '아래 버튼으로 카드를 넘겨 보세요', d: '내 일기가 문장·단어·문법 카드로 나뉘어 있어요. "다음"으로 넘기면서 뜻과 읽는 법을 보세요.', target: vis(nx) ? nx : null, act: skip() };
     }
-    if (g(() => typeof controller !== 'undefined' && controller)) return { n: 2, pose: 'thinking', t: '번역 중이에요. 30초쯤 걸려요. 잠시만 기다려 주세요.', d: `AI가 일기를 ${tn()}로 바꾸고 읽는 법·단어·문법을 정리하는 중이에요. 보통 30초쯤 걸려요.` };
+    if (g(() => typeof controller !== 'undefined' && controller)) return { n: 2, pose: 'thinking', t: '번역 중이에요. 30초쯤 걸려요', d: `AI가 일기를 ${tn()}로 바꾸고 읽는 법·단어·문법을 정리하는 중이에요.` };
     const d = document.getElementById('diary');
-    if (!vis(d)) return { n: 1, pose: 'hello', t: '아래 "일기 쓰러 가기"를 눌러 주세요.', d: `이 앱은 내가 쓴 일기를 ${tn()}로 바꿔 보여 주고, 그 문장으로 단어와 문법을 배우게 해 줘요. 먼저 일기 쓰는 화면으로 가요.`, target: document.getElementById('nest-go') };
-    if (d && d.value.trim().length >= 2) return { n: 2, pose: 'writing', t: '아래 "번역하고 배우기" 버튼을 눌러 주세요.', d: `누르면 AI가 일기를 ${tn()}로 번역하고, 읽는 법과 단어 뜻을 만들어 줘요. 일기 내용은 수집하지 않아요.`, target: document.getElementById('go') };
-    return { n: 1, pose: 'writing', t: '오늘 있었던 일을 한 줄만 써 보세요. 아무 내용이나 괜찮아요.', d: `한국어로 쓰면 ${tn()}로 번역돼 배울 자료가 돼요. 아무 내용이나 괜찮고, 쓴 내용은 수집하지 않아요.`, target: d };
+    if (!vis(d)) return { n: 1, pose: 'hello', t: '아래 "일기 쓰러 가기"를 눌러 주세요', d: `이 앱은 내가 쓴 일기를 ${tn()}로 바꿔 보여 주고, 그 문장으로 단어와 문법을 배우게 해 줘요.`, target: document.getElementById('nest-go'), stage: 'home', ptitle: '이렇게 진행돼요', pdesc: `① "일기 쓰러 가기"를 눌러 오늘 일을 한 줄 써요. ② "번역하고 배우기"를 누르면 AI가 ${tn()}로 번역하고 읽는 법·단어 뜻을 만들어 줘요. ③ 카드로 공부하며 소리를 듣고, ④ 퀴즈를 한 문제 풀면 끝이에요. 일기 내용은 수집하지 않아요.` };
+    if (d.value.trim().length >= 2) return { n: 2, pose: 'writing', t: '아래 "번역하고 배우기"를 눌러 주세요', d: `누르면 AI가 일기를 ${tn()}로 번역하고, 읽는 법과 단어 뜻을 만들어 줘요.`, target: document.getElementById('go') };
+    return { n: 1, pose: 'writing', t: '오늘 있었던 일을 한 줄만 써 보세요', d: `한국어로 쓰면 ${tn()}로 번역돼 배울 자료가 돼요. 아무 내용이나 괜찮아요.`, target: d };
   }
   function startQuiz() {
     g(() => { if (lnS.open) learnHide(); });
@@ -122,46 +128,43 @@
     if (!ok) g(() => { const e = currentVocab.slice(0, 5).map((item) => ({ item, kind: 'word' })); if (e.length) { startEntries(e); ok = true; } });
     if (!ok) { st.t[3] = null; openSurvey(); } // 퀴즈를 만들 수 없으면 설문으로 바로 넘어간다
   }
-  let pop = null, popKey = '', dismissed = '';
   const NAMES = ['일기', '번역', '소리', '퀴즈'];
   function renderBar() {
     if (!bar) return;
     const p = phase(), on = st.t.map((x) => x != null);
-    const ck = JSON.stringify(on);
-    if (bar.dataset.ck !== ck) {
-      bar.dataset.ck = ck;
-      bar.innerHTML = `<div class="ev-chips">${NAMES.map((m, i) => `<div class="ev-m${on[i] ? ' on' : ''}"><i></i><span>${i + 1} ${m}</span></div>`).join('')}</div><button type="button" id="ev-help">안내</button><button type="button" id="ev-go-survey">설문으로</button>`;
+    const sig = JSON.stringify([on, p.t, p.act && p.act[0]]);
+    if (bar.dataset.sig !== sig) {
+      bar.dataset.sig = sig;
+      bar.innerHTML = `<div class="ev-row1"><div class="ev-chips">${NAMES.map((m, i) => `<div class="ev-m${on[i] ? ' on' : ''}"><i></i><span>${i + 1} ${m}</span></div>`).join('')}</div><button type="button" id="ev-help">설명</button><button type="button" id="ev-go-survey">설문으로</button></div>
+        <div class="ev-row2" role="status"><span class="ev-hint">${esc(p.t)}</span>${p.act ? `<button type="button" class="go" id="ev-act">${esc(p.act[0])}</button>` : ''}</div>`;
     }
     if (hl !== p.target) { if (hl) hl.classList.remove('ev-hl'); hl = p.target || null; if (hl) hl.classList.add('ev-hl'); }
-    const key = JSON.stringify([p.n, p.t, p.d, p.act && p.act[0]]);
-    if (key !== popKey) { popKey = key; dismissed = ''; drawPop(p); }
-    if (pop) placePop(p);
+    // 팝업: 새 순간에 들어올 때 한 번만(닫았으면 다시 띄우지 않는다)
+    const stage = p.stage || '';
+    if (stage !== popStage) {
+      popStage = stage;
+      if (pop) { pop.remove(); pop = null; }
+      if (stage && !dismissed[stage] && !surveyOpen) drawPop(p.pose, p.n, p.ptitle, p.pdesc, p.act);
+    }
   }
-  function drawPop(p) {
-    if (pop) pop.remove(); pop = null;
-    if (surveyOpen || dismissed === popKey) return;
-    pop = document.createElement('div'); pop.id = 'ev-pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', '진행 안내');
-    pop.innerHTML = `<div class="ev-bird">${BIRD(p.pose, 64)}</div><div class="ev-pb"><div class="ev-step">${p.n} / 4 단계</div><div class="ev-msg" role="status">${esc(p.t)}</div>${p.d ? `<div class="ev-desc">${esc(p.d)}</div>` : ''}
-      <div class="ev-pbtn">${p.act ? `<button type="button" class="go" id="ev-act">${esc(p.act[0])}</button>` : ''}<button type="button" id="ev-ok">${p.act ? '더 해 볼게요' : '알겠어요'}</button></div></div>`;
+  function drawPop(pose, n, title, desc, act) {
+    if (pop) pop.remove();
+    pop = document.createElement('div'); pop.id = 'ev-pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', '안내');
+    pop.innerHTML = `<div class="ev-bird">${BIRD(pose, 64)}</div><div class="ev-pb"><div class="ev-step">${n} / 4 단계</div><div class="ev-msg">${esc(title)}</div><div class="ev-desc">${esc(desc)}</div>
+      <div class="ev-pbtn">${act ? `<button type="button" class="go" id="ev-act2">${esc(act[0])}</button>` : ''}<button type="button" id="ev-ok">${act ? '더 해 볼게요' : '알겠어요'}</button></div></div>`;
     document.body.appendChild(pop);
-  }
-  function placePop(p) { // 깜박이는 버튼을 가리지 않게, 겹치면 아래쪽으로 옮긴다
-    const r = pop.getBoundingClientRect(), t = p.target && p.target.getBoundingClientRect();
-    const top = 'calc(var(--ev-h) + 8px)';
-    const overlap = t && t.width && t.bottom > parseFloat(getComputedStyle(pop).top || 0) - 4 && t.top < (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--ev-h')) || 34) + 8 + r.height + 4;
-    if (overlap) { pop.style.top = 'auto'; pop.style.bottom = '12px'; } else { pop.style.top = top; pop.style.bottom = 'auto'; }
   }
   function mountBar() {
     bar = document.createElement('div'); bar.id = 'ev-bar'; bar.setAttribute('aria-label', '진행 표시');
     document.body.appendChild(bar); document.body.classList.add('eval-on'); renderBar();
     setInterval(renderBar, 400);
-    bar.addEventListener('click', (e) => {
-      if (e.target.id === 'ev-go-survey') openSurvey();
-      else if (e.target.id === 'ev-help') { dismissed = ''; popKey = ''; renderBar(); }
-    });
     document.addEventListener('click', (e) => {
-      if (e.target.closest && e.target.closest('#ev-ok')) { dismissed = popKey; if (pop) pop.remove(); pop = null; }
-      else if (e.target.closest && e.target.closest('#ev-act')) { const p = phase(); if (p.act) { if (pop) pop.remove(); pop = null; dismissed = popKey; p.act[1](); } }
+      const c = e.target.closest ? e.target : null; if (!c) return;
+      if (c.closest('#ev-ok')) { dismissed[popStage] = true; if (pop) pop.remove(); pop = null; }
+      else if (c.closest('#ev-act2')) { dismissed[popStage] = true; if (pop) pop.remove(); pop = null; startQuiz(); }
+      else if (c.closest('#ev-act')) { const p = phase(); if (p.act) p.act[1](); }
+      else if (c.closest('#ev-go-survey')) openSurvey();
+      else if (c.closest('#ev-help')) { const p = phase(); drawPop(p.pose, p.n, p.t, p.d, null); }
     });
   }
   function unmountBar() { if (bar) bar.remove(); bar = null; if (pop) pop.remove(); pop = null; if (hl) hl.classList.remove('ev-hl'); document.body.classList.remove('eval-on'); }
@@ -178,6 +181,7 @@
     else if (name === 'tfail') { st.tfail++; save(); }
     else if (name === 'vfail') { st.vfail++; save(); }
     else if (name === 'quiz') mark(3);
+    else if (name === 'sound') mark(2);
   }
   window.smdEval = { ev };
 
@@ -185,7 +189,7 @@
   document.addEventListener('input', (e) => { if (st.t0 && e.target && e.target.id === 'diary' && e.target.value.trim().length >= 2) mark(0); }, true);
   document.addEventListener('click', (e) => {
     if (!st.t0 || done) return;
-    if (e.target.closest && e.target.closest('.play') && !e.target.closest('#ev-bar')) mark(2);
+    if (e.isTrusted && e.target.closest && e.target.closest('.play')) mark(2); // 앱이 자동으로 누르는 재생은 세지 않는다
     // 퀴즈 1문제를 풀고 "계속/결과 보기"를 누르면 설문으로 넘어간다
     if (e.target.closest && e.target.closest('#q-next') && st.t[3] != null && !surveyOpen) {
       e.stopPropagation(); e.preventDefault();
