@@ -110,7 +110,7 @@
     if (g(() => typeof controller !== 'undefined' && controller)) return { n: 2, pose: 'thinking', t: '번역 중이에요. 30초쯤 걸려요. 잠시만 기다려 주세요.' };
     const d = document.getElementById('diary');
     if (!vis(d)) return { n: 1, pose: 'hello', t: '아래 "일기 쓰러 가기"를 눌러 주세요.', target: document.getElementById('nest-go') };
-    if (d && d.value.trim().length >= 2) return { n: 2, pose: 'writing', t: '아래 "번역" 버튼을 눌러 주세요.', target: document.getElementById('go') };
+    if (d && d.value.trim().length >= 2) return { n: 2, pose: 'writing', t: '아래 "번역하고 배우기" 버튼을 눌러 주세요.', target: document.getElementById('go') };
     return { n: 1, pose: 'writing', t: '오늘 있었던 일을 한 줄만 써 보세요. 아무 내용이나 괜찮아요.', target: d };
   }
   function startQuiz() {
