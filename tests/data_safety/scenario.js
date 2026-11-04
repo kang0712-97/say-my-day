@@ -53,4 +53,21 @@ const shown = (w, id) => !w.document.getElementById(id).classList.contains('hidd
   w.document.getElementById('ln-next').click(); await sleep(400);
   expect(w.document.getElementById('learn').innerText.includes('확인 필요 경고 시험문구'), '문장 번호 없는 경고가 첫 문장 카드에 보이지 않음');
 }
+{
+  // ⓔ 일기책 안에서 일기 삭제: 확인 뒤에만 지워지고 책이 다시 짜인다
+  const mk = (id, t) => ({ id, at: `2025-10-0${id - 700}T09:00:00.000Z`, diary: t, result: R, weather: 'sun', srcLang: 'ko', tgtLang: 'zh', glossLang: 'ko' });
+  localStorage.setItem('diary-history', JSON.stringify([mk(701, '첫째 일기.'), mk(702, '둘째 일기.')])); const w = await frame();
+  w.eval('bookOpen')(); await sleep(300); w.document.querySelector('[data-bkgo="1"]').click(); await sleep(300);
+  const del = () => w.document.querySelector('#p-book [data-bkask]');
+  expect(!!del(), '일기책 쪽에 삭제 단추가 없음');
+  del().click(); await sleep(150);
+  expect(!!w.document.querySelector('#p-book [data-bkdel]') && hist().length === 2, '삭제 확인 없이 지워졌거나 확인 단추가 없음');
+  w.document.querySelector('#p-book [data-bkcancel]').click(); await sleep(150);
+  expect(hist().length === 2 && !!del(), '취소했는데 일기가 지워졌거나 삭제 단추가 돌아오지 않음');
+  del().click(); await sleep(100); w.document.querySelector('#p-book [data-bkdel]').click(); await sleep(300);
+  expect(hist().length === 1, `삭제 뒤 기록이 ${hist().length}편(1편이어야 함)`);
+  expect(!w.document.getElementById('p-book').innerText.includes('첫째 일기') || !w.document.getElementById('p-book').innerText.includes('둘째'), '삭제 뒤에도 책에 두 일기가 모두 남음');
+  w.document.querySelector('#p-book [data-bkask]').click(); await sleep(100); w.document.querySelector('#p-book [data-bkdel]').click(); await sleep(300);
+  expect(hist().length === 0 && w.document.getElementById('p-book').innerText.includes('아직 일기가 없어요'), '마지막 일기를 지운 뒤 빈 책 안내가 보이지 않음');
+}
 return JSON.stringify({ problems });
