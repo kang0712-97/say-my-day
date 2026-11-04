@@ -45,6 +45,7 @@
   #ev-pop .ev-pb { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
   #ev-pop .ev-step { font-size: 12px; color: var(--muted); }
   #ev-pop .ev-msg { font-size: 17px; line-height: 1.4; font-weight: 700; }
+  #ev-pop .ev-desc { font-size: 14px; line-height: 1.5; color: var(--muted); }
   #ev-pop .ev-pbtn { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
   #ev-pop .ev-pbtn button { min-height: 40px; padding: 6px 16px; border-radius: 999px; border: 1px solid var(--ink); background: var(--paper); color: var(--ink); font: inherit; font-size: 14px; cursor: pointer; }
   #ev-pop .ev-pbtn button.go { background: var(--ink); color: var(--paper); font-weight: 700; }
@@ -90,28 +91,29 @@
   const g = (f) => { try { return f(); } catch (e) { return undefined; } };
   const onTop = (sel) => [...document.querySelectorAll(sel)].filter(vis).filter((el) => { const r = el.getBoundingClientRect(); return r.bottom > 0 && r.top < innerHeight; })[0] || null;
   // 지금 단계: 화면 상태로 정한다. {t: 안내 문구, target: 깜박일 요소, act: [버튼 이름, 동작]}
+  const tn = () => { try { return tgtName(); } catch (e) { return '외국어'; } };
   function phase() {
     const quizOpen = vis(document.getElementById('quiz'));
     if (quizOpen) {
-      if (document.getElementById('q-next')) return { n: 4, pose: 'saved', t: '잘했어요! 아래 "계속"을 누르면 설문으로 넘어가요.', target: document.getElementById('q-next') };
-      if (document.getElementById('q-go')) return { n: 4, pose: 'review', t: '새 단어예요. 읽어 보고 아래 버튼을 눌러 문제로 넘어가세요.', target: document.getElementById('q-go') };
-      if (document.querySelector('#quiz [data-opt]')) return { n: 4, pose: 'thinking', t: '알맞은 답을 눌러 보세요. 틀려도 괜찮아요.' };
-      return { n: 4, pose: 'thinking', t: '답을 쓰고 "확인"을 눌러 보세요.', target: document.getElementById('q-check') };
+      if (document.getElementById('q-next')) return { n: 4, pose: 'saved', t: '잘했어요! 아래 "계속"을 누르면 설문으로 넘어가요.', d: '정답과 설명을 확인했다면 "계속"을 눌러요. 이 앱의 체험은 여기까지예요. 이어서 짧은 설문이 열려요.', target: document.getElementById('q-next') };
+      if (document.getElementById('q-go')) return { n: 4, pose: 'review', t: '새 단어예요. 읽어 보고 아래 버튼을 눌러 문제로 넘어가세요.', d: '처음 보는 단어는 문제 전에 뜻과 읽는 법을 먼저 보여 줘요. 충분히 읽었으면 문제로 넘어가요.', target: document.getElementById('q-go') };
+      if (document.querySelector('#quiz [data-opt]')) return { n: 4, pose: 'thinking', t: '알맞은 답을 눌러 보세요. 틀려도 괜찮아요.', d: '소리나 뜻을 보고 알맞은 답을 하나 골라요. 틀려도 정답과 설명을 보여 주니 편하게 눌러 보세요.' };
+      return { n: 4, pose: 'thinking', t: '답을 쓰고 "확인"을 눌러 보세요.', d: '읽는 법(병음·히라가나)을 직접 써 보는 문제예요. 모르면 힌트를 보고 써도 돼요.', target: document.getElementById('q-check') };
     }
     if (st.t[1] != null) {
       const play = onTop('#learn .play') || onTop('#result .play');
       const skip = ['퀴즈로 넘어가기', startQuiz];
-      if (st.t[2] != null) return { n: 4, pose: 'saved', t: '소리까지 들어 봤어요! 이제 퀴즈 한 문제를 풀어 볼게요. 아래 버튼을 눌러 주세요.', act: ['퀴즈 시작', startQuiz], key: 'quiz' };
-      if (play) return { n: 3, pose: 'listening', t: '스피커 버튼을 눌러 소리를 들어 보세요.', target: play, act: skip };
+      if (st.t[2] != null) return { n: 4, pose: 'saved', t: '소리까지 들어 봤어요! 이제 퀴즈 한 문제를 풀어 볼게요. 아래 버튼을 눌러 주세요.', d: '배운 단어를 퀴즈로 확인하는 단계예요. 한 문제만 풀면 돼요. 카드 학습은 여기서 마쳐도 괜찮아요.', act: ['퀴즈 시작', startQuiz], key: 'quiz' };
+      if (play) return { n: 3, pose: 'listening', t: '스피커 버튼을 눌러 소리를 들어 보세요.', d: `스피커를 누르면 ${tn()} 발음을 들려 줘요. 읽는 속도에 맞춰 글자 색이 바뀌니 따라 읽어 보세요.`, target: play, act: skip };
       const nx = document.getElementById('ln-next');
-      if (vis(nx)) return { n: 3, pose: 'read-aloud', t: '아래 버튼으로 카드를 넘겨 보세요. 스피커 버튼이 나오면 눌러 소리를 들어 보세요. 충분히 봤다면 바로 퀴즈로 가도 돼요.', target: nx, act: skip };
-      return { n: 3, pose: 'listening', t: '스피커 버튼을 눌러 소리를 들어 보세요.', act: skip };
+      if (vis(nx)) return { n: 3, pose: 'read-aloud', t: '아래 버튼으로 카드를 넘겨 보세요. 스피커 버튼이 나오면 눌러 소리를 들어 보세요. 충분히 봤다면 바로 퀴즈로 가도 돼요.', d: '내가 쓴 일기가 문장·단어·문법 카드로 나뉘어 있어요. "다음"으로 넘기면서 뜻과 읽는 법을 보고, 스피커 버튼이 나오면 눌러 보세요. 충분히 봤다면 바로 퀴즈로 가도 돼요.', target: nx, act: skip };
+      return { n: 3, pose: 'listening', t: '스피커 버튼을 눌러 소리를 들어 보세요.', d: `스피커를 누르면 ${tn()} 발음을 들려 줘요.`, act: skip };
     }
-    if (g(() => typeof controller !== 'undefined' && controller)) return { n: 2, pose: 'thinking', t: '번역 중이에요. 30초쯤 걸려요. 잠시만 기다려 주세요.' };
+    if (g(() => typeof controller !== 'undefined' && controller)) return { n: 2, pose: 'thinking', t: '번역 중이에요. 30초쯤 걸려요. 잠시만 기다려 주세요.', d: `AI가 일기를 ${tn()}로 바꾸고 읽는 법·단어·문법을 정리하는 중이에요. 보통 30초쯤 걸려요.` };
     const d = document.getElementById('diary');
-    if (!vis(d)) return { n: 1, pose: 'hello', t: '아래 "일기 쓰러 가기"를 눌러 주세요.', target: document.getElementById('nest-go') };
-    if (d && d.value.trim().length >= 2) return { n: 2, pose: 'writing', t: '아래 "번역하고 배우기" 버튼을 눌러 주세요.', target: document.getElementById('go') };
-    return { n: 1, pose: 'writing', t: '오늘 있었던 일을 한 줄만 써 보세요. 아무 내용이나 괜찮아요.', target: d };
+    if (!vis(d)) return { n: 1, pose: 'hello', t: '아래 "일기 쓰러 가기"를 눌러 주세요.', d: `이 앱은 내가 쓴 일기를 ${tn()}로 바꿔 보여 주고, 그 문장으로 단어와 문법을 배우게 해 줘요. 먼저 일기 쓰는 화면으로 가요.`, target: document.getElementById('nest-go') };
+    if (d && d.value.trim().length >= 2) return { n: 2, pose: 'writing', t: '아래 "번역하고 배우기" 버튼을 눌러 주세요.', d: `누르면 AI가 일기를 ${tn()}로 번역하고, 읽는 법과 단어 뜻을 만들어 줘요. 일기 내용은 수집하지 않아요.`, target: document.getElementById('go') };
+    return { n: 1, pose: 'writing', t: '오늘 있었던 일을 한 줄만 써 보세요. 아무 내용이나 괜찮아요.', d: `한국어로 쓰면 ${tn()}로 번역돼 배울 자료가 돼요. 아무 내용이나 괜찮고, 쓴 내용은 수집하지 않아요.`, target: d };
   }
   function startQuiz() {
     g(() => { if (lnS.open) learnHide(); });
@@ -131,7 +133,7 @@
       bar.innerHTML = `<div class="ev-chips">${NAMES.map((m, i) => `<div class="ev-m${on[i] ? ' on' : ''}"><i></i><span>${i + 1} ${m}</span></div>`).join('')}</div><button type="button" id="ev-help">안내</button><button type="button" id="ev-go-survey">설문으로</button>`;
     }
     if (hl !== p.target) { if (hl) hl.classList.remove('ev-hl'); hl = p.target || null; if (hl) hl.classList.add('ev-hl'); }
-    const key = JSON.stringify([p.n, p.t, p.act && p.act[0]]);
+    const key = JSON.stringify([p.n, p.t, p.d, p.act && p.act[0]]);
     if (key !== popKey) { popKey = key; dismissed = ''; drawPop(p); }
     if (pop) placePop(p);
   }
@@ -139,7 +141,7 @@
     if (pop) pop.remove(); pop = null;
     if (surveyOpen || dismissed === popKey) return;
     pop = document.createElement('div'); pop.id = 'ev-pop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', '진행 안내');
-    pop.innerHTML = `<div class="ev-bird">${BIRD(p.pose, 64)}</div><div class="ev-pb"><div class="ev-step">${p.n} / 4 단계</div><div class="ev-msg" role="status">${esc(p.t)}</div>
+    pop.innerHTML = `<div class="ev-bird">${BIRD(p.pose, 64)}</div><div class="ev-pb"><div class="ev-step">${p.n} / 4 단계</div><div class="ev-msg" role="status">${esc(p.t)}</div>${p.d ? `<div class="ev-desc">${esc(p.d)}</div>` : ''}
       <div class="ev-pbtn">${p.act ? `<button type="button" class="go" id="ev-act">${esc(p.act[0])}</button>` : ''}<button type="button" id="ev-ok">${p.act ? '더 해 볼게요' : '알겠어요'}</button></div></div>`;
     document.body.appendChild(pop);
   }
